@@ -2,9 +2,11 @@
 | MY GRADUATION PROJECT |
 +-----------------------+
 
+The project is under development and is to be delivered in June 2016.
+
 Manifesto:
 ----------
-doc/        detailed documentation about my work
+doc/        Detailed documentation for my work
 mipsemu/    MIPS computer emulator
 firmware/   Firmware program for MIPS computer
 fpga/       VHDL code for the machine
