@@ -1,0 +1,17 @@
++-----------------------+
+| MY GRADUATION PROJECT |
++-----------------------+
+
+Manifesto:
+----------
+doc/        detailed documentation about my work
+mipsemu/    MIPS computer emulator
+firmware/   Firmware program for MIPS computer
+fpga/       VHDL code for the machine
+
+Notes:
+------
+-> You need gcc and SDL to compile the emulator (mipsemu).
+-> You need to cross compile binutils and gcc to compile the firmware
+   * For binutils, you may use "cross-mipsel-linux-gnu-binutils".
+   * For gcc, you may use "cross-mipsel-linux-gnu-gcc".

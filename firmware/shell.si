@@ -1,0 +1,458 @@
+	.file	1 "shell.c"
+	.section .mdebug.abi32
+	.previous
+	.nan	legacy
+	.gnu_attribute 4, 1
+	.local	str
+	.comm	str,256,4
+	.rdata
+	.align	2
+$LC0:
+	.ascii	"Available commands:\012\000"
+	.align	2
+$LC1:
+	.ascii	"- help\012\000"
+	.align	2
+$LC2:
+	.ascii	"- version\012\000"
+	.align	2
+$LC3:
+	.ascii	"- calc\012\000"
+	.align	2
+$LC4:
+	.ascii	"- mem\012\000"
+	.align	2
+$LC5:
+	.ascii	"- test\012\000"
+	.align	2
+$LC6:
+	.ascii	"- clear\012\000"
+	.align	2
+$LC7:
+	.ascii	"- reboot\012\000"
+	.align	2
+$LC8:
+	.ascii	"- shutdown\012\000"
+	.text
+	.align	2
+	.globl	help
+	.set	nomips16
+	.set	nomicromips
+	.ent	help
+	.type	help, @function
+help:
+	.frame	$fp,24,$31		# vars= 0, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-24
+	sw	$31,20($sp)
+	sw	$fp,16($sp)
+	move	$fp,$sp
+	lui	$2,%hi($LC0)
+	addiu	$4,$2,%lo($LC0)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC1)
+	addiu	$4,$2,%lo($LC1)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC2)
+	addiu	$4,$2,%lo($LC2)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC3)
+	addiu	$4,$2,%lo($LC3)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC4)
+	addiu	$4,$2,%lo($LC4)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC5)
+	addiu	$4,$2,%lo($LC5)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC6)
+	addiu	$4,$2,%lo($LC6)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC7)
+	addiu	$4,$2,%lo($LC7)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC8)
+	addiu	$4,$2,%lo($LC8)
+	jal	print_fmt
+	nop
+
+	move	$sp,$fp
+	lw	$31,20($sp)
+	lw	$fp,16($sp)
+	addiu	$sp,$sp,24
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	help
+	.size	help, .-help
+	.rdata
+	.align	2
+$LC9:
+	.ascii	"6502 FPGA Computer OS ported to MIPS, version 1.2 %s\000"
+	.align	2
+$LC10:
+	.ascii	"(Feb 2015)\012\000"
+	.text
+	.align	2
+	.globl	version
+	.set	nomips16
+	.set	nomicromips
+	.ent	version
+	.type	version, @function
+version:
+	.frame	$fp,24,$31		# vars= 0, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-24
+	sw	$31,20($sp)
+	sw	$fp,16($sp)
+	move	$fp,$sp
+	lui	$2,%hi($LC9)
+	addiu	$4,$2,%lo($LC9)
+	lui	$2,%hi($LC10)
+	addiu	$5,$2,%lo($LC10)
+	jal	print_fmt
+	nop
+
+	move	$sp,$fp
+	lw	$31,20($sp)
+	lw	$fp,16($sp)
+	addiu	$sp,$sp,24
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	version
+	.size	version, .-version
+	.align	2
+	.globl	reboot
+	.set	nomips16
+	.set	nomicromips
+	.ent	reboot
+	.type	reboot, @function
+reboot:
+	.frame	$fp,8,$31		# vars= 0, regs= 1/0, args= 0, gp= 0
+	.mask	0x40000000,-4
+	.fmask	0x00000000,0
+	addiu	$sp,$sp,-8
+	sw	$fp,4($sp)
+	move	$fp,$sp
+#APP
+ # 30 "shell.c" 1
+	j start
+ # 0 "" 2
+#NO_APP
+	move	$sp,$fp
+	lw	$fp,4($sp)
+	addiu	$sp,$sp,8
+	j	$31
+	.end	reboot
+	.size	reboot, .-reboot
+	.rdata
+	.align	2
+$LC11:
+	.ascii	"You can now safely power off your computer.\012\000"
+	.text
+	.align	2
+	.globl	shutdown
+	.set	nomips16
+	.set	nomicromips
+	.ent	shutdown
+	.type	shutdown, @function
+shutdown:
+	.frame	$fp,24,$31		# vars= 0, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-24
+	sw	$31,20($sp)
+	sw	$fp,16($sp)
+	move	$fp,$sp
+	lui	$2,%hi($LC11)
+	addiu	$4,$2,%lo($LC11)
+	jal	print_fmt
+	nop
+
+$L5:
+	j	$L5
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	shutdown
+	.size	shutdown, .-shutdown
+	.rdata
+	.align	2
+$LC12:
+	.ascii	"Welcome to MIPS computer shell. \000"
+	.align	2
+$LC13:
+	.ascii	"Type `help' for command listing.\012\000"
+	.align	2
+$LC14:
+	.ascii	"> \000"
+	.align	2
+$LC15:
+	.ascii	"help\000"
+	.align	2
+$LC16:
+	.ascii	"version\000"
+	.align	2
+$LC17:
+	.ascii	"calc\000"
+	.align	2
+$LC18:
+	.ascii	"mem\000"
+	.align	2
+$LC19:
+	.ascii	"test\000"
+	.align	2
+$LC20:
+	.ascii	"clear\000"
+	.align	2
+$LC21:
+	.ascii	"reboot\000"
+	.align	2
+$LC22:
+	.ascii	"shutdown\000"
+	.align	2
+$LC23:
+	.ascii	"\000"
+	.align	2
+$LC24:
+	.ascii	"Error: command not found.\012\000"
+	.text
+	.align	2
+	.globl	shell
+	.set	nomips16
+	.set	nomicromips
+	.ent	shell
+	.type	shell, @function
+shell:
+	.frame	$fp,24,$31		# vars= 0, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-24
+	sw	$31,20($sp)
+	sw	$fp,16($sp)
+	move	$fp,$sp
+	lui	$2,%hi($LC12)
+	addiu	$4,$2,%lo($LC12)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi($LC13)
+	addiu	$4,$2,%lo($LC13)
+	jal	print_fmt
+	nop
+
+$L16:
+	lui	$2,%hi($LC14)
+	addiu	$4,$2,%lo($LC14)
+	jal	print_fmt
+	nop
+
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	jal	scan_str
+	nop
+
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC15)
+	addiu	$5,$2,%lo($LC15)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L7
+	nop
+
+	jal	help
+	nop
+
+	j	$L8
+	nop
+
+$L7:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC16)
+	addiu	$5,$2,%lo($LC16)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L9
+	nop
+
+	jal	version
+	nop
+
+	j	$L8
+	nop
+
+$L9:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC17)
+	addiu	$5,$2,%lo($LC17)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L10
+	nop
+
+	jal	calc
+	nop
+
+	j	$L8
+	nop
+
+$L10:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC18)
+	addiu	$5,$2,%lo($LC18)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L11
+	nop
+
+	jal	mem
+	nop
+
+	j	$L8
+	nop
+
+$L11:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC19)
+	addiu	$5,$2,%lo($LC19)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L12
+	nop
+
+	jal	test
+	nop
+
+	j	$L8
+	nop
+
+$L12:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC20)
+	addiu	$5,$2,%lo($LC20)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L13
+	nop
+
+	lui	$2,%hi(attr)
+	lb	$2,%lo(attr)($2)
+	nop
+	move	$4,$2
+	lui	$2,%hi(fmt_attr)
+	lb	$2,%lo(fmt_attr)($2)
+	nop
+	move	$3,$2
+	lui	$2,%hi(scan_attr)
+	lb	$2,%lo(scan_attr)($2)
+	move	$5,$3
+	move	$6,$2
+	jal	clear_screen
+	nop
+
+	j	$L8
+	nop
+
+$L13:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC21)
+	addiu	$5,$2,%lo($LC21)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L14
+	nop
+
+	jal	reboot
+	nop
+
+	j	$L8
+	nop
+
+$L14:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC22)
+	addiu	$5,$2,%lo($LC22)
+	jal	str_cmp
+	nop
+
+	bne	$2,$0,$L15
+	nop
+
+	jal	shutdown
+	nop
+
+	j	$L8
+	nop
+
+$L15:
+	lui	$2,%hi(str)
+	addiu	$4,$2,%lo(str)
+	lui	$2,%hi($LC23)
+	addiu	$5,$2,%lo($LC23)
+	jal	str_cmp
+	nop
+
+	beq	$2,$0,$L8
+	nop
+
+	lui	$2,%hi($LC24)
+	addiu	$4,$2,%lo($LC24)
+	jal	print_fmt
+	nop
+
+$L8:
+	j	$L16
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	shell
+	.size	shell, .-shell
+	.ident	"GCC: (GNU) 4.9.2"

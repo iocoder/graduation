@@ -1,0 +1,925 @@
+	.file	1 "vga.c"
+	.section .mdebug.abi32
+	.previous
+	.nan	legacy
+	.gnu_attribute 4, 1
+	.globl	vga
+	.data
+	.align	2
+	.type	vga, @object
+	.size	vga, 4
+vga:
+	.word	98304
+
+	.comm	attr,1,1
+
+	.comm	fmt_attr,1,1
+
+	.comm	scan_attr,1,1
+
+	.comm	loc,4,4
+	.text
+	.align	2
+	.globl	clear_screen
+	.set	nomips16
+	.set	nomicromips
+	.ent	clear_screen
+	.type	clear_screen, @function
+clear_screen:
+	.frame	$fp,16,$31		# vars= 8, regs= 1/0, args= 0, gp= 0
+	.mask	0x40000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-16
+	sw	$fp,12($sp)
+	move	$fp,$sp
+	move	$3,$5
+	move	$2,$6
+	sb	$4,16($fp)
+	sb	$3,20($fp)
+	sb	$2,24($fp)
+	lui	$2,%hi(loc)
+	sw	$0,%lo(loc)($2)
+	lui	$2,%hi(loc)
+	lw	$2,%lo(loc)($2)
+	nop
+	sw	$2,0($fp)
+	lui	$2,%hi(attr)
+	lbu	$3,16($fp)
+	nop
+	sb	$3,%lo(attr)($2)
+	lui	$2,%hi(fmt_attr)
+	lbu	$3,20($fp)
+	nop
+	sb	$3,%lo(fmt_attr)($2)
+	lui	$2,%hi(scan_attr)
+	lbu	$3,24($fp)
+	nop
+	sb	$3,%lo(scan_attr)($2)
+	j	$L2
+	nop
+
+$L3:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,0($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,0($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	sw	$0,0($2)
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,0($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,0($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lui	$3,%hi(attr)
+	lb	$3,%lo(attr)($3)
+	nop
+	sw	$3,0($2)
+$L2:
+	lw	$2,0($fp)
+	nop
+	slt	$2,$2,4800
+	bne	$2,$0,$L3
+	nop
+
+	move	$sp,$fp
+	lw	$fp,12($sp)
+	addiu	$sp,$sp,16
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	clear_screen
+	.size	clear_screen, .-clear_screen
+	.align	2
+	.globl	scroll
+	.set	nomips16
+	.set	nomicromips
+	.ent	scroll
+	.type	scroll, @function
+scroll:
+	.frame	$fp,16,$31		# vars= 8, regs= 1/0, args= 0, gp= 0
+	.mask	0x40000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-16
+	sw	$fp,12($sp)
+	move	$fp,$sp
+	sw	$0,0($fp)
+	j	$L5
+	nop
+
+$L6:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,0($fp)
+	nop
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lui	$3,%hi(vga)
+	lw	$4,%lo(vga)($3)
+	lw	$3,0($fp)
+	nop
+	addiu	$3,$3,160
+	sll	$3,$3,2
+	addu	$3,$4,$3
+	lw	$3,0($3)
+	nop
+	sw	$3,0($2)
+	lw	$2,0($fp)
+	nop
+	addiu	$2,$2,1
+	sw	$2,0($fp)
+$L5:
+	lw	$2,0($fp)
+	nop
+	slt	$2,$2,4640
+	bne	$2,$0,$L6
+	nop
+
+	j	$L7
+	nop
+
+$L8:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,0($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,0($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	sw	$0,0($2)
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,0($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,0($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lui	$3,%hi(attr)
+	lb	$3,%lo(attr)($3)
+	nop
+	sw	$3,0($2)
+$L7:
+	lw	$2,0($fp)
+	nop
+	slt	$2,$2,4800
+	bne	$2,$0,$L8
+	nop
+
+	move	$sp,$fp
+	lw	$fp,12($sp)
+	addiu	$sp,$sp,16
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	scroll
+	.size	scroll, .-scroll
+	.align	2
+	.globl	print_char
+	.set	nomips16
+	.set	nomicromips
+	.ent	print_char
+	.type	print_char, @function
+print_char:
+	.frame	$fp,24,$31		# vars= 0, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-24
+	sw	$31,20($sp)
+	sw	$fp,16($sp)
+	move	$fp,$sp
+	move	$3,$4
+	move	$2,$5
+	sb	$3,24($fp)
+	sb	$2,28($fp)
+	lb	$3,24($fp)
+	li	$2,10			# 0xa
+	bne	$3,$2,$L10
+	nop
+
+	lui	$2,%hi(loc)
+	lw	$2,%lo(loc)($2)
+	nop
+	addiu	$3,$2,160
+	li	$2,160			# 0xa0
+	div	$0,$3,$2
+	mfhi	$3
+	mflo	$2
+	sll	$2,$2,5
+	sll	$3,$2,2
+	addu	$3,$2,$3
+	lui	$2,%hi(loc)
+	sw	$3,%lo(loc)($2)
+	j	$L11
+	nop
+
+$L10:
+	lb	$3,24($fp)
+	li	$2,8			# 0x8
+	bne	$3,$2,$L12
+	nop
+
+	lui	$2,%hi(loc)
+	lw	$2,%lo(loc)($2)
+	nop
+	slt	$2,$2,483
+	bne	$2,$0,$L11
+	nop
+
+	lui	$2,%hi(loc)
+	lw	$2,%lo(loc)($2)
+	nop
+	addiu	$3,$2,-2
+	lui	$2,%hi(loc)
+	sw	$3,%lo(loc)($2)
+	j	$L11
+	nop
+
+$L12:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lui	$2,%hi(loc)
+	lw	$2,%lo(loc)($2)
+	nop
+	addiu	$5,$2,1
+	lui	$4,%hi(loc)
+	sw	$5,%lo(loc)($4)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lb	$3,24($fp)
+	nop
+	sw	$3,0($2)
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lui	$2,%hi(loc)
+	lw	$2,%lo(loc)($2)
+	nop
+	addiu	$5,$2,1
+	lui	$4,%hi(loc)
+	sw	$5,%lo(loc)($4)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lb	$3,28($fp)
+	nop
+	sw	$3,0($2)
+$L11:
+	lui	$2,%hi(loc)
+	lw	$3,%lo(loc)($2)
+	li	$2,4800			# 0x12c0
+	bne	$3,$2,$L9
+	nop
+
+	jal	scroll
+	nop
+
+	lui	$2,%hi(loc)
+	li	$3,4640			# 0x1220
+	sw	$3,%lo(loc)($2)
+$L9:
+	move	$sp,$fp
+	lw	$31,20($sp)
+	lw	$fp,16($sp)
+	addiu	$sp,$sp,24
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	print_char
+	.size	print_char, .-print_char
+	.rdata
+	.align	2
+$LC0:
+	.ascii	"0123456789\000"
+	.text
+	.align	2
+	.globl	print_int
+	.set	nomips16
+	.set	nomicromips
+	.ent	print_int
+	.type	print_int, @function
+print_int:
+	.frame	$fp,40,$31		# vars= 16, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-40
+	sw	$31,36($sp)
+	sw	$fp,32($sp)
+	move	$fp,$sp
+	sw	$4,40($fp)
+	move	$2,$5
+	sb	$2,44($fp)
+	sw	$0,16($fp)
+	lw	$2,40($fp)
+	nop
+	bne	$2,$0,$L16
+	nop
+
+	lw	$2,16($fp)
+	nop
+	addiu	$3,$2,1
+	sw	$3,16($fp)
+	addiu	$3,$fp,16
+	addu	$2,$3,$2
+	sb	$0,4($2)
+	j	$L17
+	nop
+
+$L16:
+	j	$L18
+	nop
+
+$L19:
+	lw	$2,16($fp)
+	nop
+	addiu	$3,$2,1
+	sw	$3,16($fp)
+	lw	$4,40($fp)
+	li	$3,10			# 0xa
+	divu	$0,$4,$3
+	mfhi	$3
+	sll	$3,$3,24
+	sra	$3,$3,24
+	addiu	$4,$fp,16
+	addu	$2,$4,$2
+	sb	$3,4($2)
+	lw	$3,40($fp)
+	li	$2,10			# 0xa
+	divu	$0,$3,$2
+	mfhi	$3
+	mflo	$2
+	sw	$2,40($fp)
+$L18:
+	lw	$2,40($fp)
+	nop
+	bne	$2,$0,$L19
+	nop
+
+$L17:
+	j	$L20
+	nop
+
+$L21:
+	lw	$2,16($fp)
+	addiu	$3,$fp,16
+	addu	$2,$3,$2
+	lb	$2,4($2)
+	nop
+	move	$3,$2
+	lui	$2,%hi($LC0)
+	addiu	$2,$2,%lo($LC0)
+	addu	$2,$3,$2
+	lb	$2,0($2)
+	nop
+	move	$3,$2
+	lb	$2,44($fp)
+	move	$4,$3
+	move	$5,$2
+	jal	print_char
+	nop
+
+$L20:
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,-1
+	sw	$2,16($fp)
+	lw	$2,16($fp)
+	nop
+	bgez	$2,$L21
+	nop
+
+	move	$sp,$fp
+	lw	$31,36($sp)
+	lw	$fp,32($sp)
+	addiu	$sp,$sp,40
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	print_int
+	.size	print_int, .-print_int
+	.rdata
+	.align	2
+$LC1:
+	.ascii	"0123456789ABCDEF\000"
+	.text
+	.align	2
+	.globl	print_hex
+	.set	nomips16
+	.set	nomicromips
+	.ent	print_hex
+	.type	print_hex, @function
+print_hex:
+	.frame	$fp,32,$31		# vars= 8, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-32
+	sw	$31,28($sp)
+	sw	$fp,24($sp)
+	move	$fp,$sp
+	sw	$4,32($fp)
+	move	$2,$5
+	sb	$2,36($fp)
+	li	$2,28			# 0x1c
+	sw	$2,16($fp)
+	j	$L23
+	nop
+
+$L24:
+	lw	$3,32($fp)
+	lw	$2,16($fp)
+	nop
+	srl	$2,$3,$2
+	andi	$3,$2,0xf
+	lui	$2,%hi($LC1)
+	addiu	$2,$2,%lo($LC1)
+	addu	$2,$3,$2
+	lb	$2,0($2)
+	nop
+	move	$3,$2
+	lb	$2,36($fp)
+	move	$4,$3
+	move	$5,$2
+	jal	print_char
+	nop
+
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,-4
+	sw	$2,16($fp)
+$L23:
+	lw	$2,16($fp)
+	nop
+	bgez	$2,$L24
+	nop
+
+	move	$sp,$fp
+	lw	$31,28($sp)
+	lw	$fp,24($sp)
+	addiu	$sp,$sp,32
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	print_hex
+	.size	print_hex, .-print_hex
+	.align	2
+	.globl	print_str
+	.set	nomips16
+	.set	nomicromips
+	.ent	print_str
+	.type	print_str, @function
+print_str:
+	.frame	$fp,32,$31		# vars= 8, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-32
+	sw	$31,28($sp)
+	sw	$fp,24($sp)
+	move	$fp,$sp
+	sw	$4,32($fp)
+	move	$2,$5
+	sb	$2,36($fp)
+	sw	$0,16($fp)
+	j	$L26
+	nop
+
+$L27:
+	lw	$2,16($fp)
+	nop
+	addiu	$3,$2,1
+	sw	$3,16($fp)
+	move	$3,$2
+	lw	$2,32($fp)
+	nop
+	addu	$2,$2,$3
+	lb	$2,0($2)
+	nop
+	move	$3,$2
+	lb	$2,36($fp)
+	move	$4,$3
+	move	$5,$2
+	jal	print_char
+	nop
+
+$L26:
+	lw	$2,16($fp)
+	lw	$3,32($fp)
+	nop
+	addu	$2,$3,$2
+	lb	$2,0($2)
+	nop
+	bne	$2,$0,$L27
+	nop
+
+	move	$sp,$fp
+	lw	$31,28($sp)
+	lw	$fp,24($sp)
+	addiu	$sp,$sp,32
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	print_str
+	.size	print_str, .-print_str
+	.align	2
+	.globl	print_hf
+	.set	nomips16
+	.set	nomicromips
+	.ent	print_hf
+	.type	print_hf, @function
+print_hf:
+	.frame	$fp,48,$31		# vars= 16, regs= 3/0, args= 16, gp= 0
+	.mask	0xc0010000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-48
+	sw	$31,44($sp)
+	sw	$fp,40($sp)
+	sw	$16,36($sp)
+	move	$fp,$sp
+	sw	$4,48($fp)
+	sw	$5,52($fp)
+	move	$2,$6
+	sb	$2,56($fp)
+	lw	$2,48($fp)
+	nop
+	sll	$2,$2,5
+	sll	$3,$2,2
+	addu	$2,$2,$3
+	sw	$2,20($fp)
+	lw	$4,52($fp)
+	jal	str_len
+	nop
+
+	move	$3,$2
+	li	$2,80			# 0x50
+	subu	$2,$2,$3
+	srl	$3,$2,31
+	addu	$2,$3,$2
+	sra	$2,$2,1
+	sw	$2,24($fp)
+	sw	$0,16($fp)
+	j	$L29
+	nop
+
+$L30:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,20($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,20($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	li	$3,32			# 0x20
+	sw	$3,0($2)
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,20($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,20($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lb	$3,56($fp)
+	nop
+	sw	$3,0($2)
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,1
+	sw	$2,16($fp)
+$L29:
+	lw	$3,16($fp)
+	lw	$2,24($fp)
+	nop
+	slt	$2,$3,$2
+	bne	$2,$0,$L30
+	nop
+
+	sw	$0,16($fp)
+	j	$L31
+	nop
+
+$L32:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,20($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,20($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lw	$3,16($fp)
+	lw	$4,52($fp)
+	nop
+	addu	$3,$4,$3
+	lb	$3,0($3)
+	nop
+	sw	$3,0($2)
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,20($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,20($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lb	$3,56($fp)
+	nop
+	sw	$3,0($2)
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,1
+	sw	$2,16($fp)
+$L31:
+	lw	$4,52($fp)
+	jal	str_len
+	nop
+
+	move	$3,$2
+	lw	$2,16($fp)
+	nop
+	slt	$2,$2,$3
+	bne	$2,$0,$L32
+	nop
+
+	sw	$0,16($fp)
+	j	$L33
+	nop
+
+$L34:
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,20($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,20($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	li	$3,32			# 0x20
+	sw	$3,0($2)
+	lui	$2,%hi(vga)
+	lw	$3,%lo(vga)($2)
+	lw	$2,20($fp)
+	nop
+	addiu	$4,$2,1
+	sw	$4,20($fp)
+	sll	$2,$2,2
+	addu	$2,$3,$2
+	lb	$3,56($fp)
+	nop
+	sw	$3,0($2)
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,1
+	sw	$2,16($fp)
+$L33:
+	li	$3,80			# 0x50
+	lw	$2,24($fp)
+	nop
+	subu	$16,$3,$2
+	lw	$4,52($fp)
+	jal	str_len
+	nop
+
+	subu	$3,$16,$2
+	lw	$2,16($fp)
+	nop
+	slt	$2,$2,$3
+	bne	$2,$0,$L34
+	nop
+
+	move	$sp,$fp
+	lw	$31,44($sp)
+	lw	$fp,40($sp)
+	lw	$16,36($sp)
+	addiu	$sp,$sp,48
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	print_hf
+	.size	print_hf, .-print_hf
+	.align	2
+	.globl	print_fmt
+	.set	nomips16
+	.set	nomicromips
+	.ent	print_fmt
+	.type	print_fmt, @function
+print_fmt:
+	.frame	$fp,40,$31		# vars= 16, regs= 2/0, args= 16, gp= 0
+	.mask	0xc0000000,-4
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	addiu	$sp,$sp,-40
+	sw	$31,36($sp)
+	sw	$fp,32($sp)
+	move	$fp,$sp
+	sw	$5,44($fp)
+	sw	$6,48($fp)
+	sw	$7,52($fp)
+	sw	$4,40($fp)
+	sw	$0,24($fp)
+	addiu	$2,$fp,40
+	sw	$2,20($fp)
+	sw	$0,16($fp)
+	j	$L36
+	nop
+
+$L46:
+	lw	$3,40($fp)
+	lw	$2,16($fp)
+	nop
+	addu	$2,$3,$2
+	lb	$3,0($2)
+	li	$2,37			# 0x25
+	bne	$3,$2,$L37
+	nop
+
+	lw	$3,40($fp)
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,1
+	sw	$2,16($fp)
+	lw	$2,16($fp)
+	nop
+	addu	$2,$3,$2
+	lb	$2,0($2)
+	li	$3,100			# 0x64
+	beq	$2,$3,$L39
+	nop
+
+	slt	$3,$2,101
+	beq	$3,$0,$L40
+	nop
+
+	li	$3,99			# 0x63
+	beq	$2,$3,$L41
+	nop
+
+	j	$L44
+	nop
+
+$L40:
+	li	$3,115			# 0x73
+	beq	$2,$3,$L42
+	nop
+
+	li	$3,120			# 0x78
+	beq	$2,$3,$L43
+	nop
+
+	j	$L44
+	nop
+
+$L41:
+	lw	$2,20($fp)
+	nop
+	addiu	$2,$2,4
+	sw	$2,20($fp)
+	lw	$2,20($fp)
+	nop
+	lb	$2,0($2)
+	nop
+	move	$3,$2
+	lui	$2,%hi(fmt_attr)
+	lb	$2,%lo(fmt_attr)($2)
+	move	$4,$3
+	move	$5,$2
+	jal	print_char
+	nop
+
+	j	$L44
+	nop
+
+$L39:
+	lw	$2,20($fp)
+	nop
+	addiu	$2,$2,4
+	sw	$2,20($fp)
+	lw	$2,20($fp)
+	nop
+	lw	$2,0($2)
+	nop
+	move	$3,$2
+	lui	$2,%hi(fmt_attr)
+	lb	$2,%lo(fmt_attr)($2)
+	move	$4,$3
+	move	$5,$2
+	jal	print_int
+	nop
+
+	j	$L44
+	nop
+
+$L43:
+	lw	$2,20($fp)
+	nop
+	addiu	$2,$2,4
+	sw	$2,20($fp)
+	lw	$2,20($fp)
+	nop
+	lw	$2,0($2)
+	nop
+	move	$3,$2
+	lui	$2,%hi(fmt_attr)
+	lb	$2,%lo(fmt_attr)($2)
+	move	$4,$3
+	move	$5,$2
+	jal	print_hex
+	nop
+
+	j	$L44
+	nop
+
+$L42:
+	lw	$2,20($fp)
+	nop
+	addiu	$2,$2,4
+	sw	$2,20($fp)
+	lw	$2,20($fp)
+	nop
+	lw	$3,0($2)
+	lui	$2,%hi(fmt_attr)
+	lb	$2,%lo(fmt_attr)($2)
+	move	$4,$3
+	move	$5,$2
+	jal	print_str
+	nop
+
+	nop
+$L44:
+	j	$L45
+	nop
+
+$L37:
+	lw	$3,40($fp)
+	lw	$2,16($fp)
+	nop
+	addu	$2,$3,$2
+	lb	$2,0($2)
+	nop
+	move	$3,$2
+	lui	$2,%hi(fmt_attr)
+	lb	$2,%lo(fmt_attr)($2)
+	move	$4,$3
+	move	$5,$2
+	jal	print_char
+	nop
+
+$L45:
+	lw	$2,16($fp)
+	nop
+	addiu	$2,$2,1
+	sw	$2,16($fp)
+$L36:
+	lw	$3,40($fp)
+	lw	$2,16($fp)
+	nop
+	addu	$2,$3,$2
+	lb	$2,0($2)
+	nop
+	bne	$2,$0,$L46
+	nop
+
+	move	$sp,$fp
+	lw	$31,36($sp)
+	lw	$fp,32($sp)
+	addiu	$sp,$sp,40
+	j	$31
+	nop
+
+	.set	macro
+	.set	reorder
+	.end	print_fmt
+	.size	print_fmt, .-print_fmt
+	.ident	"GCC: (GNU) 4.9.2"
