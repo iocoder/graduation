@@ -7,9 +7,9 @@ The project is under development and is to be delivered in June 2016.
 Manifesto:
 ----------
 doc/        Detailed documentation for my work
-mipsemu/    MIPS computer emulator
 firmware/   Firmware program for MIPS computer
-fpga/       VHDL code for the machine
+hardware/   VHDL code for the machine
+mipsemu/    MIPS computer emulator
 
 Notes:
 ------
