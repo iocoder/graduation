@@ -1,0 +1,26 @@
+Suggested TODO list:
+---------------------
+
+- TCP/IP
+- Audio
+
+- ATAPI
+- ATA DMA mode
+- AHCI
+
+- USB plug and play
+- OHCI
+- xHCI
+
+- ext2
+- ntfs
+- fat
+- iso9660.
+
+- UEFI
+
+- signals and pipes
+- ajust concurrency very properly in various kernel parts
+- Make kernel design modular (everything is a module, modprobe, etc...).
+
+- QCC

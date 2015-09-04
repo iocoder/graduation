@@ -7,7 +7,7 @@
 extern SDL_Surface* screen;
 unsigned char chr[80*30];
 unsigned char att[80*30];
-unsigned char font[256][16];
+extern unsigned char font[256][16];
 int close_thread = 0;
 int thread_closed = 0;
 Uint32 palette[] = {
@@ -86,14 +86,6 @@ void vga_init() {
     FILE *f;
     int i;
 
-    /* load font */
-    if (!(f = fopen("font8x16.fon", "r"))) {
-        fprintf(stderr, "Error: cannot open %s.\n", "font8x16.fon");
-        exit(-2);
-    }
-    fread(font, sizeof(font), 1, f);
-    fclose(f);
-
     /* initialize screen */
     for (i = 0; i < 80*30; i++)
         update_char(i, 0, 0x1F);
@@ -102,3 +94,7 @@ void vga_init() {
     SDL_CreateThread(&vga_update, NULL);
 
 }
+
+__asm__(".section .rodata         ");
+__asm__("font:                    ");
+__asm__(".incbin \"font8x16.fon\" ");
