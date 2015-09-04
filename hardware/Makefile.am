@@ -121,7 +121,7 @@ simulation:
 	cd $(SIM_DIR) && XILINX=/opt/Xilinx/10.1/ISE ./$(TB).exe -tclbatch \
 	   simcmd -wavefile $(TB).xwv
 	## show results
-	cd $(SIM_DIR) && $(ISW) $(TB).xwv
+	## cd $(SIM_DIR) && $(ISW) $(TB).xwv
 
 prog: bit/final.bit
 	djtgcfg enum

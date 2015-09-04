@@ -476,7 +476,6 @@ simulation:
 	echo "quit" >> $(SIM_DIR)/simcmd
 	cd $(SIM_DIR) && XILINX=/opt/Xilinx/10.1/ISE ./$(TB).exe -tclbatch \
 	   simcmd -wavefile $(TB).xwv
-	cd $(SIM_DIR) && $(ISW) $(TB).xwv
 
 prog: bit/final.bit
 	djtgcfg enum
