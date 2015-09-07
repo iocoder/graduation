@@ -49,9 +49,10 @@ PAR_DIR=_par
 TRC_DIR=_trc
 BIT_DIR=_bit
 SIM_DIR=_sim
+WORK_DIR=work
 
 PKG_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep _pkg)
-VHD_FILES=$(shell find $(SRC_DIR)|grep -v test|grep -v _pkg|grep .vhd)
+VHD_FILES=$(shell find $(SRC_DIR) | grep -v test | grep -v _pkg | grep .vhd)
 TST_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep test)
 UCF_FILE=$(SRC_DIR)/$(PROJ).ucf
 
@@ -101,7 +102,7 @@ $(BIT_DIR)/final.bit: $(PKG_FILES) $(VHD_FILES) $(UCF_FILE) Makefile
 	cd $(BIT_DIR) && $(BIT) -f $(PROJ).ut ../$(PAR_DIR)/$(PROJ).ncd \
 	   final.bit
 
-simulation:
+isim:
 	## make fuse and isim working directory
 	mkdir -p $(SIM_DIR)
 	## generate .prj file
@@ -115,13 +116,18 @@ simulation:
 	rm -rf $(SIM_DIR)/simcmd
 	echo "ntrace select -o on -m / -l this" >> $(SIM_DIR)/simcmd
 	echo "ntrace start" >> $(SIM_DIR)/simcmd
-	echo "isimrun 100000 ns" >> $(SIM_DIR)/simcmd
+	echo "isimrun 1000000 ns" >> $(SIM_DIR)/simcmd
 	echo "quit" >> $(SIM_DIR)/simcmd
 	## run simulation
 	cd $(SIM_DIR) && XILINX=/opt/Xilinx/10.1/ISE ./$(TB).exe -tclbatch \
 	   simcmd -wavefile $(TB).xwv
 	## show results
-	## cd $(SIM_DIR) && $(ISW) $(TB).xwv
+	cd $(SIM_DIR) && $(ISW) $(TB).xwv
+
+nvcsim:
+	nvc -a $(PKG_FILES) $(VHD_FILES)
+	nvc -e tlc_sim
+	nvc -r --load=../vhdsim/vhdsim.so tlc_sim
 
 prog: bit/final.bit
 	djtgcfg enum
@@ -153,4 +159,4 @@ prog_perm: bit/final.bit
 
 clean-local:
 	rm -rf $(XST_DIR) $(NGD_DIR) $(MAP_DIR) $(PAR_DIR) \
-	       $(TRC_DIR) $(BIT_DIR) $(SIM_DIR)
+	       $(TRC_DIR) $(BIT_DIR) $(SIM_DIR) $(WORK_DIR)

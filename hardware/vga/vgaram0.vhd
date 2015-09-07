@@ -46,7 +46,4 @@ begin
 
 	end process;
 
-        -- testing purposes:
-        work.tlc_test_pkg.VGA_FIRST <= ram(0);
-
 end Behavioral;

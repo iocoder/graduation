@@ -38,20 +38,20 @@ end TLC;
 
 architecture Structural of TLC is
 
-component cpu is
-    Port (
-        CLK  : in  STD_LOGIC;
-        IRQ  : in  STD_LOGIC;
-        NMI  : in  STD_LOGIC;
-        MEME : out STD_LOGIC;
-        RW   : out STD_LOGIC;
-        ADDR : out STD_LOGIC_VECTOR (15 downto 0);
-        Din  : in  STD_LOGIC_VECTOR ( 7 downto 0);
-        Dout : out STD_LOGIC_VECTOR ( 7 downto 0);
-        IAK  : out STD_LOGIC;
-        NAK  : out STD_LOGIC
-    );
-end component;
+-- component cpu is
+--     Port (
+--         CLK  : in  STD_LOGIC;
+--         IRQ  : in  STD_LOGIC;
+--         NMI  : in  STD_LOGIC;
+--         MEME : out STD_LOGIC;
+--         RW   : out STD_LOGIC;
+--         ADDR : out STD_LOGIC_VECTOR (15 downto 0);
+--         Din  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+--         Dout : out STD_LOGIC_VECTOR ( 7 downto 0);
+--         IAK  : out STD_LOGIC;
+--         NAK  : out STD_LOGIC
+--     );
+-- end component;
 
 component memif is
     Port (
@@ -184,10 +184,10 @@ RAMDin <= x"00" & CPUToMem;
 MemToCPU <= RAMToCPU OR KBDToCPU;
 
 -- Components
-U0: cpu     port map (
-    CLK, IRQ, NMI, MEME, RW, CPUADDR,
-    MemToCPU, CPUToMem, IAK, NAK
-);
+-- U0: cpu     port map (
+--     CLK, IRQ, NMI, MEME, RW, CPUADDR,
+--     MemToCPU, CPUToMem, IAK, NAK
+-- );
 U1: decoder port map (MEME, DECADDR, DECOUT);
 U2: memif   port map (
     CLK, TMP, RAMADDR, RAMDin, RAMToCPU, RAMEn, CPUADDR(15), RW, '0',
