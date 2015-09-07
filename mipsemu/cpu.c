@@ -1100,57 +1100,50 @@ int cpu_clk() {
         id_ctrlsig[BRANCH]     = id_ctrlsig_in[BRANCH];
     }
     /* select PC source */
-    if (id_ctrlsig[BRANCH]) {
-        if (id_opcode == 0 && id_funct == 8) {
-            /* jr */
-            id_pc_src = PCSRC_JR;
-        } else if (id_opcode == 0 && id_funct == 9) {
-            /* jalr */
-            id_pc_src = PCSRC_JR;
-        } else if (id_opcode == 1 && id_ropcode == 0) {
-            /* bltz */
-            id_pc_src = (id_is_lez&&!id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
-        } else if (id_opcode == 1 && id_ropcode == 1) {
-            /* bgez */
-            id_pc_src = (id_is_gtz||id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
-        } else if (id_opcode == 1 && id_ropcode == 16) {
-            /* bltzal */
-            id_pc_src = (id_is_lez&&!id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
-        } else if (id_opcode == 1 && id_ropcode == 17) {
-            /* bgtzal */
-            id_pc_src = (id_is_gtz||id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
-        } else if (id_opcode == 2) {
-            /* j */
-            id_pc_src = PCSRC_JMP;
-        } else if (id_opcode == 3) {
-            /* jal */
-            id_pc_src = PCSRC_JMP;
-        } else if (id_opcode == 4) {
-            /* beq */
-            id_pc_src = id_is_equal ? PCSRC_BRANCH : PCSRC_PC4;
-        } else if (id_opcode == 5) {
-            /* bne */
-            id_pc_src = !id_is_equal ? PCSRC_BRANCH : PCSRC_PC4;
-        } else if (id_opcode == 6) {
-            /* blez */
-            id_pc_src = id_is_lez ? PCSRC_BRANCH : PCSRC_PC4;
-        } else if (id_opcode == 7) {
-            /* bgtz */
-            id_pc_src = id_is_gtz ? PCSRC_BRANCH : PCSRC_PC4;
-        } else {
-            /* ? */
-            id_pc_src = PCSRC_PC4;
-        }
+    if (id_opcode == 0 && id_funct == 8) {
+        /* jr */
+        id_pc_src = PCSRC_JR;
+    } else if (id_opcode == 0 && id_funct == 9) {
+        /* jalr */
+        id_pc_src = PCSRC_JR;
+    } else if (id_opcode == 1 && id_ropcode == 0) {
+        /* bltz */
+        id_pc_src = (id_is_lez&&!id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
+    } else if (id_opcode == 1 && id_ropcode == 1) {
+        /* bgez */
+        id_pc_src = (id_is_gtz||id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
+    } else if (id_opcode == 1 && id_ropcode == 16) {
+        /* bltzal */
+        id_pc_src = (id_is_lez&&!id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
+    } else if (id_opcode == 1 && id_ropcode == 17) {
+        /* bgtzal */
+        id_pc_src = (id_is_gtz||id_is_zero)?PCSRC_BRANCH:PCSRC_PC4;
+    } else if (id_opcode == 2) {
+        /* j */
+        id_pc_src = PCSRC_JMP;
+    } else if (id_opcode == 3) {
+        /* jal */
+        id_pc_src = PCSRC_JMP;
+    } else if (id_opcode == 4) {
+        /* beq */
+        id_pc_src = id_is_equal ? PCSRC_BRANCH : PCSRC_PC4;
+    } else if (id_opcode == 5) {
+        /* bne */
+        id_pc_src = !id_is_equal ? PCSRC_BRANCH : PCSRC_PC4;
+    } else if (id_opcode == 6) {
+        /* blez */
+        id_pc_src = id_is_lez ? PCSRC_BRANCH : PCSRC_PC4;
+    } else if (id_opcode == 7) {
+        /* bgtz */
+        id_pc_src = id_is_gtz ? PCSRC_BRANCH : PCSRC_PC4;
     } else {
         /* no branching */
         id_pc_src = PCSRC_PC4;
     }
 
     /* IF again */
-    if (pcclk) {
-        if_pc4 = if_pc + 4;
-        if_instr = mem_read(if_pc);
-    }
+    if_pc4 = if_pc + 4;
+    if_instr = mem_read(if_pc);
 
     /* done */
     return 0;
