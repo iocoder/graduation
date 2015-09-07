@@ -38,7 +38,8 @@ AC_CHECK_FUNCS([strtoul])
 AC_CONFIG_FILES([Makefile
                  firmware/Makefile
                  hardware/Makefile
-                 mipsemu/Makefile])
+                 mipsemu/Makefile
+                 vhdsim/Makefile])
 
 # Generate output files.
 AC_OUTPUT

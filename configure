@@ -4995,7 +4995,7 @@ done
 
 
 # Config files.
-ac_config_files="$ac_config_files Makefile firmware/Makefile hardware/Makefile mipsemu/Makefile"
+ac_config_files="$ac_config_files Makefile firmware/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile"
 
 
 # Generate output files.
@@ -5745,6 +5745,7 @@ do
     "firmware/Makefile") CONFIG_FILES="$CONFIG_FILES firmware/Makefile" ;;
     "hardware/Makefile") CONFIG_FILES="$CONFIG_FILES hardware/Makefile" ;;
     "mipsemu/Makefile") CONFIG_FILES="$CONFIG_FILES mipsemu/Makefile" ;;
+    "vhdsim/Makefile") CONFIG_FILES="$CONFIG_FILES vhdsim/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -10,6 +10,7 @@ doc/        Detailed documentation for my work
 firmware/   Firmware program for MIPS computer
 hardware/   VHDL code for the machine
 mipsemu/    MIPS computer emulator
+vhdsim/     VHDL code simulation with nvc (VHPI)
 
 Notes:
 ------
