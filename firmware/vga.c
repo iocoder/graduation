@@ -5,10 +5,11 @@ int *vga       = (int *) VGA_BASE;
 char attr;
 char fmt_attr;
 char scan_attr;
-int  loc;
+int  row;
+int  col;
 
 void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
-    int i = loc = 0;
+    int i = row = col = 0;
     attr = _attr;
     fmt_attr = _fmt_attr;
     scan_attr = _scan_attr;
@@ -31,17 +32,30 @@ void scroll() {
 
 void print_char(char c, char attr) {
     if (c == '\n') {
-        loc = ((loc+160)/160)*160;
+        row++;
+        col = 0;
     } else if (c == '\b') {
-        if (loc > 160*3+2)
-            loc -= 2;
+        col -= 1;
+        if (col < 0) {
+            col += 80;
+            row--;
+            if (row < 0) {
+                row = 0;
+                col = 0;
+            }
+        }
     } else {
-        vga[loc++] = c;
-        vga[loc++] = attr;
+        vga[row*160+col*2  ] = c;
+        vga[row*160+col*2+1] = attr;
+        col++;
+        if (col == 80) {
+            col = 0;
+            row++;
+        }
     }
-    if (loc == 160*30) {
+    if (row == 30) {
         scroll();
-        loc = 160*29;
+        row = 29;
     }
 }
 
