@@ -10,6 +10,13 @@ sim:
 	make -C firmware
 	make -C hardware nvcsim
 
+prog:
+	make -C firmware
+	make -C hardware
+	make -C ../upload prog FILE=../build/firmware/firmware.bin \
+		ADDR=0 SIZE=0x8000
+	make -C hardware prog
+
 dump:
 	make -C firmware dump
 

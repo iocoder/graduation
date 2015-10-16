@@ -252,49 +252,77 @@ package body cpu_pkg is
     function is_alureg (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode = "000000";
+        if opcode = "000000" then
+            return true;
+        else
+            return false;
+        end if;
     end is_alureg;
 
     -- is branchregimm opcode
     function is_branchregimm (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode = "000001";
+        if opcode = "000001" then
+            return true;
+        else
+            return false;
+        end if;
     end is_branchregimm;
 
     -- is jmp opcode
     function is_jmp (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode = "000010" or opcode = "000011";
+        if opcode = "000010" or opcode = "000011" then
+            return true;
+        else
+            return false;
+        end if;
     end is_jmp;
 
     -- is branch opcode
     function is_branch (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode(5 downto 2) = "0001";
+        if opcode(5 downto 2) = "0001" then
+            return true;
+        else
+            return false;
+        end if;
     end is_branch;
 
     -- is aluimm opcode
     function is_aluimm (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode(5 downto 3) = "001";
+        if opcode(5 downto 3) = "001" then
+            return true;
+        else
+            return false;
+        end if;
     end is_aluimm;
 
     -- is memload opcode
     function is_memload (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode(5 downto 3) = "100";
+        if opcode(5 downto 3) = "100" then
+            return true;
+        else
+            return false;
+        end if;
     end is_memload;
 
     -- is memstore opcode
     function is_memstore (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean is
     begin
-        return opcode(5 downto 3) = "101";
+        if opcode(5 downto 3) = "101" then
+            return true;
+        else
+            return false;
+        end if;
     end is_memstore;
 
 end cpu_pkg;

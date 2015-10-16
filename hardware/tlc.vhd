@@ -7,8 +7,6 @@ entity TLC is
     Port (
         -- The crystal:
         CLK     : in    STD_LOGIC;
-        -- LEDs:
-        LED     : out   STD_LOGIC_VECTOR ( 7 downto 0);
         -- VGA Connector
         R       : out   STD_LOGIC_VECTOR ( 2 downto 0);
         G       : out   STD_LOGIC_VECTOR ( 2 downto 0);
@@ -38,33 +36,36 @@ end TLC;
 
 architecture Structural of TLC is
 
--- component cpu is
---     Port (
---         CLK  : in  STD_LOGIC;
---         IRQ  : in  STD_LOGIC;
---         NMI  : in  STD_LOGIC;
---         MEME : out STD_LOGIC;
---         RW   : out STD_LOGIC;
---         ADDR : out STD_LOGIC_VECTOR (15 downto 0);
---         Din  : in  STD_LOGIC_VECTOR ( 7 downto 0);
---         Dout : out STD_LOGIC_VECTOR ( 7 downto 0);
---         IAK  : out STD_LOGIC;
---         NAK  : out STD_LOGIC
---     );
--- end component;
+component cpu is
+    Port (
+        CLK    : in  STD_LOGIC;
+        IRQ    : in  STD_LOGIC;
+        NMI    : in  STD_LOGIC;
+        IAK    : out STD_LOGIC;
+        NAK    : out STD_LOGIC;
+        -- system bus
+        MPULSE : out STD_LOGIC;
+        MEME   : out STD_LOGIC;
+        RW     : out STD_LOGIC;
+        ADDR   : out STD_LOGIC_VECTOR (31 downto 0);
+        Din    : in  STD_LOGIC_VECTOR (31 downto 0);
+        Dout   : out STD_LOGIC_VECTOR (31 downto 0);
+        DTYPE  : out STD_LOGIC_VECTOR ( 2 downto 0)
+    );
+end component;
 
 component memif is
     Port (
         CLK      : in    STD_LOGIC;
-        LED      : out   STD_LOGIC_VECTOR ( 7 downto 0);
         -- Interface
-        A        : in    STD_LOGIC_VECTOR (23 downto 0);
-        Din      : in    STD_LOGIC_VECTOR (15 downto 0);
-        Dout     : out   STD_LOGIC_VECTOR ( 7 downto 0);
-        CE       : in    STD_LOGIC; -- chip enable
-        SEL      : in    STD_LOGIC; -- 0: RAM, 1: ROM
+        MPULSE   : in    STD_LOGIC; -- memory cycle pulse
+        RAM_CS   : in    STD_LOGIC; -- RAM chip enable
+        ROM_CS   : in    STD_LOGIC; -- ROM chip enable
         RW       : in    STD_LOGIC; -- 0: read, 1: write
-        PRG_EN   : in    STD_LOGIC; -- 0: disable ROM programming, 1: enable
+        A        : in    STD_LOGIC_VECTOR (23 downto 0);
+        Din      : in    STD_LOGIC_VECTOR (31 downto 0);
+        Dout     : out   STD_LOGIC_VECTOR (31 downto 0);
+        DTYPE    : in    STD_LOGIC_VECTOR ( 2 downto 0);
         -- External Memory Bus:
         ADDR     : out   STD_LOGIC_VECTOR (23 downto 0);
         DATA     : inout STD_LOGIC_VECTOR (15 downto 0);
@@ -80,14 +81,6 @@ component memif is
         ST_STS   : in    STD_LOGIC;
         RP       : out   STD_LOGIC := '1'; -- active low
         ST_CE    : out   STD_LOGIC := '1'  -- active low
-    );
-end component;
-
-component decoder is
-    Port (
-        EN : in  STD_LOGIC;
-        I  : in  STD_LOGIC_VECTOR (2 downto 0);
-        O  : out STD_LOGIC_VECTOR (7 downto 0)
     );
 end component;
 
@@ -128,77 +121,52 @@ component kbdctl is
     );
 end component;
 
-signal MEME     : STD_LOGIC;
-signal RW       : STD_LOGIC;
-signal CPUADDR  : STD_LOGIC_VECTOR (15 downto 0);
-signal RAMADDR  : STD_LOGIC_VECTOR (23 downto 0);
-signal VGAADDR  : STD_LOGIC_VECTOR (13 downto 0);
-signal DECADDR  : STD_LOGIC_VECTOR ( 2 downto 0);
-signal DECOUT   : STD_LOGIC_VECTOR ( 7 downto 0);
-signal RAMToCPU : STD_LOGIC_VECTOR ( 7 downto 0);
-signal KBDToCPU : STD_LOGIC_VECTOR ( 7 downto 0);
-signal MemToCPU : STD_LOGIC_VECTOR ( 7 downto 0);
-signal CPUToMem : STD_LOGIC_VECTOR ( 7 downto 0);
-signal RAMEn    : STD_LOGIC;
-signal RAMDin   : STD_LOGIC_VECTOR (15 downto 0);
-signal TMP      : STD_LOGIC_VECTOR ( 7 downto 0);
+-- CPU signals
+signal IRQ          : STD_LOGIC := '0';
+signal NMI          : STD_LOGIC := '0';
+signal IAK          : STD_LOGIC := '0';
+signal NAK          : STD_LOGIC := '0';
 
-signal NMI      : STD_LOGIC;
-signal NAK      : STD_LOGIC;
-signal IRQ      : STD_LOGIC;
-signal IAK      : STD_LOGIC;
-
+-- System bus:
+signal MPULSE       : STD_LOGIC := '0';
+signal MEME         : STD_LOGIC := '0';
+signal RW           : STD_LOGIC := '0';
+signal Address      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal RAMAddress   : STD_LOGIC_VECTOR (23 downto 0) := x"000000";
+signal VGAAddress   : STD_LOGIC_VECTOR (13 downto 0) := "00" & x"000";
+signal DataCPUToMem : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal DataMemToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal DataRAMToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal DataKBDToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal DTYPE        : STD_LOGIC_VECTOR ( 2 downto 0) := "000";
+signal RAM_CS       : STD_LOGIC := '0';
+signal ROM_CS       : STD_LOGIC := '0';
+signal VGA_CS       : STD_LOGIC := '0';
+signal KBD_CS       : STD_LOGIC := '0';
 
 begin
 
--- Decoder Address:
-DECADDR( 0) <= CPUADDR(13);
-DECADDR( 1) <= CPUADDR(14);
-DECADDR( 2) <= CPUADDR(15);
+-- memory decoding
+DataMemToCPU <= DataRAMToCPU OR DataKBDToCPU;
+ROM_CS <= MEME when Address(31 downto 16) = x"0000" else '0';
+RAM_CS <= MEME when Address(31 downto 16) = x"0001" else '0';
+VGA_CS <= MEME when Address(31 downto 15) = x"0001"&"1" else '0';
+KBD_CS <= MEME when Address(31 downto 20) = x"FFF" else '0';
+RAMAddress <= x"00" & Address(15 downto 0);
+VGAAddress <= "0" & Address(14 downto 2);
 
--- VGA Address:
-VGAADDR( 0) <= CPUADDR( 0);
-VGAADDR( 1) <= CPUADDR( 1);
-VGAADDR( 2) <= CPUADDR( 2);
-VGAADDR( 3) <= CPUADDR( 3);
-VGAADDR( 4) <= CPUADDR( 4);
-VGAADDR( 5) <= CPUADDR( 5);
-VGAADDR( 6) <= CPUADDR( 6);
-VGAADDR( 7) <= CPUADDR( 7);
-VGAADDR( 8) <= CPUADDR( 8);
-VGAADDR( 9) <= CPUADDR( 9);
-VGAADDR(10) <= CPUADDR(10);
-VGAADDR(11) <= CPUADDR(11);
-VGAADDR(12) <= CPUADDR(12);
-VGAADDR(13) <= '0';
-
--- RAM/RM Enable
-RAMEn <= DECOUT(0) OR DECOUT(1) OR DECOUT(3) OR
-         DECOUT(4) OR DECOUT(5) OR DECOUT(6) OR DECOUT(7);
-
--- RAM Address:
-RAMADDR <= "000000000" & CPUADDR(14 downto 0);
-RAMDin <= x"00" & CPUToMem;
-
--- Data to CPU
-MemToCPU <= RAMToCPU OR KBDToCPU;
-
--- Components
--- U0: cpu     port map (
---     CLK, IRQ, NMI, MEME, RW, CPUADDR,
---     MemToCPU, CPUToMem, IAK, NAK
--- );
-U1: decoder port map (MEME, DECADDR, DECOUT);
-U2: memif   port map (
-    CLK, TMP, RAMADDR, RAMDin, RAMToCPU, RAMEn, CPUADDR(15), RW, '0',
-    ADDR, DATA, OE, WE,
-    MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
-    ST_STS, RP, ST_CE
-);
-U3: vga     port map (CLK, DECOUT(3), RW, VGAADDR, CPUToMem, R, G, B, HS, VS);
-U4: kbdctl  port map (
-    CLK, PS2CLK, PS2DATA, LED,
-    DECOUT(2), RW, KBDToCPU, NMI, NAK
-);
+-- subblocks
+U1: cpu   port map (CLK, IRQ, NMI, IAK, NAK,
+                    MPULSE, MEME, RW,
+                    Address, DataMemToCPU, DataCPUToMem, DTYPE);
+U2: memif port map (CLK,
+                    MPULSE, RAM_CS, ROM_CS, RW,
+                    RAMAddress, DataCPUToMem(31 downto 0),
+                    DataRAMToCPU(31 downto 0), DTYPE,
+                    ADDR, DATA, OE, WE,
+                    MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
+                    ST_STS, RP, ST_CE);
+U3: vga   port map (CLK, VGA_CS, RW, VGAAddress, DataCPUToMem(7 downto 0),
+                    R, G, B, HS, VS);
 
 end Structural;

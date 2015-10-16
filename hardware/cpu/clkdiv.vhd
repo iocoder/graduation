@@ -18,7 +18,7 @@ architecture Behavioral of clkdiv is
 signal oCLK1MHz    : STD_LOGIC := '0';
 signal oCLK2MHz    : STD_LOGIC := '0';
 
-signal counter1MHz : integer := 23;
+signal counter1MHz : integer := 24;
 signal counter2MHz : integer := 11;
 
 begin
@@ -36,7 +36,7 @@ begin
     end if;
 
     if ( CLK50MHz = '1' and CLK50MHz'event ) then
-        if (counter1MHz = 23) then
+        if (counter1MHz = 24) then
             oCLK1MHz    <= NOT oCLK1MHz;
             counter1MHz <= 0;
         else

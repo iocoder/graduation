@@ -12,6 +12,7 @@ entity cpu is
         IAK    : out STD_LOGIC;
         NAK    : out STD_LOGIC;
         -- system bus
+        MPULSE : out STD_LOGIC;
         MEME   : out STD_LOGIC;
         RW     : out STD_LOGIC;
         ADDR   : out STD_LOGIC_VECTOR (31 downto 0);
@@ -74,6 +75,7 @@ component cache is
         dDout    : out STD_LOGIC_VECTOR (31 downto 0);
         dDTYPE   : in  STD_LOGIC_VECTOR ( 2 downto 0);
         -- system bus interface
+        MPULSE   : out STD_LOGIC;
         MEME     : out STD_LOGIC;
         RW       : out STD_LOGIC;
         ADDR     : out STD_LOGIC_VECTOR (31 downto 0);
@@ -109,6 +111,6 @@ U2: pipeline port map (CLK1MHz, IRQ, NMI, IAK, NAK,
 U3: cache    port map (CLK, CLK2MHz,
                        iMEME, iRW, iADDR, iDout, iDin, iDTYPE,
                        dMEME, dRW, dADDR, dDout, dDin, dDTYPE,
-                       MEME, RW, ADDR, Din, Dout, DTYPE);
+                       MPULSE, MEME, RW, ADDR, Din, Dout, DTYPE);
 
 end Structual;

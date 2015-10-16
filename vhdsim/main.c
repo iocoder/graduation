@@ -163,19 +163,31 @@ static int get_st_ce() {
     return getsigvalLogic(handle_st_ce);
 }
 
+#if 0
+#define DEBUG
+#endif
+
 static void mem_clk() {
     unsigned int data;
     unsigned char *word;
+    vhpiTimeT now;
+    long cycles;
+    vhpi_get_time(&now, &cycles);
     if (get_st_ce()==0 && get_oe()==0) {
         /* ROM READ */
-        /* vhpi_printf("ROM ADDR: 0x%08X", get_addr()); */
         data = rom[(get_addr()&0xFFFFFF)>>1];
-        /* vhpi_printf("DATA: 0x%08X", data); */
+#ifdef DEBUG
+        vhpi_printf("at %dns: ROM RD ADDR: 0x%08X, DATA: 0x%08X",
+                    now.high*4295+now.low/1000000, get_addr(), data);
+#endif
         set_datain(data);
     } else if (get_mt_ce()==0 && get_oe()==0) {
         /* RAM READ */
         data = ram[(get_addr()&0xFFFFFF)>>1];
-//         vhpi_printf("RAM ADDR: 0x%08X, DATA: 0x%08X", get_addr(), data);
+#ifdef DEBUG
+        vhpi_printf("at %dns: RAM RD ADDR: 0x%08X, DATA: 0x%08X",
+                    now.high*4295+now.low/1000000, get_addr(), data);
+#endif
         set_datain(data);
     } else if (get_mt_ce()==0 && get_we()==0) {
         /* RAM WRITE */
@@ -186,6 +198,10 @@ static void mem_clk() {
         if (get_mt_ub()==0) {
             word[1] = get_dataout()>>8;
         }
+#ifdef DEBUG
+        vhpi_printf("at %dns: RAM WR ADDR: 0x%08X, DATA: 0x%08X",
+                    now.high*4295+now.low/1000000, get_addr(), word);
+#endif
     } else {
         tri_datain();
     }

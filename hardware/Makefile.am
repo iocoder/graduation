@@ -1,5 +1,5 @@
 PROJ=mipscomp
-TLC=TLC
+TLC=tlc
 PART=xc3s500e-4-fg320
 
 BIN=/opt/Xilinx/10.1/ISE/bin/lin
@@ -52,8 +52,8 @@ SIM_DIR=_sim
 WORK_DIR=work
 
 PKG_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep _pkg)
-VHD_FILES=$(shell find $(SRC_DIR) | grep -v test | grep -v _pkg | grep .vhd)
-TST_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep test)
+VHD_FILES=$(shell find $(SRC_DIR) | grep -v _sim | grep -v _pkg | grep .vhd)
+TST_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep _sim)
 UCF_FILE=$(SRC_DIR)/$(PROJ).ucf
 
 all: $(BIT_DIR)/final.bit
@@ -125,16 +125,16 @@ isim:
 	cd $(SIM_DIR) && $(ISW) $(TB).xwv
 
 nvcsim:
-	nvc -a $(PKG_FILES) $(VHD_FILES)
+	nvc -a $(PKG_FILES) $(TST_FILES) $(VHD_FILES)
 	nvc -e tlc_sim
 	nvc -r --load=../vhdsim/vhdsim.so tlc_sim
 
-prog: bit/final.bit
+prog: $(BIT_DIR)/final.bit
 	djtgcfg enum
 	djtgcfg init -d Nexys2
-	djtgcfg prog -d Nexys2 -i 0 -f bit/final.bit
+	djtgcfg prog -d Nexys2 -i 0 -f $(BIT_DIR)/final.bit
 
-prog_perm: bit/final.bit
+prog_perm: $(BIT_DIR)/final.bit
 	## generate genbit command line file
 	echo $(BITOPTS) $(CLKPRM) > bit/$(PROJ)_perm.ut
 	## generate programming file for PROM:
@@ -144,13 +144,13 @@ prog_perm: bit/final.bit
 	## program the PROM
 	djtgcfg enum
 	djtgcfg init -d Nexys2
-	djtgcfg prog -d Nexys2 -i 1 -f bit/final.mcs
+	djtgcfg prog -d Nexys2 -i 1 -f $(BIT_DIR)/final.mcs
 	## delay
 	sleep 5
 	## program the FPGA
 	djtgcfg enum
 	djtgcfg init -d Nexys2
-	djtgcfg prog -d Nexys2 -i 0 -f bit/final.bit
+	djtgcfg prog -d Nexys2 -i 0 -f $(BIT_DIR)/final.bit
 	## inform the user of what they should do.
 	@echo The configuration ROM and the FPGA have been programmed.
 	@echo Please make sure that the switches on your FPGA board are

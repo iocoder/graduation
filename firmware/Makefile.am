@@ -30,9 +30,11 @@ all: $(OBJECT).bin
 $(OBJECT).bin: $(COBJ) $(SOBJ) $(LSCRIPT) Makefile
 	$(CC) $(CFLAGS) $(LFLAGS) -o $(OBJECT).elf $(COBJ) $(SOBJ)
 	$(OC) -O binary $(OBJECT).elf $@
+	dd oflag=append conv=notrunc if=/dev/zero of=$@ bs=1 \
+		count=$$((32768-`stat -c%s $@`))
 
 dump:
-	$(OD) -D -m mips $(OBJECT).bin
+	$(OD) -D -m mips $(OBJECT).elf
 
 clean-local:
 	rm -rf $(OFILES) $(IFILES) $(BFILES) $(OBJECT).bin $(OBJECT).elf

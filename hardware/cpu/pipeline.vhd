@@ -142,6 +142,8 @@ signal   id_stall       : STD_LOGIC := '0';
 signal   id_ifclk       : STD_LOGIC := '1';
 signal   id_pcclk       : STD_LOGIC := '1';
 signal   id_regfile     : regfile_t := (others => x"00000000");
+attribute ram_style: string;
+attribute ram_style of id_regfile : signal is "distributed";
 
 -- EX
 signal   ex_hi          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -240,7 +242,7 @@ end process;
 process(CLK)
 begin
     if ( CLK = '0' and CLK'event ) then
-        if (wb_ctrlsig(REG_WRITE) = '1' and wb_rk /= x"00") then
+        if (wb_ctrlsig(REG_WRITE) = '1' and wb_rk /= "00000") then
             id_regfile(conv_integer(wb_rk)) <= wb_value_of_rk;
             if (wb_rk = id_rs) then
                 id_val_of_rs <= wb_value_of_rk;
@@ -364,42 +366,42 @@ id_ctrlsig_in(BRANCH) <=
     '0';
 
 -- decoding
-id_aluop <= ALUOP_SLL   when is_alureg(id_opcode) and id_funct = x"00" else
-            ALUOP_SRL   when is_alureg(id_opcode) and id_funct = x"02" else
-            ALUOP_SRA   when is_alureg(id_opcode) and id_funct = x"03" else
-            ALUOP_SLLV  when is_alureg(id_opcode) and id_funct = x"04" else
-            ALUOP_SRLV  when is_alureg(id_opcode) and id_funct = x"06" else
-            ALUOP_SRAV  when is_alureg(id_opcode) and id_funct = x"07" else
-            ALUOP_CPYPC when is_alureg(id_opcode) and id_funct = x"08" else
-            ALUOP_CPYPC when is_alureg(id_opcode) and id_funct = x"09" else
-            ALUOP_EXP   when is_alureg(id_opcode) and id_funct = x"0C" else
-            ALUOP_EXP   when is_alureg(id_opcode) and id_funct = x"0D" else
-            ALUOP_MFHI  when is_alureg(id_opcode) and id_funct = x"10" else
-            ALUOP_MTHI  when is_alureg(id_opcode) and id_funct = x"11" else
-            ALUOP_MFLO  when is_alureg(id_opcode) and id_funct = x"12" else
-            ALUOP_MTLO  when is_alureg(id_opcode) and id_funct = x"13" else
-            ALUOP_MULT  when is_alureg(id_opcode) and id_funct = x"18" else
-            ALUOP_MULTU when is_alureg(id_opcode) and id_funct = x"19" else
-            ALUOP_DIV   when is_alureg(id_opcode) and id_funct = x"1A" else
-            ALUOP_DIVU  when is_alureg(id_opcode) and id_funct = x"1B" else
-            ALUOP_ADD   when is_alureg(id_opcode) and id_funct = x"20" else
-            ALUOP_ADDU  when is_alureg(id_opcode) and id_funct = x"21" else
-            ALUOP_SUB   when is_alureg(id_opcode) and id_funct = x"22" else
-            ALUOP_SUBU  when is_alureg(id_opcode) and id_funct = x"23" else
-            ALUOP_AND   when is_alureg(id_opcode) and id_funct = x"24" else
-            ALUOP_OR    when is_alureg(id_opcode) and id_funct = x"25" else
-            ALUOP_XOR   when is_alureg(id_opcode) and id_funct = x"26" else
-            ALUOP_NOR   when is_alureg(id_opcode) and id_funct = x"27" else
-            ALUOP_SLT   when is_alureg(id_opcode) and id_funct = x"2A" else
-            ALUOP_SLTU  when is_alureg(id_opcode) and id_funct = x"2B" else
-            ALUOP_ADD   when is_aluimm(id_opcode) and id_opcode= x"08" else
-            ALUOP_ADDU  when is_aluimm(id_opcode) and id_opcode= x"09" else
-            ALUOP_SLT   when is_aluimm(id_opcode) and id_opcode= x"0A" else
-            ALUOP_SLTU  when is_aluimm(id_opcode) and id_opcode= x"0B" else
-            ALUOP_AND   when is_aluimm(id_opcode) and id_opcode= x"0C" else
-            ALUOP_OR    when is_aluimm(id_opcode) and id_opcode= x"0D" else
-            ALUOP_XOR   when is_aluimm(id_opcode) and id_opcode= x"0E" else
-            ALUOP_LUI   when is_aluimm(id_opcode) and id_opcode= x"0F" else
+id_aluop <= ALUOP_SLL   when is_alureg(id_opcode) and id_funct = "000000" else
+            ALUOP_SRL   when is_alureg(id_opcode) and id_funct = "000010" else
+            ALUOP_SRA   when is_alureg(id_opcode) and id_funct = "000011" else
+            ALUOP_SLLV  when is_alureg(id_opcode) and id_funct = "000100" else
+            ALUOP_SRLV  when is_alureg(id_opcode) and id_funct = "000110" else
+            ALUOP_SRAV  when is_alureg(id_opcode) and id_funct = "000111" else
+            ALUOP_CPYPC when is_alureg(id_opcode) and id_funct = "001000" else
+            ALUOP_CPYPC when is_alureg(id_opcode) and id_funct = "001001" else
+            ALUOP_EXP   when is_alureg(id_opcode) and id_funct = "001100" else
+            ALUOP_EXP   when is_alureg(id_opcode) and id_funct = "001101" else
+            ALUOP_MFHI  when is_alureg(id_opcode) and id_funct = "010000" else
+            ALUOP_MTHI  when is_alureg(id_opcode) and id_funct = "010001" else
+            ALUOP_MFLO  when is_alureg(id_opcode) and id_funct = "010010" else
+            ALUOP_MTLO  when is_alureg(id_opcode) and id_funct = "010011" else
+            ALUOP_MULT  when is_alureg(id_opcode) and id_funct = "011000" else
+            ALUOP_MULTU when is_alureg(id_opcode) and id_funct = "011001" else
+            ALUOP_DIV   when is_alureg(id_opcode) and id_funct = "011010" else
+            ALUOP_DIVU  when is_alureg(id_opcode) and id_funct = "011011" else
+            ALUOP_ADD   when is_alureg(id_opcode) and id_funct = "100000" else
+            ALUOP_ADDU  when is_alureg(id_opcode) and id_funct = "100001" else
+            ALUOP_SUB   when is_alureg(id_opcode) and id_funct = "100010" else
+            ALUOP_SUBU  when is_alureg(id_opcode) and id_funct = "100011" else
+            ALUOP_AND   when is_alureg(id_opcode) and id_funct = "100100" else
+            ALUOP_OR    when is_alureg(id_opcode) and id_funct = "100101" else
+            ALUOP_XOR   when is_alureg(id_opcode) and id_funct = "100110" else
+            ALUOP_NOR   when is_alureg(id_opcode) and id_funct = "100111" else
+            ALUOP_SLT   when is_alureg(id_opcode) and id_funct = "101010" else
+            ALUOP_SLTU  when is_alureg(id_opcode) and id_funct = "101011" else
+            ALUOP_ADD   when is_aluimm(id_opcode) and id_opcode= "001000" else
+            ALUOP_ADDU  when is_aluimm(id_opcode) and id_opcode= "001001" else
+            ALUOP_SLT   when is_aluimm(id_opcode) and id_opcode= "001010" else
+            ALUOP_SLTU  when is_aluimm(id_opcode) and id_opcode= "001011" else
+            ALUOP_AND   when is_aluimm(id_opcode) and id_opcode= "001100" else
+            ALUOP_OR    when is_aluimm(id_opcode) and id_opcode= "001101" else
+            ALUOP_XOR   when is_aluimm(id_opcode) and id_opcode= "001110" else
+            ALUOP_LUI   when is_aluimm(id_opcode) and id_opcode= "001111" else
             ALUOP_CPYPC when is_jmp(id_opcode)                         else
             ALUOP_ADD   when is_memload(id_opcode)                     else
             ALUOP_ADD   when is_memstore(id_opcode)                    else
@@ -409,14 +411,14 @@ id_memop <= "00000" & id_opcode(2 downto 0);
 -- hazard detection unit
 id_stall <= '1' when
     -- LW followed immediately by instruction that needs its value
-    (ex_ctrlsig(MEM_READ) = '1' and ex_rk /= x"00" and
+    (ex_ctrlsig(MEM_READ) = '1' and ex_rk /= "00000" and
      ((ex_rk=id_rs) or ((ex_rk=id_rt) and (id_ctrlsig_in(MEM_READ)='0')))) or
-    -- branch/jmp instruction that needs values in EX and MEM stages
-    (id_ctrlsig_in(BRANCH) = '1' and
-     ((ex_ctrlsig(REG_WRITE) = '1' and ex_rk /= x"00" and
-       (ex_rk = id_rs or (id_opcode /= x"01" and ex_rk = id_rt))) or
-      (mem_ctrlsig(REG_WRITE) = '1' and mem_rk /= x"00" and
-          (mem_rk = id_rs or (id_opcode /= x"01" and mem_rk = id_rt)))))
+    -- branch/jmpreg instruction that needs values in EX and MEM stages
+    (id_ctrlsig_in(BRANCH) = '1' and (NOT is_jmp(id_opcode)) and
+     ((ex_ctrlsig(REG_WRITE) = '1' and ex_rk /= "00000" and
+       (ex_rk = id_rs or (id_opcode /= "000001" and ex_rk = id_rt))) or
+      (mem_ctrlsig(REG_WRITE) = '1' and mem_rk /= "00000" and
+          (mem_rk = id_rs or (id_opcode /= "000001" and mem_rk = id_rt)))))
     else '0';
 id_ifclk <= NOT id_stall;
 id_pcclk <= NOT id_stall;
@@ -578,7 +580,6 @@ dDTYPE(1)    <= '1' when (mem_memop = MEMOP_HALF or
 dDTYPE(2)    <= '1' when (mem_memop = MEMOP_WORD) else '0';
 
 -- sign extension for memory data
-mem_data_out( 7 downto 0) <= dDin( 7 downto 0);
 mem_data_out <= signext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTE  else
                 unsiext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTEU else
                 signext2(dDin(15 downto 0)) when mem_memop = MEMOP_HALF  else
