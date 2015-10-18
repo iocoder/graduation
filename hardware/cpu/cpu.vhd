@@ -18,7 +18,8 @@ entity cpu is
         ADDR   : out STD_LOGIC_VECTOR (31 downto 0);
         Din    : in  STD_LOGIC_VECTOR (31 downto 0);
         Dout   : out STD_LOGIC_VECTOR (31 downto 0);
-        DTYPE  : out STD_LOGIC_VECTOR ( 2 downto 0)
+        DTYPE  : out STD_LOGIC_VECTOR ( 2 downto 0);
+        RDY    : in  STD_LOGIC
     );
 end entity;
 
@@ -36,6 +37,7 @@ end component;
 component pipeline is
     Port (
         CLK    : in  STD_LOGIC;
+        nRDY   : in  STD_LOGIC;
         IRQ    : in  STD_LOGIC;
         NMI    : in  STD_LOGIC;
         IAK    : out STD_LOGIC;
@@ -61,6 +63,7 @@ component cache is
     Port (
         CLK50MHz : in  STD_LOGIC;
         CLK2MHz  : in  STD_LOGIC;
+        nRDY     : out STD_LOGIC;
         -- CPU interface
         iMEME    : in  STD_LOGIC;
         iRW      : in  STD_LOGIC;
@@ -81,7 +84,8 @@ component cache is
         ADDR     : out STD_LOGIC_VECTOR (31 downto 0);
         Din      : in  STD_LOGIC_VECTOR (31 downto 0);
         Dout     : out STD_LOGIC_VECTOR (31 downto 0);
-        DTYPE    : out STD_LOGIC_VECTOR ( 2 downto 0)
+        DTYPE    : out STD_LOGIC_VECTOR ( 2 downto 0);
+        RDY      : in  STD_LOGIC
     );
 end component;
 
@@ -99,18 +103,19 @@ signal dADDR    : STD_LOGIC_VECTOR (31 downto 0);
 signal dDin     : STD_LOGIC_VECTOR (31 downto 0);
 signal dDout    : STD_LOGIC_VECTOR (31 downto 0);
 signal dDTYPE   : STD_LOGIC_VECTOR ( 2 downto 0);
+signal nRDY     : STD_LOGIC;
 
 begin
 
 U1: clkdiv   port map (CLK, CLK2MHz, CLK1MHz);
 
-U2: pipeline port map (CLK1MHz, IRQ, NMI, IAK, NAK,
+U2: pipeline port map (CLK, nRDY, IRQ, NMI, IAK, NAK,
                        iMEME, iRW, iADDR, iDin, iDout, iDTYPE,
                        dMEME, dRW, dADDR, dDin, dDout, dDTYPE);
 
-U3: cache    port map (CLK, CLK2MHz,
+U3: cache    port map (CLK, CLK2MHz, nRDY,
                        iMEME, iRW, iADDR, iDout, iDin, iDTYPE,
                        dMEME, dRW, dADDR, dDout, dDin, dDTYPE,
-                       MPULSE, MEME, RW, ADDR, Din, Dout, DTYPE);
+                       MPULSE, MEME, RW, ADDR, Din, Dout, DTYPE, RDY);
 
 end Structual;

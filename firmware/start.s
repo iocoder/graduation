@@ -3,8 +3,7 @@
 .section .entry, "ax"
 .global start
 start:
-    nop
-    lui   $v0, 0x0001       # IF ID EX MM WB
+/*    lui   $v0, 0x0001       # IF ID EX MM WB
     ori   $v0, $v0, 0x8000  #    IF ID EX MM WB
     ori   $v1, $0, 'H'      #       IF ID EX MM WB
     sw    $v1, 0x00($v0)    #          IF ID EX MM WB
@@ -37,8 +36,13 @@ start:
     ori   $v1, $0, 'S'
     sw    $v1, 0x70($v0)
     ori   $v1, $0, '!'
-    sw    $v1, 0x78($v0)
-
+    nop
+    nop
+    nop*/
+    /*lui   $a2, 0x0001
+    sw    $v1, 0x00($a2)
+    lw    $v1, 0x00($a2)*/
+/*     sw    $v1, 0x78($v0) */
 
 /*    ori   $v1, $0, 'H'      # WB
     lui   $v0, 0x0001       # MEM

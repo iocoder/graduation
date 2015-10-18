@@ -1,6 +1,10 @@
 #include <SDL/SDL.h>
 #include "vhpi_user.h"
 
+#if 0
+#define DEBUG
+#endif
+
 static vhpiHandleT handle_clk;
 static vhpiHandleT handle_r0;
 static vhpiHandleT handle_r1;
@@ -162,10 +166,6 @@ static int get_mt_ce() {
 static int get_st_ce() {
     return getsigvalLogic(handle_st_ce);
 }
-
-#if 0
-#define DEBUG
-#endif
 
 static void mem_clk() {
     unsigned int data;

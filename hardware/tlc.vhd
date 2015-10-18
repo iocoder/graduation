@@ -50,7 +50,8 @@ component cpu is
         ADDR   : out STD_LOGIC_VECTOR (31 downto 0);
         Din    : in  STD_LOGIC_VECTOR (31 downto 0);
         Dout   : out STD_LOGIC_VECTOR (31 downto 0);
-        DTYPE  : out STD_LOGIC_VECTOR ( 2 downto 0)
+        DTYPE  : out STD_LOGIC_VECTOR ( 2 downto 0);
+        RDY    : in  STD_LOGIC
     );
 end component;
 
@@ -66,6 +67,7 @@ component memif is
         Din      : in    STD_LOGIC_VECTOR (31 downto 0);
         Dout     : out   STD_LOGIC_VECTOR (31 downto 0);
         DTYPE    : in    STD_LOGIC_VECTOR ( 2 downto 0);
+        RDY      : out STD_LOGIC;
         -- External Memory Bus:
         ADDR     : out   STD_LOGIC_VECTOR (23 downto 0);
         DATA     : inout STD_LOGIC_VECTOR (15 downto 0);
@@ -89,10 +91,11 @@ component vga is
         -- 50MHz clock input
         CLK : in  STD_LOGIC;
         -- System Bus
-        CS  : in STD_LOGIC;
-        WR  : in STD_LOGIC;
-        A   : in STD_LOGIC_VECTOR (13 downto 0);
-        D   : in STD_LOGIC_VECTOR (7 downto 0);
+        CS  : in  STD_LOGIC;
+        WR  : in  STD_LOGIC;
+        A   : in  STD_LOGIC_VECTOR (13 downto 0);
+        D   : in  STD_LOGIC_VECTOR (7 downto 0);
+        RDY : out STD_LOGIC;
         -- VGA Port
         R   : out STD_LOGIC_VECTOR (2 downto 0);
         G   : out STD_LOGIC_VECTOR (2 downto 0);
@@ -143,6 +146,10 @@ signal RAM_CS       : STD_LOGIC := '0';
 signal ROM_CS       : STD_LOGIC := '0';
 signal VGA_CS       : STD_LOGIC := '0';
 signal KBD_CS       : STD_LOGIC := '0';
+signal MEM_RDY      : STD_LOGIC := '0';
+signal VGA_RDY      : STD_LOGIC := '0';
+signal KBD_RDY      : STD_LOGIC := '0';
+signal RDY          : STD_LOGIC := '0';
 
 begin
 
@@ -152,21 +159,26 @@ ROM_CS <= MEME when Address(31 downto 16) = x"0000" else '0';
 RAM_CS <= MEME when Address(31 downto 16) = x"0001" else '0';
 VGA_CS <= MEME when Address(31 downto 15) = x"0001"&"1" else '0';
 KBD_CS <= MEME when Address(31 downto 20) = x"FFF" else '0';
+RDY    <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
+          VGA_RDY when VGA_CS = '1' else
+          KBD_RDY when KBD_CS = '1' else
+          '0';
 RAMAddress <= x"00" & Address(15 downto 0);
 VGAAddress <= "0" & Address(14 downto 2);
 
 -- subblocks
 U1: cpu   port map (CLK, IRQ, NMI, IAK, NAK,
                     MPULSE, MEME, RW,
-                    Address, DataMemToCPU, DataCPUToMem, DTYPE);
+                    Address, DataMemToCPU, DataCPUToMem, DTYPE, RDY);
 U2: memif port map (CLK,
                     MPULSE, RAM_CS, ROM_CS, RW,
                     RAMAddress, DataCPUToMem(31 downto 0),
-                    DataRAMToCPU(31 downto 0), DTYPE,
+                    DataRAMToCPU(31 downto 0), DTYPE, MEM_RDY,
                     ADDR, DATA, OE, WE,
                     MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
                     ST_STS, RP, ST_CE);
-U3: vga   port map (CLK, VGA_CS, RW, VGAAddress, DataCPUToMem(7 downto 0),
+U3: vga   port map (CLK, VGA_CS, RW, VGAAddress,
+                    DataCPUToMem(7 downto 0), VGA_RDY,
                     R, G, B, HS, VS);
 
 end Structural;

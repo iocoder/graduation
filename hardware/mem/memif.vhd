@@ -15,6 +15,7 @@ entity memif is
         Din      : in    STD_LOGIC_VECTOR (31 downto 0);
         Dout     : out   STD_LOGIC_VECTOR (31 downto 0);
         DTYPE    : in    STD_LOGIC_VECTOR ( 2 downto 0);
+        RDY      : out   STD_LOGIC := '1';
         -- External Memory Bus:
         ADDR     : out   STD_LOGIC_VECTOR (23 downto 0);
         DATA     : inout STD_LOGIC_VECTOR (15 downto 0);
@@ -94,10 +95,11 @@ Dout    <= Dout16b & Dout16a when ((RAM_CS OR ROM_CS) AND (NOT RW))='1'
 process (CLK)
 begin
 
-    if ( CLK = '0' and CLK'event ) then
+    if ( CLK = '1' and CLK'event ) then
         if (MPULSE = '1' and (RAM_CS = '1' OR ROM_CS = '1')) then
             -- startup of a new memory cycle
             counter <= 0;
+            RDY <= '0';
             if (DTYPE(0) = '1') then
                 -- BYTE
                 A16a   <= A(23 downto 1) & "0";
@@ -178,6 +180,7 @@ begin
                 LB16    <= '0';
                 UB16    <= '0';
                 EN16    <= '0';
+                RDY     <= '1';
             end if;
         end if;
     end if;

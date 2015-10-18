@@ -1,20 +1,20 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    00:48:05 06/30/2014 
--- Design Name: 
--- Module Name:    vga - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Company:
+-- Engineer:
 --
--- Dependencies: 
+-- Create Date:    00:48:05 06/30/2014
+-- Design Name:
+-- Module Name:    vga - Behavioral
+-- Project Name:
+-- Target Devices:
+-- Tool versions:
+-- Description:
 --
--- Revision: 
+-- Dependencies:
+--
+-- Revision:
 -- Revision 0.01 - File Created
--- Additional Comments: 
+-- Additional Comments:
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -29,13 +29,14 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity vga is
     Port ( CLK : in  STD_LOGIC; -- 50MHz clock input
-			  -- System Bus
-			  CS  : in STD_LOGIC;
-           WR  : in STD_LOGIC;
-           A   : in STD_LOGIC_VECTOR (13 downto 0);
-           D   : in STD_LOGIC_VECTOR (7 downto 0);
-			  -- VGA Port
-			  R   : out STD_LOGIC_VECTOR (2 downto 0);
+           -- System Bus
+           CS  : in  STD_LOGIC;
+           WR  : in  STD_LOGIC;
+           A   : in  STD_LOGIC_VECTOR (13 downto 0);
+           D   : in  STD_LOGIC_VECTOR (7 downto 0);
+           RDY : out STD_LOGIC := '1';
+           -- VGA Port
+           R   : out STD_LOGIC_VECTOR (2 downto 0);
            G   : out STD_LOGIC_VECTOR (2 downto 0);
            B   : out STD_LOGIC_VECTOR (1 downto 0);
            HS  : out STD_LOGIC;
@@ -64,11 +65,11 @@ end component;
 
 component vgaram0 is
     Port ( CLK         : in STD_LOGIC;
-	 
+
 	        ReadEnable  : in STD_LOGIC;
 	        ReadAddr    : in STD_LOGIC_VECTOR (11 downto 0);
            ReadData    : out STD_LOGIC_VECTOR (7 downto 0);
-			  
+
 			  WriteEnable : in STD_LOGIC;
            WriteAddr   : in  STD_LOGIC_VECTOR (11 downto 0);
            WriteData   : in  STD_LOGIC_VECTOR (7 downto 0));
@@ -76,11 +77,11 @@ end component;
 
 component vgaram1 is
     Port ( CLK         : in STD_LOGIC;
-	 
+
 	        ReadEnable  : in STD_LOGIC;
 	        ReadAddr    : in STD_LOGIC_VECTOR (11 downto 0);
            ReadData    : out STD_LOGIC_VECTOR (7 downto 0);
-			  
+
 			  WriteEnable : in STD_LOGIC;
            WriteAddr   : in  STD_LOGIC_VECTOR (11 downto 0);
            WriteData   : in  STD_LOGIC_VECTOR (7 downto 0));
@@ -88,11 +89,11 @@ end component;
 
 component vgaram2 is
     Port ( CLK         : in STD_LOGIC;
-	 
+
 	        ReadEnable  : in STD_LOGIC;
 	        ReadAddr    : in STD_LOGIC_VECTOR (11 downto 0);
            ReadData    : out STD_LOGIC_VECTOR (7 downto 0);
-			  
+
 			  WriteEnable : in STD_LOGIC;
            WriteAddr   : in  STD_LOGIC_VECTOR (11 downto 0);
            WriteData   : in  STD_LOGIC_VECTOR (7 downto 0));
@@ -100,11 +101,11 @@ end component;
 
 component vgaram3 is
     Port ( CLK         : in STD_LOGIC;
-	 
+
 	        ReadEnable  : in STD_LOGIC;
 	        ReadAddr    : in STD_LOGIC_VECTOR (11 downto 0);
            ReadData    : out STD_LOGIC_VECTOR (7 downto 0);
-			  
+
 			  WriteEnable : in STD_LOGIC;
            WriteAddr   : in  STD_LOGIC_VECTOR (11 downto 0);
            WriteData   : in  STD_LOGIC_VECTOR (7 downto 0));
@@ -112,27 +113,27 @@ end component;
 
 component sequencer is
     Port ( CLK       : in  STD_LOGIC;
-	 
+
 	        SE        : in  STD_LOGIC;
            X         : in  STD_LOGIC_VECTOR (15 downto 0);
            Y         : in  STD_LOGIC_VECTOR (15 downto 0);
-			  
+
 			  VRAM0Read : out  STD_LOGIC;
 			  VRAM0Addr : out  STD_LOGIC_VECTOR (11 downto 0);
            VRAM0Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-			  
+
 			  VRAM1Read : out  STD_LOGIC;
 			  VRAM1Addr : out  STD_LOGIC_VECTOR (11 downto 0);
            VRAM1Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-			  
+
 			  VRAM2Read : out  STD_LOGIC;
 			  VRAM2Addr : out  STD_LOGIC_VECTOR (11 downto 0);
            VRAM2Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-			  
+
 			  VRAM3Read : out  STD_LOGIC;
 			  VRAM3Addr : out  STD_LOGIC_VECTOR (11 downto 0);
            VRAM3Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-			  
+
            Color     : out  STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
@@ -183,7 +184,7 @@ signal VRAM2ReadData   : STD_LOGIC_VECTOR (7 downto 0);
 
 signal VRAM3ReadEnable : STD_LOGIC;
 signal VRAM3ReadAddr   : STD_LOGIC_VECTOR (11 downto 0);
-signal VRAM3ReadData   : STD_LOGIC_VECTOR (7 downto 0);			  
+signal VRAM3ReadData   : STD_LOGIC_VECTOR (7 downto 0);
 
 begin
 
