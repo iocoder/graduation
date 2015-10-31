@@ -7,9 +7,9 @@ use work.cpu_pkg.all;
 
 entity cache is
     Port (
-        CLK50MHz : in  STD_LOGIC;
-        CLK2MHz  : in  STD_LOGIC;
-        nRDY     : out STD_LOGIC := '0';
+        CLK      : in  STD_LOGIC;
+        CACHE_EN : in  STD_LOGIC;
+        STALL    : out STD_LOGIC;
         -- CPU interface
         iMEME    : in  STD_LOGIC;
         iRW      : in  STD_LOGIC;
@@ -24,7 +24,6 @@ entity cache is
         dDout    : out STD_LOGIC_VECTOR (31 downto 0);
         dDTYPE   : in  STD_LOGIC_VECTOR ( 2 downto 0);
         -- system bus interface
-        MPULSE   : out STD_LOGIC := '0';
         MEME     : out STD_LOGIC := '0';
         RW       : out STD_LOGIC := '0';
         ADDR     : out STD_LOGIC_VECTOR (31 downto 0);
@@ -37,10 +36,32 @@ end entity;
 
 architecture Behavioral of cache is
 
-signal phase         : integer := 0;
+component cachearray is
+    Port (
+        CLK      : in  STD_LOGIC;
+        -- bus interface
+        RW       : in  STD_LOGIC;
+        RD_ADDR  : in  STD_LOGIC_VECTOR (7 downto 0);
+        WR_ADDR  : in  STD_LOGIC_VECTOR (7 downto 0);
+        -- inputs
+        Vin      : in  STD_LOGIC;
+        Din      : in  STD_LOGIC_VECTOR (31 downto 0);
+        TAGin    : in  STD_LOGIC_VECTOR (21 downto 0);
+        -- outputs
+        Vout     : out STD_LOGIC;
+        Dout     : out STD_LOGIC_VECTOR (31 downto 0);
+        TAGout   : out STD_LOGIC_VECTOR (21 downto 0)
+    );
+end component;
+
+-- stall signal
+signal STALLout : STD_LOGIC := '0';
+
+-- phase
+signal phase    : integer range 0 to 15 := 0;
 
 --------------------------------------------------------------------------------
---                           MEMORY I/O BUFFER                                --
+--                               R/W BUFFER                                   --
 --------------------------------------------------------------------------------
 
 constant BUFFER_SIZE : integer := 10;
@@ -69,7 +90,7 @@ signal buf1 : buf_entry_t := (USED => false, RW => '0',
 signal cur_buf : buf_entry_t;
 
 --------------------------------------------------------------------------------
---                           INSTRUCTION CACHE                                --
+--                            CACHE PARAMETERS                                --
 --------------------------------------------------------------------------------
 
 -- +-------+-------+--------+
@@ -77,143 +98,156 @@ signal cur_buf : buf_entry_t;
 -- +-------+-------+--------+
 --    22       8       2
 
-constant ICACHE_LINES : integer range 0 to 100000 := 256;
-constant IOFFSET_BITS : integer range 0 to 100000 := 2;
-constant IINDEX_BITS  : integer range 0 to 100000 := 8;
-constant IINDEX_LOW   : integer range 0 to 100000 := 2;
-constant IINDEX_HIGH  : integer range 0 to 100000 := 9;
-constant ITAG_BITS    : integer range 0 to 100000 := 22;
-constant ITAG_LOW     : integer range 0 to 100000 := 10;
-constant ITAG_HIGH    : integer range 0 to 100000 := 31;
+constant CACHE_LINES : integer range 0 to 100000 := 256;
+constant OFFSET_BITS : integer range 0 to 100000 := 2;
+constant INDEX_BITS  : integer range 0 to 100000 := 8;
+constant INDEX_LOW   : integer range 0 to 100000 := 2;
+constant INDEX_HIGH  : integer range 0 to 100000 := 9;
+constant TAG_BITS    : integer range 0 to 100000 := 22;
+constant TAG_LOW     : integer range 0 to 100000 := 10;
+constant TAG_HIGH    : integer range 0 to 100000 := 31;
 
-type icache_v_t    is array (0 to ICACHE_LINES-1) of
-                            boolean;
-type icache_data_t is array (0 to ICACHE_LINES-1) of
-                            std_logic_vector(31 downto 0);
-type icache_tag_t  is array (0 to ICACHE_LINES-1) of
-                            std_logic_vector(ITAG_BITS-1 downto 0);
-
-signal icache_arr_v    : icache_v_t := (others => false);
-signal icache_arr_data : icache_data_t;
-signal icache_arr_tag  : icache_tag_t;
-
-signal icache_wr_enable : boolean := false;
-signal icache_wr_index  : integer range 0 to 100000;
-signal icache_wr_v      : boolean;
+-- icache interface
+signal icache_rw        : std_logic := '0';
+signal icache_rd_v      : std_logic;
+signal icache_rd_data   : std_logic_vector(31 downto 0);
+signal icache_rd_tag    : std_logic_vector(TAG_BITS-1 downto 0);
+signal icache_wr_index  : std_logic_vector(INDEX_BITS-1 downto 0);
+signal icache_wr_v      : std_logic;
 signal icache_wr_data   : std_logic_vector(31 downto 0);
-signal icache_wr_tag    : std_logic_vector(ITAG_BITS-1 downto 0);
+signal icache_wr_tag    : std_logic_vector(TAG_BITS-1 downto 0);
 
---------------------------------------------------------------------------------
---                              DATA CACHE                                    --
---------------------------------------------------------------------------------
-
--- +-------+-------+--------+
--- |  TAG  | INDEX | OFFSET |
--- +-------+-------+--------+
---    22       8       2
-
-constant DCACHE_LINES : integer range 0 to 100000 := 256;
-constant DOFFSET_BITS : integer range 0 to 100000 := 2;
-constant DINDEX_BITS  : integer range 0 to 100000 := 8;
-constant DINDEX_LOW   : integer range 0 to 100000 := 2;
-constant DINDEX_HIGH  : integer range 0 to 100000 := 9;
-constant DTAG_BITS    : integer range 0 to 100000 := 22;
-constant DTAG_LOW     : integer range 0 to 100000 := 10;
-constant DTAG_HIGH    : integer range 0 to 100000 := 31;
-
-type dcache_v_t    is array (0 to DCACHE_LINES-1) of
-                            boolean;
-type dcache_data_t is array (0 to DCACHE_LINES-1) of
-                            std_logic_vector(31 downto 0);
-type dcache_tag_t  is array (0 to DCACHE_LINES-1) of
-                            std_logic_vector(DTAG_BITS-1 downto 0);
-
-signal dcache_arr_v    : dcache_v_t := (others => false);
-signal dcache_arr_data : dcache_data_t;
-signal dcache_arr_tag  : dcache_tag_t;
-
-signal dcache_wr_enable : boolean := false;
-signal dcache_wr_index  : integer range 0 to 100000;
-signal dcache_wr_v      : boolean;
+-- dcache interface
+signal dcache_rw        : std_logic := '0';
+signal dcache_rd_v      : std_logic;
+signal dcache_rd_data   : std_logic_vector(31 downto 0);
+signal dcache_rd_tag    : std_logic_vector(TAG_BITS-1 downto 0);
+signal dcache_wr_index  : std_logic_vector(INDEX_BITS-1 downto 0);
+signal dcache_wr_v      : std_logic;
 signal dcache_wr_data   : std_logic_vector(31 downto 0);
-signal dcache_wr_tag    : std_logic_vector(DTAG_BITS-1 downto 0);
-
-attribute ram_style: string;
-attribute ram_style of icache_arr_v    : signal is "distributed";
-attribute ram_style of icache_arr_data : signal is "distributed";
-attribute ram_style of icache_arr_tag  : signal is "distributed";
-attribute ram_style of dcache_arr_v    : signal is "distributed";
-attribute ram_style of dcache_arr_data : signal is "distributed";
-attribute ram_style of dcache_arr_tag  : signal is "distributed";
-
---------------------------------------------------------------------------------
---                         FINITE STATE MACHINE                              --
---------------------------------------------------------------------------------
-
-signal icache_idx   : std_logic_vector(IINDEX_BITS-1 downto 0);
-signal icache_index : integer range 0 to 255 := 0;
-signal icache_tag   : std_logic_vector(ITAG_BITS-1 downto 0);
-signal icache_hit   : boolean := FALSE;
-signal icache_data  : std_logic_vector(31 downto 0);
-
-signal dcache_idx   : std_logic_vector(DINDEX_BITS-1 downto 0);
-signal dcache_index : integer range 0 to 255 := 0;
-signal dcache_tag   : std_logic_vector(DTAG_BITS-1 downto 0);
-signal dcache_hit   : boolean := FALSE;
-signal dcache_data  : std_logic_vector(31 downto 0);
+signal dcache_wr_tag    : std_logic_vector(TAG_BITS-1 downto 0);
 
 begin
 
--- icache hit signals
-icache_idx   <= iADDR(IINDEX_HIGH downto IINDEX_LOW);
-icache_index <= conv_integer(icache_idx);
-icache_tag   <= iADDR(ITAG_HIGH downto ITAG_LOW);
-icache_hit   <= icache_arr_v(icache_index) and
-                icache_arr_tag(icache_index) = icache_tag;
-icache_data  <= icache_arr_data(icache_index);
+--------------------------------------------------------------------------------
+--                            CACHE ARRAYS                                    --
+--------------------------------------------------------------------------------
 
--- dcache hit signals
-dcache_idx   <= dADDR(DINDEX_HIGH downto DINDEX_LOW);
-dcache_index <= conv_integer(dcache_idx);
-dcache_tag   <= dADDR(DTAG_HIGH downto DTAG_LOW);
-dcache_hit   <= dcache_arr_v(dcache_index) and
-                dcache_arr_tag(dcache_index) = dcache_tag;
-dcache_data  <= dcache_arr_data(dcache_index);
+C1: cachearray port map (
+    CLK, icache_rw, iADDR(INDEX_HIGH downto INDEX_LOW), icache_wr_index,
+    icache_wr_v, icache_wr_data, icache_wr_tag,
+    icache_rd_v, icache_rd_data, icache_rd_tag
+);
 
-process (CLK50MHz)
+C2: cachearray port map (
+    CLK, dcache_rw, dADDR(INDEX_HIGH downto INDEX_LOW), dcache_wr_index,
+    dcache_wr_v, dcache_wr_data, dcache_wr_tag,
+    dcache_rd_v, dcache_rd_data, dcache_rd_tag
+);
+
+--------------------------------------------------------------------------------
+--                        FINITE STATE MACHINE                                --
+--------------------------------------------------------------------------------
+
+-- Synchronization note:
+--
+-- pipeline cycle begins with rising edge of even cache cycles:
+--   _   _   _   _   _   _
+--  | |_| |_| |_| |_| |_| |_
+--  +       +       +       +   pipeline cycles
+--  ^   ^   ^   ^   ^   ^   ^   cache array cycles
+--  001111000011110000111100    phase variable
+--
+-- if a cache miss occurs, phase will be updated from 1 to 2
+-- instead of going back to 0, and STALLout will be set to 1.
+--
+process(CLK)
+
+variable icache_hit : boolean;
+variable dcache_hit : boolean;
+variable buf_empty  : boolean := true;
+
+function extract(dtype : in STD_LOGIC_VECTOR (2  downto 0);
+                 addr  : in STD_LOGIC_VECTOR (31 downto 0);
+                 word  : in STD_LOGIC_VECTOR (31 downto 0))
+                 return STD_LOGIC_VECTOR is
+variable retval : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 begin
-
-    if ( CLK50MHz = '1' and CLK50MHz'event ) then
-        if (dcache_wr_enable) then
-            dcache_arr_v(dcache_wr_index) <= dcache_wr_v;
-            dcache_arr_data(dcache_wr_index) <= dcache_wr_data;
-            dcache_arr_tag(dcache_wr_index) <= dcache_wr_tag;
+    if (dtype = "001") then
+        if (addr(1 downto 0) = "00") then
+            retval := x"000000" & word(7 downto 0);
+        elsif (addr(1 downto 0) = "01") then
+            retval := x"000000" & word(15 downto 8);
+        elsif (addr(1 downto 0) = "10") then
+            retval := x"000000" & word(23 downto 16);
+        else
+            retval := x"000000" & word(31 downto 24);
         end if;
-
-
-        if (icache_wr_enable) then
-            icache_arr_v(icache_wr_index) <= icache_wr_v;
-            icache_arr_data(icache_wr_index) <= icache_wr_data;
-            icache_arr_tag(icache_wr_index) <= icache_wr_tag;
+    elsif (dtype = "010") then
+        if (addr(0) = '0') then
+            retval := x"0000" & word(15 downto 0);
+        elsif (addr(0) = '1') then
+            retval := x"0000" & word(31 downto 16);
         end if;
+    else
+        retval := word;
     end if;
+    return retval;
+end extract;
 
-end process;
-
-
-process (CLK50MHz)
+function merge(dtype : in STD_LOGIC_VECTOR (2  downto 0);
+               addr  : in STD_LOGIC_VECTOR (31 downto 0);
+               orig  : in STD_LOGIC_VECTOR (31 downto 0);
+               word  : in STD_LOGIC_VECTOR (31 downto 0))
+                 return STD_LOGIC_VECTOR is
+variable retval : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+begin
+    if (dtype = "001") then
+        if (addr(1 downto 0) = "00") then
+            retval:=orig(31 downto 8)&word(7 downto 0);
+        elsif (addr(1 downto 0) = "01") then
+            retval:=orig(31 downto 16)&word(15 downto 8)&orig(7 downto 0);
+        elsif (addr(1 downto 0) = "10") then
+            retval:=orig(31 downto 24)&word(23 downto 16)&orig(15 downto 0);
+        else
+            retval:=word(31 downto 24)&orig(23 downto 0);
+        end if;
+    elsif (dtype = "010") then
+        if (addr(0) = '0') then
+            retval := orig(31 downto 16) & word(15 downto 0);
+        elsif (addr(0) = '1') then
+            retval := word(31 downto 16) & orig(15 downto 0);
+        end if;
+    else
+        retval := word;
+    end if;
+    return retval;
+end merge;
 
 begin
 
-    if ( CLK50MHz = '0' and CLK50MHz'event ) then
-
-        -- state machine
+    if ( CLK='0' and CLK'event and CACHE_EN = '1' ) then
+        -- detect cache hits
+        icache_hit := icache_rd_v = '1' and
+                        icache_rd_tag = iADDR(TAG_HIGH downto TAG_LOW);
+        dcache_hit := dcache_rd_v = '1' and
+                        dcache_rd_tag = dADDR(TAG_HIGH downto TAG_LOW);
+        -- execute fsm
         if (phase = 0) then
-
+            -------------------
+            -- initial delay --
+            -------------------
+            -- wait until address is resolved and cache array is queried
+            phase <= 1;
+        elsif (phase = 1) then
+            -------------------------------
+            -- cache hit/miss processing --
+            -------------------------------
+            -- process cache hits/misses:
             if (iMEME = '1') then
                 if (iRW = '0' and icache_hit) then
                     -- icache hit and read
-                    iDout <= icache_data;
+                    iDout <= icache_rd_data;
                 else
                     -- icache miss or write through
                     buf0.USED  <= true;
@@ -222,36 +256,16 @@ begin
                     buf0.DATA  <= iDin;
                     buf0.DTYPE <= iDTYPE;
                     buf0.DSRC  <= '0';
-                    nRDY       <= '1';
                     buf_head   <= 0;
                     buf_cycle  <= 0;
-                    phase      <= 1;
-
+                    buf_empty := false;
                 end if;
             end if;
 
             if (dMEME = '1') then
                 if (dRW = '0' and dcache_hit) then
                     -- dcache hit and read
-                    if (dDTYPE = "001") then
-                        if (dADDR(1 downto 0) = "00") then
-                            dDout <= x"000000" & dcache_data(7 downto 0);
-                        elsif (dADDR(1 downto 0) = "01") then
-                            dDout <= x"000000" & dcache_data(15 downto 8);
-                        elsif (dADDR(1 downto 0) = "10") then
-                            dDout <= x"000000" & dcache_data(23 downto 16);
-                        else
-                            dDout <= x"000000" & dcache_data(31 downto 24);
-                        end if;
-                    elsif (dDTYPE = "010") then
-                        if (dADDR(0) = '0') then
-                            dDout <= x"0000" & dcache_data(15 downto 0);
-                        elsif (dADDR(0) = '1') then
-                            dDout <= x"0000" & dcache_data(31 downto 16);
-                        end if;
-                    else
-                        dDout <= dcache_data;
-                    end if;
+                    dDout <= extract(dDTYPE, dADDR, dcache_rd_data);
                 else
                     -- dcache miss or write through
                     buf1.USED  <= true;
@@ -260,21 +274,29 @@ begin
                     buf1.DATA  <= dDin;
                     buf1.DTYPE <= dDTYPE;
                     buf1.DSRC  <= '1';
-                    nRDY       <= '1';
                     buf_head   <= 0;
                     buf_cycle  <= 0;
-                    phase      <= 1;
-
+                    buf_empty  := false;
                 end if;
             end if;
 
-        else
-            -- process buffers
+            -- determine next phase
+            if (buf_empty) then
+                -- no cache misses.
+                phase <= 0;
+            else
+                -- there is at least one cache miss
+                phase <= 2;
+                STALLout <= '1';
+            end if;
+        elsif (phase = 2) then
+            -----------------------
+            -- buffer processing --
+            -----------------------
             if (buf_cycle = 0) then
                 -- setup memory interface
                 if (buf_head = 0) then
                     if (buf0.used) then
-                        MPULSE <= '1';
                         MEME   <= '1';
                         RW     <= buf0.RW;
                         Dout   <= buf0.DATA;
@@ -293,7 +315,6 @@ begin
                     end if;
                 else
                     if (buf1.used) then
-                        MPULSE <= '1';
                         MEME   <= '1';
                         RW     <= buf1.RW;
                         Dout   <= buf1.DATA;
@@ -312,12 +333,11 @@ begin
                     end if;
                 end if;
             elsif (buf_cycle < 25) then
-                MPULSE <= '0';
-                --if (RDY = '1') then
-                --    buf_cycle <= 25;
-                --else
+                if (RDY = '1') then
+                    buf_cycle <= 25;
+                else
                     buf_cycle <= buf_cycle + 1;
-                --end if;
+                end if;
             elsif (buf_cycle = 25) then
                 -- read in data if read operation
                 if (cur_buf.RW = '0') then
@@ -325,101 +345,86 @@ begin
                     if (cur_buf.DSRC = '0') then
                         -- IMEM read
                         iDout <= Din;
-                        icache_wr_enable <= true;
-                        icache_wr_index <= conv_integer(
-                            cur_buf.ADDR(IINDEX_HIGH downto IINDEX_LOW));
-                        icache_wr_v <= true;
+                        icache_rw <= '1';
+                        icache_wr_index <=
+                            cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
+                        icache_wr_v <= '1';
                         icache_wr_data <= Din;
                         icache_wr_tag <=
-                            cur_buf.ADDR(ITAG_HIGH downto ITAG_LOW);
+                            cur_buf.ADDR(TAG_HIGH downto TAG_LOW);
                     else
                         -- DMEM read
-                        if (dDTYPE = "001") then
-                            if (dADDR(1 downto 0) = "00") then
-                                dDout <= x"000000" & Din(7 downto 0);
-                            elsif (dADDR(1 downto 0) = "01") then
-                                dDout <= x"000000" & Din(15 downto 8);
-                            elsif (dADDR(1 downto 0) = "10") then
-                                dDout <= x"000000" & Din(23 downto 16);
-                            else
-                                dDout <= x"000000" & Din(31 downto 24);
-                            end if;
-                        elsif (dDTYPE = "010") then
-                            if (dADDR(0) = '0') then
-                                dDout <= x"0000" & Din(15 downto 0);
-                            elsif (dADDR(0) = '1') then
-                                dDout <= x"0000" & Din(31 downto 16);
-                            end if;
-                        else
-                            dDout <= Din;
-                        end if;
-                        dcache_wr_enable <= true;
-                        dcache_wr_index <= conv_integer(
-                            cur_buf.ADDR(DINDEX_HIGH downto DINDEX_LOW));
-                        dcache_wr_v <= true;
+                        dDout <= extract(dDTYPE, dADDR, Din);
+                        dcache_rw <= '1';
+                        dcache_wr_index <=
+                            cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
+                        dcache_wr_v <= '1';
                         dcache_wr_data <= Din;
                         dcache_wr_tag <=
-                            cur_buf.ADDR(DTAG_HIGH downto DTAG_LOW);
+                            cur_buf.ADDR(TAG_HIGH downto TAG_LOW);
                     end if;
                 elsif (cur_buf.DTYPE = "100") then
                     -- write word operation
                     if (cur_buf.DSRC = '0') then
                         -- IMEM write word
---                     icache_index := conv_integer(
---                         cur_buf.ADDR(IINDEX_HIGH downto IINDEX_LOW));
---                     icache_tag   :=
---                         cur_buf.ADDR(ITAG_HIGH   downto ITAG_LOW);
---                     icache_arr_v(icache_index)    <= true;
---                     icache_arr_data(icache_index) <= cur_buf.DATA;
---                     icache_arr_tag(icache_index)  <= icache_tag;
                     else
                         -- DMEM write word
-                        dcache_wr_enable <= true;
-                        dcache_wr_index <= conv_integer(
-                            cur_buf.ADDR(DINDEX_HIGH downto DINDEX_LOW));
-                        dcache_wr_v <= true;
+                        dcache_rw <= '1';
+                        dcache_wr_index <=
+                            cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
+                        dcache_wr_v <= '1';
                         dcache_wr_data <= cur_buf.DATA;
                         dcache_wr_tag <=
-                            cur_buf.ADDR(DTAG_HIGH downto DTAG_LOW);
+                            cur_buf.ADDR(TAG_HIGH downto TAG_LOW);
                     end if;
                 else
                     -- write byte/half operation
                     if (cur_buf.DSRC = '0') then
-                        -- IMEM write byte/half
---                     icache_index := conv_integer(
---                         cur_buf.ADDR(IINDEX_HIGH downto IINDEX_LOW));
---                     icache_arr_v(icache_index)    <= false;
                     else
                         -- DMEM write byte/half
-                        dcache_wr_enable <= true;
-                        dcache_wr_index <= conv_integer(
-                            cur_buf.ADDR(DINDEX_HIGH downto DINDEX_LOW));
-                        dcache_wr_v <= false;
+                        if (dcache_hit) then
+                            -- found in cache, do merge
+                            dcache_rw <= '1';
+                            dcache_wr_index <=
+                                cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
+                            dcache_wr_v <= '1';
+                            dcache_wr_data <= merge(cur_buf.DTYPE,
+                                                    cur_buf.ADDR,
+                                                    dcache_rd_data,
+                                                    cur_buf.DATA);
+                            dcache_wr_tag <=
+                                cur_buf.ADDR(TAG_HIGH downto TAG_LOW);
+                        end if;
                     end if;
                 end if;
                 buf_cycle <= buf_cycle + 1;
             elsif (buf_cycle = 26) then
                 buf_cycle <= buf_cycle + 1;
             elsif (buf_cycle = 27) then
-                icache_wr_enable <= false;
-                dcache_wr_enable <= false;
+                icache_rw <= '0';
+                dcache_rw <= '0';
                 MEME   <= '0';
                 RW     <= '0';
                 ADDR   <= x"00000000";
                 Dout   <= x"00000000";
                 DTYPE  <= "000";
                 if (buf_head = 1) then
-                    nRDY     <= '0';
                     phase    <= 0;
+                    STALLout <= '0';
                 else
                     buf_head <= buf_head + 1;
                 end if;
                 buf_cycle <= 0;
             end if;
+        elsif (phase = 3) then
+            phase <= 0;
         end if;
 
     end if;
 
 end process;
+
+-- stall
+STALL <= STALLout;
 
 end Behavioral;

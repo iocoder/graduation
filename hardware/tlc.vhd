@@ -44,7 +44,6 @@ component cpu is
         IAK    : out STD_LOGIC;
         NAK    : out STD_LOGIC;
         -- system bus
-        MPULSE : out STD_LOGIC;
         MEME   : out STD_LOGIC;
         RW     : out STD_LOGIC;
         ADDR   : out STD_LOGIC_VECTOR (31 downto 0);
@@ -59,7 +58,6 @@ component memif is
     Port (
         CLK      : in    STD_LOGIC;
         -- Interface
-        MPULSE   : in    STD_LOGIC; -- memory cycle pulse
         RAM_CS   : in    STD_LOGIC; -- RAM chip enable
         ROM_CS   : in    STD_LOGIC; -- ROM chip enable
         RW       : in    STD_LOGIC; -- 0: read, 1: write
@@ -131,7 +129,6 @@ signal IAK          : STD_LOGIC := '0';
 signal NAK          : STD_LOGIC := '0';
 
 -- System bus:
-signal MPULSE       : STD_LOGIC := '0';
 signal MEME         : STD_LOGIC := '0';
 signal RW           : STD_LOGIC := '0';
 signal Address      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -168,11 +165,9 @@ VGAAddress <= "0" & Address(14 downto 2);
 
 -- subblocks
 U1: cpu   port map (CLK, IRQ, NMI, IAK, NAK,
-                    MPULSE, MEME, RW,
-                    Address, DataMemToCPU, DataCPUToMem, DTYPE, RDY);
+                    MEME, RW, Address, DataMemToCPU, DataCPUToMem, DTYPE, RDY);
 U2: memif port map (CLK,
-                    MPULSE, RAM_CS, ROM_CS, RW,
-                    RAMAddress, DataCPUToMem(31 downto 0),
+                    RAM_CS, ROM_CS, RW, RAMAddress, DataCPUToMem(31 downto 0),
                     DataRAMToCPU(31 downto 0), DTYPE, MEM_RDY,
                     ADDR, DATA, OE, WE,
                     MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,

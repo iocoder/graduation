@@ -127,7 +127,7 @@ isim:
 nvcsim:
 	nvc -a $(PKG_FILES) $(TST_FILES) $(VHD_FILES)
 	nvc -e tlc_sim
-	nvc -r --load=../vhdsim/vhdsim.so tlc_sim
+	nvc -r --load=../vhdsim/vhdsim.so --wave=waveform.gw tlc_sim
 
 prog: $(BIT_DIR)/final.bit
 	djtgcfg enum

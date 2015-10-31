@@ -12,7 +12,6 @@ entity cpu is
         IAK    : out STD_LOGIC;
         NAK    : out STD_LOGIC;
         -- system bus
-        MPULSE : out STD_LOGIC;
         MEME   : out STD_LOGIC;
         RW     : out STD_LOGIC;
         ADDR   : out STD_LOGIC_VECTOR (31 downto 0);
@@ -27,17 +26,20 @@ architecture Structual of cpu is
 
 component clkdiv is
     Port (
-        CLK50MHz : in  STD_LOGIC;
+        CLK      : in  STD_LOGIC;
         -- CPU interface
+        CLK50MHz : out STD_LOGIC;
+        CLK25MHz : out STD_LOGIC;
         CLK2MHz  : out STD_LOGIC;
-        CLK1MHz  : out STD_LOGIC
+        CLK1MHz  : out STD_LOGIC;
+        CACHE_EN : out STD_LOGIC
     );
 end component;
 
 component pipeline is
     Port (
         CLK    : in  STD_LOGIC;
-        nRDY   : in  STD_LOGIC;
+        STALL  : in  STD_LOGIC;
         IRQ    : in  STD_LOGIC;
         NMI    : in  STD_LOGIC;
         IAK    : out STD_LOGIC;
@@ -61,9 +63,9 @@ end component;
 
 component cache is
     Port (
-        CLK50MHz : in  STD_LOGIC;
-        CLK2MHz  : in  STD_LOGIC;
-        nRDY     : out STD_LOGIC;
+        CLK      : in  STD_LOGIC;
+        CACHE_EN : in  STD_LOGIC;
+        STALL    : out STD_LOGIC;
         -- CPU interface
         iMEME    : in  STD_LOGIC;
         iRW      : in  STD_LOGIC;
@@ -78,7 +80,6 @@ component cache is
         dDout    : out STD_LOGIC_VECTOR (31 downto 0);
         dDTYPE   : in  STD_LOGIC_VECTOR ( 2 downto 0);
         -- system bus interface
-        MPULSE   : out STD_LOGIC;
         MEME     : out STD_LOGIC;
         RW       : out STD_LOGIC;
         ADDR     : out STD_LOGIC_VECTOR (31 downto 0);
@@ -89,8 +90,12 @@ component cache is
     );
 end component;
 
+signal CLK50MHz : STD_LOGIC;
+signal CLK25MHz : STD_LOGIC;
 signal CLK2MHz  : STD_LOGIC;
 signal CLK1MHz  : STD_LOGIC;
+signal CACHE_EN : STD_LOGIC;
+signal STALL    : STD_LOGIC;
 signal iMEME    : STD_LOGIC;
 signal iRW      : STD_LOGIC;
 signal iADDR    : STD_LOGIC_VECTOR (31 downto 0);
@@ -103,19 +108,18 @@ signal dADDR    : STD_LOGIC_VECTOR (31 downto 0);
 signal dDin     : STD_LOGIC_VECTOR (31 downto 0);
 signal dDout    : STD_LOGIC_VECTOR (31 downto 0);
 signal dDTYPE   : STD_LOGIC_VECTOR ( 2 downto 0);
-signal nRDY     : STD_LOGIC;
 
 begin
 
-U1: clkdiv   port map (CLK, CLK2MHz, CLK1MHz);
+U1: clkdiv   port map (CLK, CLK50MHz, CLK25MHz, CLK2MHz, CLK1MHz, CACHE_EN);
 
-U2: pipeline port map (CLK, nRDY, IRQ, NMI, IAK, NAK,
+U2: pipeline port map (CLK25MHz, STALL, IRQ, NMI, IAK, NAK,
                        iMEME, iRW, iADDR, iDin, iDout, iDTYPE,
                        dMEME, dRW, dADDR, dDin, dDout, dDTYPE);
 
-U3: cache    port map (CLK, CLK2MHz, nRDY,
+U3: cache    port map (CLK50MHz, CACHE_EN, STALL,
                        iMEME, iRW, iADDR, iDout, iDin, iDTYPE,
                        dMEME, dRW, dADDR, dDout, dDin, dDTYPE,
-                       MPULSE, MEME, RW, ADDR, Din, Dout, DTYPE, RDY);
+                       MEME, RW, ADDR, Din, Dout, DTYPE, RDY);
 
 end Structual;

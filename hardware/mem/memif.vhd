@@ -7,7 +7,6 @@ entity memif is
     Port (
         CLK      : in    STD_LOGIC;
         -- Interface
-        MPULSE   : in    STD_LOGIC; -- memory cycle pulse
         RAM_CS   : in    STD_LOGIC; -- RAM chip enable
         ROM_CS   : in    STD_LOGIC; -- ROM chip enable
         RW       : in    STD_LOGIC; -- 0: read, 1: write
@@ -35,6 +34,8 @@ entity memif is
 end memif;
 
 architecture Dataflow of memif is
+
+signal LAST_CS : BOOLEAN;
 
 signal READ    : STD_LOGIC;
 signal WRITE   : STD_LOGIC;
@@ -96,7 +97,8 @@ process (CLK)
 begin
 
     if ( CLK = '1' and CLK'event ) then
-        if (MPULSE = '1' and (RAM_CS = '1' OR ROM_CS = '1')) then
+
+        if ((NOT LAST_CS) and (RAM_CS = '1' OR ROM_CS = '1')) then
             -- startup of a new memory cycle
             counter <= 0;
             RDY <= '0';
@@ -183,6 +185,9 @@ begin
                 RDY     <= '1';
             end if;
         end if;
+
+        LAST_CS <= (RAM_CS = '1' OR ROM_CS = '1');
+
     end if;
 
 end process;

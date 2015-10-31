@@ -36,9 +36,11 @@ start:
     ori   $v1, $0, 'S'
     sw    $v1, 0x70($v0)
     ori   $v1, $0, '!'
+    sw    $v1, 0x78($v0)
     nop
     nop
-    nop*/
+    nop
+    j     .*/
     /*lui   $a2, 0x0001
     sw    $v1, 0x00($a2)
     lw    $v1, 0x00($a2)*/

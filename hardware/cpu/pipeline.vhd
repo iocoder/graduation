@@ -7,7 +7,7 @@ use work.cpu_pkg.all;
 entity pipeline is
     Port (
         CLK    : in  STD_LOGIC;
-        nRDY   : in  STD_LOGIC;
+        STALL  : in  STD_LOGIC;
         IRQ    : in  STD_LOGIC;
         NMI    : in  STD_LOGIC;
         IAK    : out STD_LOGIC := '0';
@@ -198,7 +198,7 @@ begin
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and nRDY = '0') then
+    if ( CLK = '1' and CLK'event and STALL = '0') then
         if (id_pcclk = '1') then
             if (id_pc_src = PCSRC_PC4) then
                 if_pc <= if_pc4;
@@ -231,7 +231,7 @@ iDout    <= x"00000000";
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and nRDY = '0') then
+    if ( CLK = '1' and CLK'event and STALL = '0') then
         if (id_ifclk = '1') then
             id_instr <= if_instr;
             id_pc4   <= if_pc4;
@@ -450,7 +450,7 @@ id_pc_src <=
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and nRDY = '0') then
+    if ( CLK = '1' and CLK'event and STALL = '0') then
         if (id_ifclk = '0') then
             -- introduce bubble
             ex_instr     <= x"00000000";
@@ -556,7 +556,7 @@ with ex_aluop
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and nRDY = '0') then
+    if ( CLK = '1' and CLK'event and STALL = '0') then
         mem_instr   <= ex_instr;
         mem_pc4     <= ex_pc4;
         mem_memop   <= ex_memop;
@@ -594,7 +594,7 @@ mem_data_out <= signext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTE  else
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and nRDY = '0') then
+    if ( CLK = '1' and CLK'event and STALL = '0') then
         wb_instr   <= mem_instr;
         wb_pc4     <= mem_pc4;
         wb_ctrlsig <= mem_ctrlsig;
