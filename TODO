@@ -1,8 +1,6 @@
 Suggested TODO list:
 ---------------------
 
-- VGA 640x400
-- VGA cursor
 - uncacheable regions
 - KBD controller
 - TLB

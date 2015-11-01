@@ -13,7 +13,7 @@ void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
     attr = _attr;
     fmt_attr = _fmt_attr;
     scan_attr = _scan_attr;
-    while (i < 160*30) {
+    while (i < 160*25) {
         vga[i++] = 0;
         vga[i++] = attr;
     }
@@ -21,10 +21,10 @@ void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
 
 void scroll() {
     int i;
-    for (i = 0; i < 160*29; i++) {
+    for (i = 0; i < 160*24; i++) {
         vga[i] = vga[i+160];
     }
-    while (i < 160*30) {
+    while (i < 160*25) {
         vga[i++] = 0;
         vga[i++] = attr;
     }
@@ -53,10 +53,12 @@ void print_char(char c, char attr) {
             row++;
         }
     }
-    if (row == 30) {
+    if (row == 25) {
         scroll();
-        row = 29;
+        row = 24;
     }
+    vga[0xFFE] = row;
+    vga[0xFFF] = col;
 }
 
 void print_int(unsigned int num, char attr) {

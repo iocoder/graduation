@@ -4,23 +4,25 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity sequencer is
-    Port (CLK       : in  STD_LOGIC;
-          SE        : in  STD_LOGIC;
-          X         : in  STD_LOGIC_VECTOR (15 downto 0);
-          Y         : in  STD_LOGIC_VECTOR (15 downto 0);
-          VRAM0Read : out STD_LOGIC := '0';
-          VRAM0Addr : out STD_LOGIC_VECTOR (11 downto 0);
-          VRAM0Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-          VRAM1Read : out STD_LOGIC := '0';
-          VRAM1Addr : out STD_LOGIC_VECTOR (11 downto 0);
-          VRAM1Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-          VRAM2Read : out STD_LOGIC := '0';
-          VRAM2Addr : out STD_LOGIC_VECTOR (11 downto 0);
-          VRAM2Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-          VRAM3Read : out STD_LOGIC := '0';
-          VRAM3Addr : out STD_LOGIC_VECTOR (11 downto 0);
-          VRAM3Data : in  STD_LOGIC_VECTOR  (7 downto 0);
-          Color     : out STD_LOGIC_VECTOR (3 downto 0) := "0000");
+    Port (CLK        : in  STD_LOGIC;
+          SE         : in  STD_LOGIC;
+          CURSOR_ROW : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          CURSOR_COL : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          X          : in  STD_LOGIC_VECTOR (15 downto 0);
+          Y          : in  STD_LOGIC_VECTOR (15 downto 0);
+          VRAM0Read  : out STD_LOGIC := '0';
+          VRAM0Addr  : out STD_LOGIC_VECTOR (11 downto 0);
+          VRAM0Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM1Read  : out STD_LOGIC := '0';
+          VRAM1Addr  : out STD_LOGIC_VECTOR (11 downto 0);
+          VRAM1Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM2Read  : out STD_LOGIC := '0';
+          VRAM2Addr  : out STD_LOGIC_VECTOR (11 downto 0);
+          VRAM2Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM3Read  : out STD_LOGIC := '0';
+          VRAM3Addr  : out STD_LOGIC_VECTOR (11 downto 0);
+          VRAM3Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          Color      : out STD_LOGIC_VECTOR ( 3 downto 0) := "0000");
 end sequencer;
 
 architecture Dataflow of sequencer is
@@ -32,12 +34,16 @@ signal addr       : integer range 0 to 10240;
 signal fg         : std_logic_vector (3 downto 0);
 signal bg         : std_logic_vector (3 downto 0);
 signal tcolor     : std_logic_vector (3 downto 0);
+signal xcolor     : std_logic_vector (3 downto 0);
 
 signal font_index : integer range 0 to 255;
 signal font_row   : integer range 0 to 15;
 signal font_addr  : integer range 0 to 4095;
 
 signal fg_or_bg   : STD_LOGIC;
+
+signal cursor_vis : boolean := false;
+signal cursor_ctr : integer range 0 to 20000000 := 0;
 
 begin
 
@@ -78,10 +84,23 @@ fg_or_bg <= VRAM2Data(conv_integer(unsigned(X)) mod 8);
 with fg_or_bg select tcolor <= fg when '1',
                                bg when others;
 
+-- apply cursor
+xcolor <= fg when (row = conv_integer(cursor_row) and
+                   col = conv_integer(cursor_col) and
+                   cursor_vis and
+                   font_row > 13) else tcolor;
+
+-- fetch color and update cursor counter
 process(CLK)
 begin
     if (CLK='1' and CLK'event) then
-        color <= tcolor;
+        color <= xcolor;
+        if (cursor_ctr = 14000000) then
+            cursor_ctr <= 0;
+            cursor_vis <= NOT cursor_vis;
+        else
+            cursor_ctr <= cursor_ctr + 1;
+        end if;
     end if;
 end process;
 
