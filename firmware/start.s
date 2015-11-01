@@ -3,6 +3,9 @@
 .section .entry, "ax"
 .global start
 start:
+
+    /*j .*/
+
 /*    lui   $v0, 0x0001       # IF ID EX MM WB
     ori   $v0, $v0, 0x8000  #    IF ID EX MM WB
     ori   $v1, $0, 'H'      #       IF ID EX MM WB

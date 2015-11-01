@@ -153,7 +153,7 @@ begin
 -- memory decoding
 DataMemToCPU <= DataRAMToCPU OR DataKBDToCPU;
 ROM_CS <= MEME when Address(31 downto 16) = x"0000" else '0';
-RAM_CS <= MEME when Address(31 downto 16) = x"0001" else '0';
+RAM_CS <= MEME when Address(31 downto 15) = x"0001"&"0" else '0';
 VGA_CS <= MEME when Address(31 downto 15) = x"0001"&"1" else '0';
 KBD_CS <= MEME when Address(31 downto 20) = x"FFF" else '0';
 RDY    <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
