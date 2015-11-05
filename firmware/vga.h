@@ -4,7 +4,7 @@
 #define HEADER_ATTR     0x0E
 #define FOOTER_ATTR     0x0F
 
-#define VGA_BASE        0x18000
+#define VGA_BASE        0xE0000000
 
 extern char attr;
 extern char fmt_attr;

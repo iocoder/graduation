@@ -97,14 +97,14 @@ static void vga_clk() {
     if (cur_hs && !last_hs) {
         /* new line */
         line_counter++;
-        if (line_counter == 521)
+        if (line_counter == 449)
             line_counter = 0;
         pixel_counter = 0;
         /*vhpi_printf("line: %d", line_counter);*/
     }
-    if (line_counter >= 32 && line_counter < 512) {
-        if (cur_pixel >= 48 && cur_pixel < 688) {
-            set_fpx(cur_pixel-48, line_counter-32, get_rgb());
+    if (line_counter >= 35 && line_counter < 435) {
+        if (cur_pixel >= 51 && cur_pixel < 771) {
+            set_fpx(cur_pixel-51, line_counter-35, get_rgb());
         }
     }
     pixel_counter++;
@@ -271,7 +271,7 @@ static void startup() {
     /* initialize SDL */
     SDL_Init(SDL_INIT_EVERYTHING);
     /* Set up screen */
-    screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(720, 400, 32, SDL_SWSURFACE);
     /* Set title */
     SDL_WM_SetCaption("MIPS FPGA Computer VHDL Simulator", NULL);
     /* instantiate a thread for updating the screen */

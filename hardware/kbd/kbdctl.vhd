@@ -10,14 +10,15 @@ entity kbdctl is
         -- Inputs from PS/2 keyboard:
         PS2CLK  : in  STD_LOGIC;
         PS2DATA : in  STD_LOGIC;
-        -- Outputs to LED:
+        -- Output:
         LED     : out STD_LOGIC_VECTOR (7 downto 0);
         -- System bus interface:
         EN      : in  STD_LOGIC;
         RW      : in  STD_LOGIC;
-        DATA    : out STD_LOGIC_VECTOR (7 downto 0);
+        DATA    : out STD_LOGIC_VECTOR (7 downto 0) := x"00";
+        RDY     : out STD_LOGIC := '0';
         -- Interrupt Logic:
-        INT     : out STD_LOGIC;
+        INT     : out STD_LOGIC := '0';
         IAK     : in  STD_LOGIC
     );
 end entity;
@@ -46,24 +47,49 @@ component ps2 is
 end component;
 
 
-signal PS2CLKD  : STD_LOGIC;
-signal PS2DATAD : STD_LOGIC;
-signal SENSE    : STD_LOGIC := '0';
-signal PACKET   : STD_LOGIC_VECTOR (7 downto 0) := x"00";
+signal PS2CLKD   : STD_LOGIC;
+signal SENSE     : STD_LOGIC := '0';
+signal LASTSENSE : STD_LOGIC := '0';
+signal LASTEN    : STD_LOGIC := '0';
+signal PACKET    : STD_LOGIC_VECTOR (7 downto 0) := x"00";
+signal IOPORT    : STD_LOGIC_VECTOR (7 downto 0) := x"00";
 
 begin
 
 D: debouncer port map (CLK, PS2CLK, PS2CLKD);
 K: ps2       port map (CLK, PS2CLKD, PS2DATA, SENSE, PACKET);
 
-DATA <= PACKET when EN = '1' and RW = '0' else x"00";
+LED  <= PACKET;
 
-process (SENSE, IAK)
+process (CLK)
 begin
-    if (SENSE = '1') then
-        INT <= '1';
-    elsif (IAK = '1') then
-        INT <= '0';
+    if (CLK = '1' and CLK'event ) then
+        if (SENSE = '1') then
+            LASTSENSE <= '1';
+        else
+            LASTSENSE <= '0';
+        end if;
+
+        if (EN = '1') then
+            LASTEN <= '1';
+        else
+            LASTEN <= '0';
+        end if;
+
+        if (SENSE = '1' and LASTSENSE = '0') then
+            -- a scancode has arrived
+            IOPORT <= PACKET;        -- save a copy of the scancode
+            if (EN = '1') then
+                DATA <= PACKET;
+            end if;
+        elsif (EN = '1' and LASTEN = '0') then
+            -- data cycle started
+            DATA   <= IOPORT;        -- output IOPORT register
+        elsif (EN = '0' and LASTEN = '1') then
+            -- data cycle ended
+            DATA   <= x"00";
+            IOPORT <= x"00";         -- invalidate buffer
+        end if;
     end if;
 end process;
 

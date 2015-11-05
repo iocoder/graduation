@@ -1,5 +1,7 @@
 #include "vga.h"
 
+int ram_size = 0;
+
 int main() {
 
     /* initialize VGA... */
@@ -20,6 +22,25 @@ int main() {
     print_fmt("****************************");
     print_fmt("****************************");
     print_fmt("************************");
+
+    /* test cache stupidity */
+    /*int *stupid = (int *) 0xF0000000;
+    *stupid = 0x12345678;
+    print_hex(*stupid, 0x0E);
+    print_char('\n', 0x0E);
+    int j;
+    for (j = 0; j < 512; j++)
+        stupid[j+1] = stupid[j];
+    print_hex(*stupid, 0x0E);
+    while(1);*/
+
+    /*int i;
+    for (i = 6; i < 25; i++) {
+        print_hex(i, 0x0E);
+        print_char('\n', 0x0E);
+    }
+    print_hex(i, 0x0E);
+    while(1);*/
 
     /* start shell */
     shell();

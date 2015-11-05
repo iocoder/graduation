@@ -206,17 +206,17 @@ begin
         if (addr(1 downto 0) = "00") then
             retval:=orig(31 downto 8)&word(7 downto 0);
         elsif (addr(1 downto 0) = "01") then
-            retval:=orig(31 downto 16)&word(15 downto 8)&orig(7 downto 0);
+            retval:=orig(31 downto 16)&word(7 downto 0)&orig(7 downto 0);
         elsif (addr(1 downto 0) = "10") then
-            retval:=orig(31 downto 24)&word(23 downto 16)&orig(15 downto 0);
+            retval:=orig(31 downto 24)&word(7 downto 0)&orig(15 downto 0);
         else
-            retval:=word(31 downto 24)&orig(23 downto 0);
+            retval:=word(7 downto 0)&orig(23 downto 0);
         end if;
     elsif (dtype = "010") then
         if (addr(0) = '0') then
             retval := orig(31 downto 16) & word(15 downto 0);
         elsif (addr(0) = '1') then
-            retval := word(31 downto 16) & orig(15 downto 0);
+            retval := word(15 downto 0) & orig(15 downto 0);
         end if;
     else
         retval := word;
@@ -224,14 +224,24 @@ begin
     return retval;
 end merge;
 
+function cacheable(addr : in STD_LOGIC_VECTOR (31 downto 0))
+                   return STD_LOGIC is
+begin
+    if (addr(31 downto 29) /= "111") then
+        return '1';
+    else
+        return '0';
+    end if;
+end cacheable;
+
 begin
 
     if ( CLK='0' and CLK'event and CACHE_EN = '1' ) then
         -- detect cache hits
         icache_hit := icache_rd_v = '1' and
-                        icache_rd_tag = iADDR(TAG_HIGH downto TAG_LOW);
+                      icache_rd_tag = iADDR(TAG_HIGH downto TAG_LOW);
         dcache_hit := dcache_rd_v = '1' and
-                        dcache_rd_tag = dADDR(TAG_HIGH downto TAG_LOW);
+                      dcache_rd_tag = dADDR(TAG_HIGH downto TAG_LOW);
         -- execute fsm
         if (phase = 0) then
             -------------------
@@ -318,7 +328,7 @@ begin
                         MEME   <= '1';
                         RW     <= buf1.RW;
                         Dout   <= buf1.DATA;
-                        if (buf1.RW = '0') then
+                        if (buf1.RW='0' and cacheable(buf1.ADDR)='1') then
                             DTYPE  <= "100";
                             ADDR   <= buf1.ADDR(31 downto 2) & "00";
                         else
@@ -333,7 +343,7 @@ begin
                     end if;
                 end if;
             elsif (buf_cycle < 25) then
-                if (RDY = '1') then
+                if (buf_cycle > 3 and RDY = '1') then
                     buf_cycle <= 25;
                 else
                     buf_cycle <= buf_cycle + 1;
@@ -345,7 +355,7 @@ begin
                     if (cur_buf.DSRC = '0') then
                         -- IMEM read
                         iDout <= Din;
-                        icache_rw <= '1';
+                        icache_rw <= cacheable(cur_buf.ADDR);
                         icache_wr_index <=
                             cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
                         icache_wr_v <= '1';
@@ -354,8 +364,12 @@ begin
                             cur_buf.ADDR(TAG_HIGH downto TAG_LOW);
                     else
                         -- DMEM read
-                        dDout <= extract(dDTYPE, dADDR, Din);
-                        dcache_rw <= '1';
+                        if (cacheable(cur_buf.ADDR) = '1') then
+                            dDout <= extract(dDTYPE, dADDR, Din);
+                        else
+                            dDout <= Din;
+                        end if;
+                        dcache_rw <= cacheable(cur_buf.ADDR);
                         dcache_wr_index <=
                             cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
                         dcache_wr_v <= '1';
@@ -369,7 +383,7 @@ begin
                         -- IMEM write word
                     else
                         -- DMEM write word
-                        dcache_rw <= '1';
+                        dcache_rw <= cacheable(cur_buf.ADDR);
                         dcache_wr_index <=
                             cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
                         dcache_wr_v <= '1';
@@ -384,7 +398,7 @@ begin
                         -- DMEM write byte/half
                         if (dcache_hit) then
                             -- found in cache, do merge
-                            dcache_rw <= '1';
+                            dcache_rw <= cacheable(cur_buf.ADDR);
                             dcache_wr_index <=
                                 cur_buf.ADDR(INDEX_HIGH downto INDEX_LOW);
                             dcache_wr_v <= '1';

@@ -7,6 +7,8 @@ entity TLC is
     Port (
         -- The crystal:
         CLK     : in    STD_LOGIC;
+        -- LED:
+        LED     : out   STD_LOGIC_VECTOR ( 7 downto 0);
         -- VGA Connector
         R       : out   STD_LOGIC_VECTOR ( 2 downto 0);
         G       : out   STD_LOGIC_VECTOR ( 2 downto 0);
@@ -85,22 +87,20 @@ component memif is
 end component;
 
 component vga is
-    Port (
-        -- 50MHz clock input
-        CLK : in  STD_LOGIC;
-        -- System Bus
-        CS  : in  STD_LOGIC;
-        WR  : in  STD_LOGIC;
-        A   : in  STD_LOGIC_VECTOR (13 downto 0);
-        D   : in  STD_LOGIC_VECTOR (7 downto 0);
-        RDY : out STD_LOGIC;
-        -- VGA Port
-        R   : out STD_LOGIC_VECTOR (2 downto 0);
-        G   : out STD_LOGIC_VECTOR (2 downto 0);
-        B   : out STD_LOGIC_VECTOR (1 downto 0);
-        HS  : out STD_LOGIC;
-        VS  : out STD_LOGIC
-    );
+    Port ( CLK  : in  STD_LOGIC; -- 50MHz clock input
+           -- System Bus
+           CS   : in  STD_LOGIC;
+           RW   : in  STD_LOGIC;
+           A    : in  STD_LOGIC_VECTOR (13 downto 0);
+           Din  : in  STD_LOGIC_VECTOR (7 downto 0);
+           Dout : out STD_LOGIC_VECTOR (7 downto 0);
+           RDY  : out STD_LOGIC := '0';
+           -- VGA Port
+           R    : out STD_LOGIC_VECTOR (2 downto 0);
+           G    : out STD_LOGIC_VECTOR (2 downto 0);
+           B    : out STD_LOGIC_VECTOR (1 downto 0);
+           HS   : out STD_LOGIC;
+           VS   : out STD_LOGIC);
 end component;
 
 component kbdctl is
@@ -110,12 +110,13 @@ component kbdctl is
         -- Inputs from PS/2 keyboard:
         PS2CLK  : in  STD_LOGIC;
         PS2DATA : in  STD_LOGIC;
-        -- Outputs to LED:
+        -- Output:
         LED     : out STD_LOGIC_VECTOR (7 downto 0);
         -- System bus interface:
         EN      : in  STD_LOGIC;
         RW      : in  STD_LOGIC;
         DATA    : out STD_LOGIC_VECTOR (7 downto 0);
+        RDY     : out STD_LOGIC;
         -- Interrupt Logic:
         INT     : out STD_LOGIC;
         IAK     : in  STD_LOGIC
@@ -137,6 +138,7 @@ signal VGAAddress   : STD_LOGIC_VECTOR (13 downto 0) := "00" & x"000";
 signal DataCPUToMem : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataMemToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataRAMToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal DataVGAToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataKBDToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DTYPE        : STD_LOGIC_VECTOR ( 2 downto 0) := "000";
 signal RAM_CS       : STD_LOGIC := '0';
@@ -150,30 +152,42 @@ signal RDY          : STD_LOGIC := '0';
 
 begin
 
+------------- memory map -------------
+-- 0x00000000 - 0xBFFFFFFF: RAM
+-- 0xC0000000 - 0xCFFFFFFF: ROM
+-- 0xE0000000 - 0xE0000FFF: VGA RAM
+-- 0xE8000000 - 0xE8000FFF: KBD CTRL
+
 -- memory decoding
-DataMemToCPU <= DataRAMToCPU OR DataKBDToCPU;
-ROM_CS <= MEME when Address(31 downto 16) = x"0000" else '0';
-RAM_CS <= MEME when Address(31 downto 15) = x"0001"&"0" else '0';
-VGA_CS <= MEME when Address(31 downto 15) = x"0001"&"1" else '0';
-KBD_CS <= MEME when Address(31 downto 20) = x"FFF" else '0';
-RDY    <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
-          VGA_RDY when VGA_CS = '1' else
-          KBD_RDY when KBD_CS = '1' else
-          '0';
+RAM_CS <= MEME when Address(31 downto 30) /=  "11"    else '0';
+ROM_CS <= MEME when Address(31 downto 28)  = x"C"     else '0';
+VGA_CS <= MEME when Address(31 downto 12)  = x"E0000" else '0';
+KBD_CS <= MEME when Address(31 downto 12)  = x"E8000" else '0';
+DataMemToCPU <= DataRAMToCPU when ROM_CS = '1' or RAM_CS = '1' else
+                DataVGAToCPU when VGA_CS = '1' else
+                DataKBDToCPU when KBD_CS = '1' else
+                x"00000000";
+RDY <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
+       VGA_RDY when VGA_CS = '1' else
+       KBD_RDY when KBD_CS = '1' else
+       '0';
 RAMAddress <= x"00" & Address(15 downto 0);
-VGAAddress <= "0" & Address(14 downto 2);
+VGAAddress <= "00" & Address(11 downto 0);
 
 -- subblocks
-U1: cpu   port map (CLK, IRQ, NMI, IAK, NAK,
-                    MEME, RW, Address, DataMemToCPU, DataCPUToMem, DTYPE, RDY);
-U2: memif port map (CLK,
-                    RAM_CS, ROM_CS, RW, RAMAddress, DataCPUToMem(31 downto 0),
-                    DataRAMToCPU(31 downto 0), DTYPE, MEM_RDY,
-                    ADDR, DATA, OE, WE,
-                    MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
-                    ST_STS, RP, ST_CE);
-U3: vga   port map (CLK, VGA_CS, RW, VGAAddress,
-                    DataCPUToMem(7 downto 0), VGA_RDY,
-                    R, G, B, HS, VS);
+U1: cpu    port map (CLK, IRQ, NMI, IAK, NAK,
+                     MEME, RW, Address, DataMemToCPU, DataCPUToMem, DTYPE, RDY);
+U2: memif  port map (CLK,
+                     RAM_CS, ROM_CS, RW, RAMAddress, DataCPUToMem(31 downto 0),
+                     DataRAMToCPU(31 downto 0), DTYPE, MEM_RDY,
+                     ADDR, DATA, OE, WE,
+                     MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
+                     ST_STS, RP, ST_CE);
+U3: vga    port map (CLK, VGA_CS, RW, VGAAddress, DataCPUToMem(7 downto 0),
+                     DataVGAToCPU(7 downto 0), VGA_RDY,
+                     R, G, B, HS, VS);
+U4: kbdctl port map (CLK, PS2CLK, PS2DATA, LED,
+                     KBD_CS, RW, DataKBDToCPU(7 downto 0), KBD_RDY,
+                     IRQ, IAK);
 
 end Structural;

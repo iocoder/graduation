@@ -1,7 +1,7 @@
 #include "vga.h"
 #include "string.h"
 
-int *vga       = (int *) VGA_BASE;
+char *vga       = (char *) VGA_BASE;
 char attr;
 char fmt_attr;
 char scan_attr;

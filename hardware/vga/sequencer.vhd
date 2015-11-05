@@ -42,7 +42,7 @@ signal font_addr  : integer range 0 to 4095;
 
 signal fg_or_bg   : STD_LOGIC;
 
-signal cursor_vis : boolean := false;
+signal cursor_vis : boolean := true;
 signal cursor_ctr : integer range 0 to 20000000 := 0;
 
 begin

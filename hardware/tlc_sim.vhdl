@@ -99,6 +99,8 @@ component TLC is
     Port (
         -- The crystal:
         CLK     : in    STD_LOGIC;
+        -- LED:
+        LED     : out   STD_LOGIC_VECTOR ( 7 downto 0);
         -- VGA Connector
         R       : out   STD_LOGIC_VECTOR ( 2 downto 0);
         G       : out   STD_LOGIC_VECTOR ( 2 downto 0);
@@ -126,6 +128,8 @@ component TLC is
 
     );
 end component;
+
+signal LED     : STD_LOGIC_VECTOR ( 7 downto 0);
 
 signal R       : STD_LOGIC_VECTOR ( 2 downto 0);
 signal G       : STD_LOGIC_VECTOR ( 2 downto 0);
@@ -213,7 +217,7 @@ DataOut15 <= DataOut(15);
 DATA <= DataIn;
 DataOut <= DATA;
 
-U: TLC port map (myCLK, R, G, B, HS, VS,
+U: TLC port map (myCLK, LED, R, G, B, HS, VS,
                  ADDR, DATA, OE, WE,
                  MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
                  ST_STS, RP, ST_CE,

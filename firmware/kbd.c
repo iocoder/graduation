@@ -140,24 +140,33 @@ static const char cmap[][3] = {
 /*                          BUFFER MANAGEMENT                                */
 /*****************************************************************************/
 
-int *kbd = (int *) KBD_BASE;
+char *kbd = (char *) KBD_BASE;
 char buf[KBD_BUF_SIZE];
 int buf_write;
 int buf_read;
 
 int next_read() {
-    return (buf_read+1)%KBD_BUF_SIZE;
+    /*return (buf_read+1)%KBD_BUF_SIZE;*/
+    if (buf_read+1 == KBD_BUF_SIZE)
+        return 0;
+    else
+        return buf_read+1;
 }
 
 int next_write() {
-    return (buf_write+1)%KBD_BUF_SIZE;
+    /*return (buf_write+1)%KBD_BUF_SIZE;*/
+    if (buf_write+1 == KBD_BUF_SIZE)
+        return 0;
+    else
+        return buf_write+1;
 }
 
 char get_from_buf() {
-    char ret;
+    int ret;
     while (buf_write == buf_read) {
-        while(!kbd[KBD_STATUS]);
-        scproc(kbd[KBD_DATA]);
+        int kbd_data;
+        while(!(kbd_data = kbd[KBD_DATA]));
+        scproc(kbd_data);
     }
     ret = buf[buf_read];
     buf_read = next_read();

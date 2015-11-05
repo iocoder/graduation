@@ -42,6 +42,7 @@ CLKBIT="-g StartUpClk:JtagClk"
 CLKPRM="-g StartUpClk:CClk"
 
 SRC_DIR=$(abs_srcdir)
+LIB_DIR=$(SRC_DIR)/lib
 XST_DIR=_xst
 NGD_DIR=_ngd
 MAP_DIR=_map
@@ -51,9 +52,11 @@ BIT_DIR=_bit
 SIM_DIR=_sim
 WORK_DIR=work
 
-PKG_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep _pkg)
-VHD_FILES=$(shell find $(SRC_DIR) | grep -v _sim | grep -v _pkg | grep .vhd)
-TST_FILES=$(shell find $(SRC_DIR) | grep .vhd | grep _sim)
+PKG_FILES=$(shell find $(SRC_DIR)   | grep .vhd | grep _pkg)
+VHD_FILES=$(shell find $(SRC_DIR)   | grep -v _sim | grep -v _pkg | grep .vhd)
+TMP_FILES=$(shell echo $(VHD_FILES) | sed 's/ /\\\\n/g')
+NVC_FILES=$(shell echo -e $(TMP_FILES) | grep -v clkgen.vhd)
+TST_FILES=$(shell find $(SRC_DIR)   | grep .vhd | grep _sim)
 UCF_FILE=$(SRC_DIR)/$(PROJ).ucf
 
 all: $(BIT_DIR)/final.bit
@@ -125,7 +128,7 @@ isim:
 	cd $(SIM_DIR) && $(ISW) $(TB).xwv
 
 nvcsim:
-	nvc -a $(PKG_FILES) $(TST_FILES) $(VHD_FILES)
+	nvc -L $(LIB_DIR) -a $(PKG_FILES) $(TST_FILES) $(NVC_FILES)
 	nvc -e tlc_sim
 	nvc -r --load=../vhdsim/vhdsim.so --wave=waveform.gw tlc_sim
 

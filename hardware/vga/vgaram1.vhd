@@ -4,13 +4,17 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity vgaram1 is
-    Port (CLK         : in  STD_LOGIC;
-          ReadEnable  : in  STD_LOGIC;
-          ReadAddr    : in  STD_LOGIC_VECTOR (11 downto 0);
-          ReadData    : out STD_LOGIC_VECTOR (7 downto 0) := "00000000";
-          WriteEnable : in  STD_LOGIC;
-          WriteAddr   : in  STD_LOGIC_VECTOR (11 downto 0);
-          WriteData   : in  STD_LOGIC_VECTOR (7 downto 0));
+    Port (CLK           : in  STD_LOGIC;
+          -- sequencer port:
+          SeqReadEnable : in  STD_LOGIC;
+          SeqAddr       : in  STD_LOGIC_VECTOR (11 downto 0);
+          SeqDataOut    : out STD_LOGIC_VECTOR ( 7 downto 0) := "00000000";
+          -- GU port:
+          GUReadEnable  : in  STD_LOGIC;
+          GUWriteEnable : in  STD_LOGIC;
+          GUAddr        : in  STD_LOGIC_VECTOR (11 downto 0);
+          GUDataIn      : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          GUDataOut     : out STD_LOGIC_VECTOR ( 7 downto 0));
 end vgaram1;
 
 architecture Behavioral of vgaram1 is
@@ -24,13 +28,18 @@ process (clk)
 begin
 
     if (clk = '0' and clk'event) then
-        if (WriteEnable = '1') then
-            ram(conv_integer(unsigned(WriteAddr))) <= WriteData;
+        if (GUWriteEnable = '1') then
+            ram(conv_integer(unsigned(GUAddr))) <= GUDataIn;
         end if;
-        if (ReadEnable = '1') then
-            ReadData <= ram(conv_integer(unsigned(ReadAddr)));
+        if (GUReadEnable = '1') then
+            SeqDataOut <= "00000000";
+            GUDataOut  <= ram(conv_integer(unsigned(GUAddr)));
+        elsif (SeqReadEnable = '1') then
+            SeqDataOut <= ram(conv_integer(unsigned(SeqAddr)));
+            GUDataOut  <= "00000000";
         else
-            ReadData <= "00000000";
+            SeqDataOut <= "00000000";
+            GUDataOut  <= "00000000";
         end if;
     end if;
 

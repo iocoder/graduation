@@ -96,8 +96,8 @@ constant PCSRC_JR       : STD_LOGIC_VECTOR ( 7 downto 0) := x"03";
 constant PCSRC_EXP      : STD_LOGIC_VECTOR ( 7 downto 0) := x"04";
 
 -- IF
-signal   if_pc          : STD_LOGIC_VECTOR (31 downto 0) := x"FFFFFFFC";
-signal   if_pc4         : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   if_pc          : STD_LOGIC_VECTOR (31 downto 0) := x"BFFFFFFC";
+signal   if_pc4         : STD_LOGIC_VECTOR (31 downto 0) := x"C0000000";
 signal   if_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
 -- ID
