@@ -2,7 +2,7 @@
 #define _MIPSCOMP_KBD_H
 
 #define KBD_BUF_SIZE    16
-#define KBD_BASE        0xE8000000
+#define KBD_BASE        0xBE800000
 #define KBD_DATA        0
 #define KBD_STATUS      1
 

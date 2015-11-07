@@ -114,7 +114,7 @@ static void vga_clk() {
 static unsigned int get_addr() {
     unsigned int addr = 0;
     int i;
-    for (i = 0; i < 23; i++) {
+    for (i = 0; i < 24; i++) {
         addr |= getsigvalLogic(handle_addr[i])<<i;
     }
     return addr;
@@ -278,7 +278,7 @@ static void startup() {
     SDL_CreateThread(&vga_update, NULL);
     /* initialize rom */
     romf = fopen("../firmware/firmware.bin", "r");
-    fread(rom, sizeof(rom), 1, romf);
+    fread(&rom[0xC00000/2], 0x400000, 1, romf);
     fclose(romf);
     /* get root entity */
     vhpiHandleT root = vhpi_handle(vhpiRootInst, NULL);

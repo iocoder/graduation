@@ -2,14 +2,13 @@ ENTRY(start)
 
 SECTIONS {
 
-        . = 0x00000000;
-        .bss    : {*(.bss COMMON)}
+    . = 0x80000000;
+    .bss    : {*(.bss COMMON)}
 
-	. = 0xC0000000;
+    . = 0x9FC00000;
 
-        .entry  : {*(.entry )}
-	.text   : {*(.text  )}
-	.rodata : {*(.rodata)}
-
+    .entry  : {*(.entry )}
+    .text   : {*(.text  )}
+    .rodata : {*(.rodata)}
 
 }

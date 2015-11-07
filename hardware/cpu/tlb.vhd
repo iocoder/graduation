@@ -83,6 +83,7 @@ begin
                 cacheable := '1';
             end if;
         end loop;
+
         if (found = false) then
             paddr     := x"00000";
             miss      := '1';

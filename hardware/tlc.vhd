@@ -153,16 +153,16 @@ signal RDY          : STD_LOGIC := '0';
 begin
 
 ------------- memory map -------------
--- 0x00000000 - 0xBFFFFFFF: RAM
--- 0xC0000000 - 0xCFFFFFFF: ROM
--- 0xE0000000 - 0xE0000FFF: VGA RAM
--- 0xE8000000 - 0xE8000FFF: KBD CTRL
+-- 0x00000000 - 0x00FFFFFF : RAM
+-- 0x1E000000 - 0x1E000FFF : VGA
+-- 0x1E800000 - 0x1E800FFF : KBD
+-- 0x1F000000 - 0x1FFFFFFF : ROM
 
 -- memory decoding
-RAM_CS <= MEME when Address(31 downto 30) /=  "11"    else '0';
-ROM_CS <= MEME when Address(31 downto 28)  = x"C"     else '0';
-VGA_CS <= MEME when Address(31 downto 12)  = x"E0000" else '0';
-KBD_CS <= MEME when Address(31 downto 12)  = x"E8000" else '0';
+RAM_CS <= MEME when Address(31 downto 24)  = x"00"    else '0';
+ROM_CS <= MEME when Address(31 downto 24)  = x"1F"    else '0';
+VGA_CS <= MEME when Address(31 downto 12)  = x"1E000" else '0';
+KBD_CS <= MEME when Address(31 downto 12)  = x"1E800" else '0';
 DataMemToCPU <= DataRAMToCPU when ROM_CS = '1' or RAM_CS = '1' else
                 DataVGAToCPU when VGA_CS = '1' else
                 DataKBDToCPU when KBD_CS = '1' else
@@ -171,7 +171,7 @@ RDY <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
        VGA_RDY when VGA_CS = '1' else
        KBD_RDY when KBD_CS = '1' else
        '0';
-RAMAddress <= x"00" & Address(15 downto 0);
+RAMAddress <= Address(23 downto 0);
 VGAAddress <= "00" & Address(11 downto 0);
 
 -- subblocks

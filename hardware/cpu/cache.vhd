@@ -227,10 +227,10 @@ end merge;
 function cacheable(addr : in STD_LOGIC_VECTOR (31 downto 0))
                    return STD_LOGIC is
 begin
-    if (addr(31 downto 29) /= "111") then
-        return '1';
-    else
+    if (addr(31 downto 24) = x"1E") then
         return '0';
+    else
+        return '1';
     end if;
 end cacheable;
 

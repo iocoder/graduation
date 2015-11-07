@@ -6,7 +6,7 @@ start:
 
     /*j .*/
 /*
-    lui   $v0, 0xE000       # IF ID EX MM WB
+    lui   $v0, 0xBE00       # IF ID EX MM WB
     ori   $v0, $v0, 0x0000  #    IF ID EX MM WB
     ori   $v1, $0, 'H'      #       IF ID EX MM WB
     sw    $v1, 0x00($v0)    #          IF ID EX MM WB
@@ -44,8 +44,7 @@ start:
     nop
     nop
     j     .
-    */
-
+*/
     /*lui   $a2, 0x0001
     sw    $v1, 0x00($a2)
     lw    $v1, 0x00($a2)*/
@@ -103,7 +102,7 @@ start:
     nop
     nop*/
 
-    lui   $sp, 0x0001
+    lui   $sp, 0x8001
     ori   $sp, $sp, 0x8000
     nop
     jal   main
