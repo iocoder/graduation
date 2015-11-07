@@ -32,7 +32,7 @@ end entity;
 architecture Behavioral of pipeline is
 
 -- TYPES
-type     regfile_t is array (0 to 31) of STD_LOGIC_VECTOR (31 downto 0);
+type     regfile_t  is array (0 to 31) of STD_LOGIC_VECTOR (31 downto 0);
 
 -- CONTROL SIGNALS
 constant REG_DEST       : integer := 0;
@@ -133,6 +133,8 @@ signal   id_is_equal    : STD_LOGIC := '0';
 signal   id_is_zero     : STD_LOGIC := '0';
 signal   id_is_lez      : STD_LOGIC := '0';
 signal   id_is_gtz      : STD_LOGIC := '0';
+signal   id_is_mfc0     : STD_LOGIC := '0';
+signal   id_is_mtc0     : STD_LOGIC := '0';
 signal   id_pc_src      : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal   id_if_flush    : STD_LOGIC := '0';
 signal   id_ctrlsig_in  : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
@@ -169,6 +171,8 @@ signal   ex_alu1        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   ex_alu2        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   ex_alu_output  : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   ex_rk          : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
+signal   ex_is_mfc0     : STD_LOGIC := '0';
+signal   ex_is_mtc0     : STD_LOGIC := '0';
 
 -- MEM
 signal   mem_instr      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -179,6 +183,8 @@ signal   mem_addr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_data_in    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_data_out   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_rk         : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
+signal   mem_is_mfc0    : STD_LOGIC := '0';
+signal   mem_is_mtc0    : STD_LOGIC := '0';
 
 -- WB
 signal   wb_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -188,6 +194,13 @@ signal   wb_mem_out     : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   wb_alu_out     : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   wb_value_of_rk : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   wb_rk          : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
+signal   wb_is_mfc0     : STD_LOGIC := '0';
+signal   wb_is_mtc0     : STD_LOGIC := '0';
+
+-- coprocessor registers:
+signal   SR             : STD_LOGIC_VECTOR (31 downto 0) := x"12651256";
+signal   CAUSE          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
 begin
 
@@ -241,23 +254,77 @@ end process;
 
 -- register file operation
 process(CLK)
+
+-- vals of rs & rt registers extracted from regfile (or by forwarding)
+variable val_of_rs : STD_LOGIC_VECTOR(31 downto 0);
+variable val_of_rt : STD_LOGIC_VECTOR(31 downto 0);
+
+impure function read_cop0_reg(indx : in STD_LOGIC_VECTOR (4  downto 0))
+                return STD_LOGIC_VECTOR is
+    variable retval    : STD_LOGIC_VECTOR(31 downto 0);
+    begin
+        case indx is
+            when "01100" => retval := SR;
+            when others  =>
+        end case;
+        return retval;
+end read_cop0_reg;
+
+procedure write_cop0_reg(indx : in STD_LOGIC_VECTOR (4  downto 0);
+                         val  : in STD_LOGIC_VECTOR (31 downto 0)) is
+    begin
+        case indx is
+            when "01100" => SR <= val;
+            when others  =>
+        end case;
+end write_cop0_reg;
+
 begin
     if ( CLK = '0' and CLK'event ) then
+        -- handle register file operations
         if (wb_ctrlsig(REG_WRITE) = '1' and wb_rk /= "00000") then
+            -- write & read
             id_regfile(conv_integer(wb_rk)) <= wb_value_of_rk;
             if (wb_rk = id_rs) then
-                id_val_of_rs <= wb_value_of_rk;
+                val_of_rs := wb_value_of_rk;
             else
-                id_val_of_rs <= id_regfile(conv_integer(id_rs));
+                val_of_rs := id_regfile(conv_integer(id_rs));
             end if;
             if (wb_rk = id_rt) then
-                id_val_of_rt <= wb_value_of_rk;
+                val_of_rt := wb_value_of_rk;
             else
-                id_val_of_rt <= id_regfile(conv_integer(id_rt));
+                val_of_rt := id_regfile(conv_integer(id_rt));
             end if;
         else
-            id_val_of_rs <= id_regfile(conv_integer(id_rs));
-            id_val_of_rt <= id_regfile(conv_integer(id_rt));
+            -- read only (no write)
+            val_of_rs := id_regfile(conv_integer(id_rs));
+            val_of_rt := id_regfile(conv_integer(id_rt));
+        end if;
+        -- evaluate values of id_val_of_rs and id_val_of_rt
+        if (is_cop0(id_opcode)) then
+            -- cop0 instruction
+            if (id_is_mfc0='1') then
+                -- MFC0: move from c0 register
+                if (wb_is_mtc0='1' and wb_rk=id_rd) then
+                    -- wb is writing and id is reading the same thing
+                    id_val_of_rs <= wb_value_of_rk;
+                else
+                    id_val_of_rs <= read_cop0_reg(id_rd);
+                end if;
+                id_val_of_rt <= x"00000000";
+            elsif (id_is_mtc0='1') then
+                -- MTC0: move to c0 register
+                id_val_of_rs <= x"00000000";
+                id_val_of_rt <= val_of_rt;
+            end if;
+        else
+            -- move results to data signals
+            id_val_of_rs <= val_of_rs;
+            id_val_of_rt <= val_of_rt;
+        end if;
+        -- cop0 registers writeback
+        if (wb_is_mtc0='1') then
+            write_cop0_reg(wb_rk, wb_value_of_rk);
         end if;
     end if;
 end process;
@@ -300,6 +367,8 @@ id_is_equal <= '1' when id_val_of_rs = id_val_of_rt else '0';
 id_is_zero  <= '1' when id_val_of_rs = x"00000000" else '0';
 id_is_lez   <= alu_lts(id_val_of_rs, x"00000000")(0) OR id_is_zero;
 id_is_gtz   <= NOT id_is_lez;
+id_is_mfc0  <= '1' when is_cop0(id_opcode) and id_rs = "00000" else '0';
+id_is_mtc0  <= '1' when is_cop0(id_opcode) and id_rs = "00100" else '0';
 
 -- generate control signals
 id_ctrlsig_in(REG_DEST) <=
@@ -310,6 +379,7 @@ id_ctrlsig_in(REG_DEST) <=
     '0'                                 when is_aluimm      (id_opcode) else
     '0'                                 when is_memload     (id_opcode) else
     '0'                                 when is_memstore    (id_opcode) else
+    id_is_mtc0                          when is_cop0        (id_opcode) else
     '0';
 id_ctrlsig_in(ALU_SRC) <=
     id_is_jr or id_is_jalr              when is_alureg      (id_opcode) else
@@ -319,6 +389,7 @@ id_ctrlsig_in(ALU_SRC) <=
     '1'                                 when is_aluimm      (id_opcode) else
     '1'                                 when is_memload     (id_opcode) else
     '1'                                 when is_memstore    (id_opcode) else
+    '0'                                 when is_cop0        (id_opcode) else
     '0';
 id_ctrlsig_in(MEM_TO_REG) <=
     '0'                                 when is_alureg      (id_opcode) else
@@ -328,6 +399,7 @@ id_ctrlsig_in(MEM_TO_REG) <=
     '0'                                 when is_aluimm      (id_opcode) else
     '1'                                 when is_memload     (id_opcode) else
     '0'                                 when is_memstore    (id_opcode) else
+    '0'                                 when is_cop0        (id_opcode) else
     '0';
 id_ctrlsig_in(REG_WRITE) <=
     '1'                                 when is_alureg      (id_opcode) else
@@ -337,6 +409,7 @@ id_ctrlsig_in(REG_WRITE) <=
     '1'                                 when is_aluimm      (id_opcode) else
     '1'                                 when is_memload     (id_opcode) else
     '0'                                 when is_memstore    (id_opcode) else
+    id_is_mfc0                          when is_cop0        (id_opcode) else
     '0';
 id_ctrlsig_in(MEM_READ) <=
     '0'                                 when is_alureg      (id_opcode) else
@@ -346,6 +419,7 @@ id_ctrlsig_in(MEM_READ) <=
     '0'                                 when is_aluimm      (id_opcode) else
     '1'                                 when is_memload     (id_opcode) else
     '0'                                 when is_memstore    (id_opcode) else
+    '0'                                 when is_cop0        (id_opcode) else
     '0';
 id_ctrlsig_in(MEM_WRITE) <=
     '0'                                 when is_alureg      (id_opcode) else
@@ -355,6 +429,7 @@ id_ctrlsig_in(MEM_WRITE) <=
     '0'                                 when is_aluimm      (id_opcode) else
     '0'                                 when is_memload     (id_opcode) else
     '1'                                 when is_memstore    (id_opcode) else
+    '0'                                 when is_cop0        (id_opcode) else
     '0';
 id_ctrlsig_in(BRANCH) <=
     id_is_jr or id_is_jalr              when is_alureg      (id_opcode) else
@@ -364,6 +439,7 @@ id_ctrlsig_in(BRANCH) <=
     '0'                                 when is_aluimm      (id_opcode) else
     '0'                                 when is_memload     (id_opcode) else
     '0'                                 when is_memstore    (id_opcode) else
+    '0'                                 when is_cop0        (id_opcode) else
     '0';
 
 -- decoding
@@ -403,9 +479,11 @@ id_aluop <= ALUOP_SLL   when is_alureg(id_opcode) and id_funct = "000000" else
             ALUOP_OR    when is_aluimm(id_opcode) and id_opcode= "001101" else
             ALUOP_XOR   when is_aluimm(id_opcode) and id_opcode= "001110" else
             ALUOP_LUI   when is_aluimm(id_opcode) and id_opcode= "001111" else
-            ALUOP_CPYPC when is_jmp(id_opcode)                         else
-            ALUOP_ADD   when is_memload(id_opcode)                     else
-            ALUOP_ADD   when is_memstore(id_opcode)                    else
+            ALUOP_CPYPC when is_jmp(id_opcode)                            else
+            ALUOP_ADD   when is_memload(id_opcode)                        else
+            ALUOP_ADD   when is_memstore(id_opcode)                       else
+            ALUOP_ADD   when id_is_mfc0='1'                               else
+            ALUOP_ADD   when id_is_mtc0='1'                               else
             ALUOP_NOP;
 id_memop <= "00000" & id_opcode(2 downto 0);
 
@@ -419,7 +497,14 @@ id_stall <= '1' when
      ((ex_ctrlsig(REG_WRITE) = '1' and ex_rk /= "00000" and
        (ex_rk = id_rs or (id_opcode /= "000001" and ex_rk = id_rt))) or
       (mem_ctrlsig(REG_WRITE) = '1' and mem_rk /= "00000" and
-          (mem_rk = id_rs or (id_opcode /= "000001" and mem_rk = id_rt)))))
+          (mem_rk = id_rs or (id_opcode /= "000001" and mem_rk = id_rt))))) or
+    -- mtc0 instruction that needs values in EX and MEM stages
+    (id_is_mtc0 = '1' and (
+     (ex_ctrlsig(REG_WRITE) ='1' and ex_rk /="00000" and ex_rk =id_rt) or
+     (mem_ctrlsig(REG_WRITE)='1' and mem_rk/="00000" and mem_rk=id_rt))) or
+    -- mfc0 needs to wait for mtc0
+    (id_is_mfc0 = '1' and (ex_is_mtc0='1' or mem_is_mtc0='1'))
+
     else '0';
 id_ifclk <= NOT id_stall;
 id_pcclk <= NOT id_stall;
@@ -465,6 +550,8 @@ begin
             ex_val_of_rs <= x"00000000";
             ex_val_of_rt <= x"00000000";
             ex_imm32     <= x"00000000";
+            ex_is_mfc0   <= '0';
+            ex_is_mtc0   <= '0';
         else
             ex_instr     <= id_instr;
             ex_pc4       <= id_pc4;
@@ -478,6 +565,8 @@ begin
             ex_val_of_rs <= id_val_of_rs;
             ex_val_of_rt <= id_val_of_rt;
             ex_imm32     <= id_imm32;
+            ex_is_mfc0   <= id_is_mfc0;
+            ex_is_mtc0   <= id_is_mtc0;
         end if;
     end if;
 end process;
@@ -557,13 +646,15 @@ with ex_aluop
 process(CLK)
 begin
     if ( CLK = '1' and CLK'event and STALL = '0') then
-        mem_instr   <= ex_instr;
-        mem_pc4     <= ex_pc4;
-        mem_memop   <= ex_memop;
-        mem_ctrlsig <= ex_ctrlsig;
-        mem_addr    <= ex_alu_output;
-        mem_data_in <= ex_muxop2;
-        mem_rk      <= ex_rk;
+        mem_instr     <= ex_instr;
+        mem_pc4       <= ex_pc4;
+        mem_memop     <= ex_memop;
+        mem_ctrlsig   <= ex_ctrlsig;
+        mem_addr      <= ex_alu_output;
+        mem_data_in   <= ex_muxop2;
+        mem_rk        <= ex_rk;
+        mem_is_mfc0   <= ex_is_mfc0;
+        mem_is_mtc0   <= ex_is_mtc0;
     end if;
 end process;
 
@@ -595,12 +686,14 @@ mem_data_out <= signext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTE  else
 process(CLK)
 begin
     if ( CLK = '1' and CLK'event and STALL = '0') then
-        wb_instr   <= mem_instr;
-        wb_pc4     <= mem_pc4;
-        wb_ctrlsig <= mem_ctrlsig;
-        wb_mem_out <= mem_data_out;
-        wb_alu_out <= mem_addr;
-        wb_rk      <= mem_rk;
+        wb_instr     <= mem_instr;
+        wb_pc4       <= mem_pc4;
+        wb_ctrlsig   <= mem_ctrlsig;
+        wb_mem_out   <= mem_data_out;
+        wb_alu_out   <= mem_addr;
+        wb_rk        <= mem_rk;
+        wb_is_mfc0   <= mem_is_mfc0;
+        wb_is_mtc0   <= mem_is_mtc0;
     end if;
 end process;
 

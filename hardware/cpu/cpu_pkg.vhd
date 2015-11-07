@@ -66,6 +66,8 @@ package cpu_pkg is
              return boolean;
     function is_memstore (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean;
+    function is_cop0 (opcode: in STD_LOGIC_VECTOR(5 downto 0))
+             return boolean;
 end package;
 
 package body cpu_pkg is
@@ -324,5 +326,16 @@ package body cpu_pkg is
             return false;
         end if;
     end is_memstore;
+
+    -- is cop0 opcode
+    function is_cop0 (opcode: in STD_LOGIC_VECTOR(5 downto 0))
+             return boolean is
+    begin
+        if opcode(5 downto 0) = "010000" then
+            return true;
+        else
+            return false;
+        end if;
+    end is_cop0;
 
 end cpu_pkg;

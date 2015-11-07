@@ -1,11 +1,18 @@
 #include "vga.h"
 
-int ram_size = 0;
-
 int main() {
+
+    int reg;
 
     /* initialize VGA... */
     clear_screen(0x0E, 0x0E, 0x0E);
+
+    /* test */
+    __asm__("mfc0 %0, $12":"=r"(reg));
+    print_fmt("reg: %x\n", reg);
+    __asm__("mtc0 %0, $12"::"r"(0xABCDDCBA));
+    __asm__("mfc0 %0, $12":"=r"(reg));
+    print_fmt("reg: %x\n", reg);
 
     /* initialize keyboard */
     kbd_init();
