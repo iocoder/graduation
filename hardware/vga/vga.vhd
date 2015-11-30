@@ -51,6 +51,7 @@ component graphics is
            VRAM2DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
            VRAM3DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
            VRAMDataOut : out STD_LOGIC_VECTOR ( 7 downto 0);
+           ROW_BASE    : out STD_LOGIC_VECTOR ( 7 downto 0);
            CURSOR_ROW  : out STD_LOGIC_VECTOR ( 7 downto 0);
            CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0));
 end component;
@@ -114,6 +115,7 @@ end component;
 component sequencer is
     Port (CLK        : in  STD_LOGIC;
           SE         : in  STD_LOGIC;
+          ROW_BASE   : in  STD_LOGIC_VECTOR ( 7 downto 0);
           CURSOR_ROW : in  STD_LOGIC_VECTOR ( 7 downto 0);
           CURSOR_COL : in  STD_LOGIC_VECTOR ( 7 downto 0);
           X          : in  STD_LOGIC_VECTOR (15 downto 0);
@@ -173,6 +175,7 @@ signal VRAM2DataToGU   : STD_LOGIC_VECTOR ( 7 downto 0);
 signal VRAM3DataToGU   : STD_LOGIC_VECTOR ( 7 downto 0);
 signal VRAMDataFromGU  : STD_LOGIC_VECTOR ( 7 downto 0);
 
+signal ROW_BASE        : STD_LOGIC_VECTOR ( 7 downto 0);
 signal CURSOR_ROW      : STD_LOGIC_VECTOR ( 7 downto 0);
 signal CURSOR_COL      : STD_LOGIC_VECTOR ( 7 downto 0);
 
@@ -206,7 +209,7 @@ u1: graphics  port map (CLK_50MHz, CS, RW, A, Din, Dout,
                         VRAM0Write, VRAM1Write, VRAM2Write, VRAM3Write,
                         VRAMAddrFromGU, VRAM0DataToGU, VRAM1DataToGU,
                         VRAM2DataToGU, VRAM3DataToGU, VRAMDataFromGU,
-                        CURSOR_ROW, CURSOR_COL);
+                        ROW_BASE, CURSOR_ROW, CURSOR_COL);
 u2: vgaram0   port map (CLK_56MHz,
                         VRAM0ReadEnable, VRAM0ReadAddr, VRAM0ReadData,
                         VRAM0Read, VRAM0Write,
@@ -223,7 +226,8 @@ u5: vgaram3   port map (CLK_56MHz,
                         VRAM3ReadEnable, VRAM3ReadAddr, VRAM3ReadData,
                         VRAM3Read, VRAM3Write,
                         VRAMAddrFromGU, VRAMDataFromGU, VRAM3DataToGU);
-u6: sequencer port map (CLK_28MHz, SE, CURSOR_ROW, CURSOR_COL, X, Y,
+u6: sequencer port map (CLK_28MHz, SE,
+                        ROW_BASE, CURSOR_ROW, CURSOR_COL, X, Y,
                         VRAM0ReadEnable, VRAM0ReadAddr, VRAM0ReadData,
                         VRAM1ReadEnable, VRAM1ReadAddr, VRAM1ReadData,
                         VRAM2ReadEnable, VRAM2ReadAddr, VRAM2ReadData,

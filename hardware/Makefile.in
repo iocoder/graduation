@@ -452,10 +452,10 @@ $(BIT_DIR)/final.bit: $(PKG_FILES) $(VHD_FILES) $(UCF_FILE) Makefile
 	cd $(NGD_DIR) && $(NGD) -dd _ngo -nt timestamp -p $(PART) \
 	   -uc $(UCF_FILE) ../$(XST_DIR)/$(PROJ).ngc $(PROJ).ngd
 	mkdir -p $(MAP_DIR)
-	cd $(MAP_DIR) && $(MAP) -p $(PART) ../$(NGD_DIR)/$(PROJ).ngd \
-	   -o $(PROJ).ncd
+	cd $(MAP_DIR) && $(MAP) -p $(PART) \
+	   ../$(NGD_DIR)/$(PROJ).ngd -o $(PROJ).ncd
 	mkdir -p $(PAR_DIR)
-	cd $(PAR_DIR) && $(PAR) -w -ol std -t 1 ../$(MAP_DIR)/$(PROJ).ncd \
+	cd $(PAR_DIR) && $(PAR) -w -t 1 ../$(MAP_DIR)/$(PROJ).ncd \
 	   $(PROJ).ncd ../$(MAP_DIR)/$(PROJ).pcf
 	mkdir -p $(TRC_DIR)
 	cd $(TRC_DIR) && $(TRC) -e 3 -s 4 -xml $(PROJ) \

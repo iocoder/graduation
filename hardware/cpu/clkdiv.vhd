@@ -20,6 +20,10 @@ architecture Behavioral of clkdiv is
 
 signal oCLK1MHz     : STD_LOGIC := '0';
 signal oCLK2MHz     : STD_LOGIC := '0';
+signal oCLK12_5MHz  : STD_LOGIC := '0';
+signal oCLK6_25MHz  : STD_LOGIC := '0';
+signal oCLK3_150MHz : STD_LOGIC := '0';
+signal oCLK1_5MHz   : STD_LOGIC := '0';
 signal oCLK25MHz    : STD_LOGIC := '0';
 signal oCLK50MHz    : STD_LOGIC := '0';
 
@@ -49,6 +53,22 @@ begin
         oCLK25MHz    <= NOT oCLK25MHz;
     end if;
 
+    if ( oCLK25MHz = '1' and oCLK25MHz'event ) then
+        oCLK12_5MHz  <= NOT oCLK12_5MHz;
+    end if;
+
+    if ( oCLK12_5MHz = '1' and oCLK12_5MHz'event ) then
+        oCLK6_25MHz  <= NOT oCLK6_25MHz;
+    end if;
+
+    if ( oCLK6_25MHz = '1' and oCLK6_25MHz'event ) then
+        oCLK3_150MHz  <= NOT oCLK3_150MHz;
+    end if;
+
+    if ( oCLK3_150MHz = '1' and oCLK3_150MHz'event ) then
+        oCLK1_5MHz  <= NOT oCLK1_5MHz;
+    end if;
+
     if ( oCLK50MHz = '1' and oCLK50MHz'event ) then
         if (counter2MHz = 11) then
             oCLK2MHz    <= NOT oCLK2MHz;
@@ -58,19 +78,14 @@ begin
         end if;
     end if;
 
-    if ( oCLK50MHz = '1' and oCLK50MHz'event ) then
-        if (counter1MHz = 24) then
-            oCLK1MHz    <= NOT oCLK1MHz;
-            counter1MHz <= 0;
-        else
-            counter1MHz <= counter1MHz + 1;
-        end if;
+    if ( oCLK2MHz = '1' and oCLK2MHz'event ) then
+        oCLK1MHz  <= NOT oCLK1MHz;
     end if;
 
 end process;
 
-CLK50MHz <= oCLK50MHz;
-CLK25MHz <= oCLK25MHz;
+CLK50MHz <= oCLK6_25MHz;
+CLK25MHz <= oCLK3_150MHz;
 CLK2MHz  <= oCLK2MHz;
 CLK1MHz  <= oCLK1MHz;
 

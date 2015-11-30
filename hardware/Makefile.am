@@ -84,12 +84,12 @@ $(BIT_DIR)/final.bit: $(PKG_FILES) $(VHD_FILES) $(UCF_FILE) Makefile
 	## make mapping working directory
 	mkdir -p $(MAP_DIR)
 	## map
-	cd $(MAP_DIR) && $(MAP) -p $(PART) ../$(NGD_DIR)/$(PROJ).ngd \
-	   -o $(PROJ).ncd
+	cd $(MAP_DIR) && $(MAP) -p $(PART) \
+	   ../$(NGD_DIR)/$(PROJ).ngd -o $(PROJ).ncd
 	## make place & route working directory
 	mkdir -p $(PAR_DIR)
 	## place and route:
-	cd $(PAR_DIR) && $(PAR) -w -ol std -t 1 ../$(MAP_DIR)/$(PROJ).ncd \
+	cd $(PAR_DIR) && $(PAR) -w -t 1 ../$(MAP_DIR)/$(PROJ).ncd \
 	   $(PROJ).ncd ../$(MAP_DIR)/$(PROJ).pcf
 	## make post-par static timing working directory
 	mkdir -p $(TRC_DIR)

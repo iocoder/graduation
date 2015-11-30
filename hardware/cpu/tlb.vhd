@@ -39,100 +39,113 @@ signal tlb_v     : v_t := (others => '0');
 
 begin
 
-process(CLK)
+cache_iMEME <= cpu_iMEME;
+cache_dMEME <= cpu_dMEME;
 
-variable paddr        : STD_LOGIC_VECTOR (19 downto 0);
-variable miss         : STD_LOGIC;
-variable valid        : STD_LOGIC;
-variable dirty        : STD_LOGIC;
-variable cacheable    : STD_LOGIC;
-variable pass_instr   : boolean := false;
+cache_iADDR <= "000"&cpu_iADDR(16 downto 0) when
+                        cpu_iADDR(19 downto 17)="100" or
+                        cpu_iADDR(19 downto 17)="101" else
+               cpu_iADDR;
+cache_dADDR <= "000"&cpu_dADDR(16 downto 0) when
+                        cpu_dADDR(19 downto 17)="100" or
+                        cpu_dADDR(19 downto 17)="101" else
+               cpu_dADDR;
 
-procedure translate(vaddr     : in  STD_LOGIC_VECTOR (19 downto 0);
-                    paddr     : out STD_LOGIC_VECTOR (19 downto 0);
-                    miss      : out STD_LOGIC;
-                    valid     : out STD_LOGIC;
-                    dirty     : out STD_LOGIC;
-                    cacheable : out STD_LOGIC) is
-variable found : boolean := false;
-begin
-    if (vaddr(19 downto 17) = "100") then
-        -- kseg0 [0x80000000-0x9FFFFFFF]
-        paddr     := "000" & vaddr(16 downto 0);
-        miss      := '0';
-        valid     := '1';
-        dirty     := '1';
-        cacheable := '1';
-    elsif (vaddr(19 downto 17) = "101") then
-        -- kseg1 [0xA0000000-0xBFFFFFFF]
-        paddr     := "000" & vaddr(16 downto 0);
-        miss      := '0';
-        valid     := '1';
-        dirty     := '1';
-        cacheable := '0';
-    else
-        -- kuseg [0x00000000-0x7FFFFFFF]
-        -- kseg2 [0xC0000000-0xFFFFFFFF]
-        for i in 0 to TLB_SIZE-1 loop
-            if (tlb_page(i)=cpu_iADDR) then
-                found     := true;
-                paddr     := tlb_frame(i);
-                miss      := '0';
-                valid     := tlb_v(i);
-                dirty     := '1';
-                cacheable := '1';
-            end if;
-        end loop;
 
-        if (found = false) then
-            paddr     := x"00000";
-            miss      := '1';
-            valid     := '0';
-            dirty     := '0';
-            cacheable := '0';
-        end if;
-    end if;
-end translate;
-
-begin
-
-    if ( CLK = '0' and CLK'event ) then
-        -----------------------
-        -- data memory cycle --
-        -----------------------
-        if (cpu_dMEME = '1') then
-            -- translate address
-            translate(cpu_dADDR, paddr, miss, valid, dirty, cacheable);
-            if (miss='1' or valid='0') then
-                -- data tlb miss
-            else
-                -- tlb hit
-                cache_dMEME <= '1';
-                cache_dADDR <= paddr;
-            end if;
-        else
-            cache_dMEME <= '0';
-            cache_dADDR <= x"00000";
-        end if;
-        ------------------------------
-        -- instruction memory cycle --
-        ------------------------------
-        if (cpu_iMEME = '1' and not pass_instr) then
-            -- translate address
-            translate(cpu_iADDR, paddr, miss, valid, dirty, cacheable);
-            if (miss='1' or valid='0') then
-                -- instruction tlb miss
-            else
-                -- tlb hit
-                cache_iMEME <= '1';
-                cache_iADDR <= paddr;
-            end if;
-        else
-            cache_iMEME <= '0';
-            cache_iADDR <= x"00000";
-        end if;
-    end if;
-
-end process;
+-- process(cpu_iMEME, cpu_iRW, cpu_iADDR, cpu_dMEME, cpu_dRW, cpu_dADDR)
+--
+-- variable paddr        : STD_LOGIC_VECTOR (19 downto 0);
+-- variable miss         : STD_LOGIC;
+-- variable valid        : STD_LOGIC;
+-- variable dirty        : STD_LOGIC;
+-- variable cacheable    : STD_LOGIC;
+-- variable pass_instr   : boolean := false;
+--
+-- procedure translate(vaddr     : in  STD_LOGIC_VECTOR (19 downto 0);
+--                     paddr     : out STD_LOGIC_VECTOR (19 downto 0);
+--                     miss      : out STD_LOGIC;
+--                     valid     : out STD_LOGIC;
+--                     dirty     : out STD_LOGIC;
+--                     cacheable : out STD_LOGIC) is
+-- variable found : boolean := false;
+-- begin
+--     if (vaddr(19 downto 17) = "100") then
+--         -- kseg0 [0x80000000-0x9FFFFFFF]
+--         paddr     := "000" & vaddr(16 downto 0);
+--         miss      := '0';
+--         valid     := '1';
+--         dirty     := '1';
+--         cacheable := '1';
+--     elsif (vaddr(19 downto 17) = "101") then
+--         -- kseg1 [0xA0000000-0xBFFFFFFF]
+--         paddr     := "000" & vaddr(16 downto 0);
+--         miss      := '0';
+--         valid     := '1';
+--         dirty     := '1';
+--         cacheable := '0';
+--     else
+--         -- kuseg [0x00000000-0x7FFFFFFF]
+--         -- kseg2 [0xC0000000-0xFFFFFFFF]
+--         for i in 0 to TLB_SIZE-1 loop
+--             if (tlb_page(i)=cpu_iADDR) then
+--                 found     := true;
+--                 paddr     := tlb_frame(i);
+--                 miss      := '0';
+--                 valid     := tlb_v(i);
+--                 dirty     := '1';
+--                 cacheable := '1';
+--             end if;
+--         end loop;
+--
+--         if (found = false) then
+--             paddr     := x"00000";
+--             miss      := '1';
+--             valid     := '0';
+--             dirty     := '0';
+--             cacheable := '0';
+--         end if;
+--     end if;
+-- end translate;
+--
+-- begin
+--
+--     if ( CLK = '0' and CLK'event ) then
+--         -----------------------
+--         -- data memory cycle --
+--         -----------------------
+--         if (cpu_dMEME = '1') then
+--             -- translate address
+--             translate(cpu_dADDR, paddr, miss, valid, dirty, cacheable);
+--             if (miss='1' or valid='0') then
+--                 -- data tlb miss
+--             else
+--                 -- tlb hit
+--                 cache_dMEME <= '1';
+--                 cache_dADDR <= paddr;
+--             end if;
+--         else
+--             cache_dMEME <= '0';
+--             cache_dADDR <= x"00000";
+--         end if;
+--         ------------------------------
+--         -- instruction memory cycle --
+--         ------------------------------
+--         if (cpu_iMEME = '1' and not pass_instr) then
+--             -- translate address
+--             translate(cpu_iADDR, paddr, miss, valid, dirty, cacheable);
+--             if (miss='1' or valid='0') then
+--                 -- instruction tlb miss
+--             else
+--                 -- tlb hit
+--                 cache_iMEME <= '1';
+--                 cache_iADDR <= paddr;
+--             end if;
+--         else
+--             cache_iMEME <= '0';
+--             cache_iADDR <= x"00000";
+--         end if;
+--     end if;
+--
+-- end process;
 
 end Behavioral;

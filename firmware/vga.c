@@ -7,26 +7,46 @@ char fmt_attr;
 char scan_attr;
 int  row;
 int  col;
+int  row_base;
+
+void write_to_vga(int index, char data) {
+    if (index >= 0xFFD) {
+        /* special registers */
+        vga[index] = data;
+    } else {
+        if (index + row_base*160 < 25*160) {
+            vga[index + row_base*160] = data;
+        } else {
+            vga[index + row_base*160 - 25*160] = data;
+        }
+    }
+}
 
 void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
-    int i = row = col = 0;
+    int i = row = col = row_base = 0;
     attr = _attr;
     fmt_attr = _fmt_attr;
     scan_attr = _scan_attr;
+    write_to_vga(0xFFD, row_base);
+    write_to_vga(0xFFE, row);
+    write_to_vga(0xFFF, col);
     while (i < 160*25) {
-        vga[i++] = 0;
-        vga[i++] = attr;
+        write_to_vga(i++, 0);
+        write_to_vga(i++, attr);
     }
 }
 
 void scroll() {
-    int i;
-    for (i = 0; i < 160*24; i++) {
-        vga[i] = vga[i+160];
+    int i = 160*24;
+    if (row_base == 24) {
+        row_base = 0;
+    } else {
+        row_base++;
     }
+    write_to_vga(0xFFD, row_base);
     while (i < 160*25) {
-        vga[i++] = 0;
-        vga[i++] = attr;
+        write_to_vga(i++, 0);
+        write_to_vga(i++, attr);
     }
 }
 
@@ -45,8 +65,8 @@ void print_char(char c, char attr) {
             }
         }
     } else {
-        vga[row*160+col*2  ] = c;
-        vga[row*160+col*2+1] = attr;
+        write_to_vga(row*160+col*2, c);
+        write_to_vga(row*160+col*2+1, attr);
         col++;
         if (col == 80) {
             col = 0;
@@ -57,8 +77,8 @@ void print_char(char c, char attr) {
         scroll();
         row = 24;
     }
-    vga[0xFFE] = row;
-    vga[0xFFF] = col;
+    write_to_vga(0xFFE, row);
+    write_to_vga(0xFFF, col);
 }
 
 void print_int(unsigned int num, char attr) {
@@ -95,16 +115,16 @@ void print_hf(int line, char *str, char attr) {
     int j = line*160;
     int spaces = (80-str_len(str))/2;
     for (i = 0; i < spaces; i++) {
-        vga[j++] = ' ';
-        vga[j++] = attr;
+        write_to_vga(j++, ' ');
+        write_to_vga(j++, attr);
     }
     for (i = 0; i < str_len(str); i++) {
-        vga[j++] = str[i];
-        vga[j++] = attr;
+        write_to_vga(j++, str[i]);
+        write_to_vga(j++, attr);
     }
     for (i = 0; i < 80-spaces-str_len(str); i++) {
-        vga[j++] = ' ';
-        vga[j++] = attr;
+        write_to_vga(j++, ' ');
+        write_to_vga(j++, attr);
     }
 }
 

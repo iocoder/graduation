@@ -162,3 +162,10 @@ NET "ST_CE"     LOC = "R5" ;
 
 NET "PS2CLK"    LOC = "R12";
 NET "PS2DATA"   LOC = "P11";
+
+##############################
+#     TIME CONSTRAINTS       #
+##############################
+
+#NET U1/CLK50MHz PERIOD = 20ns;
+#NET U1/U1/oCLK25MHz PERIOD = 40ns;

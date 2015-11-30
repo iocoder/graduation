@@ -24,15 +24,17 @@ entity graphics is
            VRAM2DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
            VRAM3DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
            VRAMDataOut : out STD_LOGIC_VECTOR ( 7 downto 0);
-           CURSOR_ROW  : out STD_LOGIC_VECTOR ( 7 downto 0);
-           CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0));
+           ROW_BASE    : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
+           CURSOR_ROW  : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
+           CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00");
 end graphics;
 
 architecture Behavioral of graphics is
 
 signal LASTCS         : STD_LOGIC := '0';
-signal CURSOR_ROW_REG : STD_LOGIC_VECTOR ( 7 downto 0):=x"00";
-signal CURSOR_COL_REG : STD_LOGIC_VECTOR ( 7 downto 0):=x"00";
+signal ROW_BASE_REG   : STD_LOGIC_VECTOR (7 downto 0):=x"00";
+signal CURSOR_ROW_REG : STD_LOGIC_VECTOR (7 downto 0):=x"00";
+signal CURSOR_COL_REG : STD_LOGIC_VECTOR (7 downto 0):=x"00";
 
 begin
 
@@ -50,7 +52,9 @@ begin
             VRAM3Write <= CS and (    RW) and (    A(0)) and (    A(13));
             VRAMAddr(11 downto 0) <= A(12 downto 1);
             VRAMDataOut <= Din;
-            if (A = "00" & x"FFE") then
+            if (A = "00" & x"FFD") then
+                ROW_BASE_REG <= Din;
+            elsif (A = "00" & x"FFE") then
                 CURSOR_ROW_REG <= Din;
             elsif (A = "00" & x"FFF") then
                 CURSOR_COL_REG <= Din;
@@ -66,6 +70,7 @@ begin
             VRAM3Write <= '0';
         end if;
         Dout <= VRAM0DataIn or VRAM1DataIn or VRAM2DataIn or VRAM3DataIn;
+        ROW_BASE   <= ROW_BASE_REG;
         CURSOR_ROW <= CURSOR_ROW_REG;
         CURSOR_COL <= CURSOR_COL_REG;
         LASTCS <= CS;

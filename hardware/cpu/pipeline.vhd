@@ -95,10 +95,15 @@ constant PCSRC_JMP      : STD_LOGIC_VECTOR ( 7 downto 0) := x"02";
 constant PCSRC_JR       : STD_LOGIC_VECTOR ( 7 downto 0) := x"03";
 constant PCSRC_EXP      : STD_LOGIC_VECTOR ( 7 downto 0) := x"04";
 
+-- EXCEPTION HANDLER
+signal   exception      : STD_LOGIC := '0';
+
 -- IF
 signal   if_pc          : STD_LOGIC_VECTOR (31 downto 0) := x"BFBFFFFC";
 signal   if_pc4         : STD_LOGIC_VECTOR (31 downto 0) := x"BFC00000";
 signal   if_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   if_exphndl     : STD_LOGIC := '0';
+signal   if_exception   : STD_LOGIC := '0';
 
 -- ID
 signal   id_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -144,6 +149,7 @@ signal   id_ctrlsig     : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal   id_stall       : STD_LOGIC := '0';
 signal   id_ifclk       : STD_LOGIC := '1';
 signal   id_pcclk       : STD_LOGIC := '1';
+signal   id_exception   : STD_LOGIC := '0';
 signal   id_regfile     : regfile_t := (others => x"00000000");
 attribute ram_style: string;
 attribute ram_style of id_regfile : signal is "distributed";
@@ -173,6 +179,7 @@ signal   ex_alu_output  : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   ex_rk          : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
 signal   ex_is_mfc0     : STD_LOGIC := '0';
 signal   ex_is_mtc0     : STD_LOGIC := '0';
+signal   ex_exception   : STD_LOGIC := '0';
 
 -- MEM
 signal   mem_instr      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -185,6 +192,7 @@ signal   mem_data_out   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_rk         : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
 signal   mem_is_mfc0    : STD_LOGIC := '0';
 signal   mem_is_mtc0    : STD_LOGIC := '0';
+signal   mem_exception  : STD_LOGIC := '0';
 
 -- WB
 signal   wb_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -196,13 +204,62 @@ signal   wb_value_of_rk : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   wb_rk          : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
 signal   wb_is_mfc0     : STD_LOGIC := '0';
 signal   wb_is_mtc0     : STD_LOGIC := '0';
+signal   wb_exception   : STD_LOGIC := '0';
 
 -- coprocessor registers:
-signal   SR             : STD_LOGIC_VECTOR (31 downto 0) := x"12651256";
+constant IEc            : integer := 0;
+
+signal   SR             : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   CAUSE          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
+signal   got_rising     : std_logic := '0';
+signal   got_falling    : std_logic := '0';
+
 begin
+
+--       _   _   _   _   _
+-- CLK _| |_| |_| |_| |_| |
+--      ^   ^   ^   ^   ^    Rising : CPU starts new cycle.
+--        +   +   +   +   +  Falling: exception handling, register transfers.
+--                                    TLB has translated address and cache
+--                                    has moved to phase 1
+
+--------------------------------------------------------------------------------
+--                              EXCEPTIONS                                    --
+--------------------------------------------------------------------------------
+
+-- -- exception handler
+process(CLK)
+begin
+
+    if (CLK = '1' and CLK'event and STALL='0') then
+        got_rising <= not got_rising;
+    end if;
+
+    if (CLK = '0' and CLK'event) then
+        if (got_falling /= got_rising) then
+            -- if exception conditions are satisfied, next cycle is
+            -- an exception fetch, and all stages before and including the
+            -- exception-source stage shall be flushed.
+            if (if_pc = x"BFC00180") then
+                -- exception served
+                if_exception <= '0';
+                IAK <= '1';
+                exception <= '1';
+            elsif (exception='1') then
+                -- deactivate interrupt ack
+                IAK <= '0';
+                exception <= '0';
+            elsif (IRQ = '1' and SR(IEc) = '1') then
+                -- IRQ
+                if_exception <= '1';
+            end if;
+            got_falling <= got_rising;
+        end if;
+    end if;
+
+end process;
 
 --------------------------------------------------------------------------------
 --                               IF STAGE                                     --
@@ -210,18 +267,52 @@ begin
 
 -- register transfer
 process(CLK)
+
+variable handle_exception : boolean := false;
+
 begin
-    if ( CLK = '1' and CLK'event and STALL = '0') then
-        if (id_pcclk = '1') then
-            if (id_pc_src = PCSRC_PC4) then
-                if_pc <= if_pc4;
-            elsif (id_pc_src = PCSRC_BRANCH) then
-                if_pc <= id_braddr;
-            elsif (id_pc_src = PCSRC_JMP) then
-                if_pc <= id_jmpaddr;
-            elsif (id_pc_src = PCSRC_JR) then
-                if_pc <= id_jraddr;
+    if (CLK = '1' and CLK'event and STALL = '0') then
+
+        handle_exception := false;
+
+        if (if_exception='1' and
+            id_instr=x"00000000" and
+            ex_instr=x"00000000" and
+            mem_instr=x"00000000") then
+            -- IF STAGE EXCEPTION
+            handle_exception := true;
+        elsif (id_exception='1' and
+               ex_instr=x"00000000" and
+               mem_instr=x"00000000") then
+            -- ID EXCEPTION
+            handle_exception := true;
+        elsif (ex_exception='1' and mem_instr=x"00000000") then
+            -- EX EXCEPTION
+            handle_exception := true;
+        elsif (mem_exception='1') then
+            -- MEM EXCEPTION
+            handle_exception := true;
+        end if;
+
+        if (handle_exception) then
+            if_pc        <= x"BFC00180";
+            if_exphndl   <= '1';
+        elsif (if_exception='1') then
+            -- Don't Move (Phantogram)
+        else
+            -- normal operation
+            if (id_pcclk = '1') then
+                if (id_pc_src = PCSRC_PC4 or if_exphndl = '1') then
+                    if_pc <= if_pc4;
+                elsif (id_pc_src = PCSRC_BRANCH) then
+                    if_pc <= id_braddr;
+                elsif (id_pc_src = PCSRC_JMP) then
+                    if_pc <= id_jmpaddr;
+                elsif (id_pc_src = PCSRC_JR) then
+                    if_pc <= id_jraddr;
+                end if;
             end if;
+            if_exphndl   <= '0';
         end if;
     end if;
 end process;
@@ -244,10 +335,19 @@ iDout    <= x"00000000";
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and STALL = '0') then
-        if (id_ifclk = '1') then
-            id_instr <= if_instr;
-            id_pc4   <= if_pc4;
+    if (CLK = '1' and CLK'event and STALL = '0') then
+        if (id_exception='1') then
+            -- don't move
+        elsif (if_exception='1') then
+            -- flush ID
+            id_instr     <= x"00000000";
+            id_pc4       <= if_pc4;
+        else
+            -- normal operation
+            if (id_ifclk = '1') then
+                id_instr     <= if_instr;
+                id_pc4       <= if_pc4;
+            end if;
         end if;
     end if;
 end process;
@@ -300,6 +400,7 @@ begin
             val_of_rs := id_regfile(conv_integer(id_rs));
             val_of_rt := id_regfile(conv_integer(id_rt));
         end if;
+
         -- evaluate values of id_val_of_rs and id_val_of_rt
         if (is_cop0(id_opcode)) then
             -- cop0 instruction
@@ -535,9 +636,11 @@ id_pc_src <=
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and STALL = '0') then
-        if (id_ifclk = '0') then
-            -- introduce bubble
+    if (CLK = '1' and CLK'event and STALL = '0') then
+        if (ex_exception='1') then
+            -- don't move
+        elsif (id_exception='1' or id_ifclk = '0') then
+            -- introduce a bubble in EX
             ex_instr     <= x"00000000";
             ex_pc4       <= x"00000000";
             ex_rs        <= "00000";
@@ -553,6 +656,7 @@ begin
             ex_is_mfc0   <= '0';
             ex_is_mtc0   <= '0';
         else
+            -- normal operation
             ex_instr     <= id_instr;
             ex_pc4       <= id_pc4;
             ex_rs        <= id_rs;
@@ -646,15 +750,31 @@ with ex_aluop
 process(CLK)
 begin
     if ( CLK = '1' and CLK'event and STALL = '0') then
-        mem_instr     <= ex_instr;
-        mem_pc4       <= ex_pc4;
-        mem_memop     <= ex_memop;
-        mem_ctrlsig   <= ex_ctrlsig;
-        mem_addr      <= ex_alu_output;
-        mem_data_in   <= ex_muxop2;
-        mem_rk        <= ex_rk;
-        mem_is_mfc0   <= ex_is_mfc0;
-        mem_is_mtc0   <= ex_is_mtc0;
+        if (mem_exception='1') then
+            -- don't move
+        elsif (ex_exception='1') then
+            -- introduce a bubble in MEM
+            mem_instr     <= x"00000000";
+            mem_pc4       <= x"00000000";
+            mem_memop     <= x"00";
+            mem_ctrlsig   <= x"00";
+            mem_addr      <= x"00000000";
+            mem_data_in   <= x"00000000";
+            mem_rk        <= "00000";
+            mem_is_mfc0   <= '0';
+            mem_is_mtc0   <= '0';
+        else
+            -- normal operation
+            mem_instr     <= ex_instr;
+            mem_pc4       <= ex_pc4;
+            mem_memop     <= ex_memop;
+            mem_ctrlsig   <= ex_ctrlsig;
+            mem_addr      <= ex_alu_output;
+            mem_data_in   <= ex_muxop2;
+            mem_rk        <= ex_rk;
+            mem_is_mfc0   <= ex_is_mfc0;
+            mem_is_mtc0   <= ex_is_mtc0;
+        end if;
     end if;
 end process;
 
@@ -686,14 +806,27 @@ mem_data_out <= signext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTE  else
 process(CLK)
 begin
     if ( CLK = '1' and CLK'event and STALL = '0') then
-        wb_instr     <= mem_instr;
-        wb_pc4       <= mem_pc4;
-        wb_ctrlsig   <= mem_ctrlsig;
-        wb_mem_out   <= mem_data_out;
-        wb_alu_out   <= mem_addr;
-        wb_rk        <= mem_rk;
-        wb_is_mfc0   <= mem_is_mfc0;
-        wb_is_mtc0   <= mem_is_mtc0;
+        if (mem_exception='1') then
+            -- introduce a bubble in WB
+            wb_instr     <= x"00000000";
+            wb_pc4       <= x"00000000";
+            wb_ctrlsig   <= x"00";
+            wb_mem_out   <= x"00000000";
+            wb_alu_out   <= x"00000000";
+            wb_rk        <= "00000";
+            wb_is_mfc0   <= '0';
+            wb_is_mtc0   <= '0';
+        else
+            -- normal operation
+            wb_instr     <= mem_instr;
+            wb_pc4       <= mem_pc4;
+            wb_ctrlsig   <= mem_ctrlsig;
+            wb_mem_out   <= mem_data_out;
+            wb_alu_out   <= mem_addr;
+            wb_rk        <= mem_rk;
+            wb_is_mfc0   <= mem_is_mfc0;
+            wb_is_mtc0   <= mem_is_mtc0;
+        end if;
     end if;
 end process;
 

@@ -6,6 +6,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity sequencer is
     Port (CLK        : in  STD_LOGIC;
           SE         : in  STD_LOGIC;
+          ROW_BASE   : in  STD_LOGIC_VECTOR ( 7 downto 0);
           CURSOR_ROW : in  STD_LOGIC_VECTOR ( 7 downto 0);
           CURSOR_COL : in  STD_LOGIC_VECTOR ( 7 downto 0);
           X          : in  STD_LOGIC_VECTOR (15 downto 0);
@@ -27,6 +28,8 @@ end sequencer;
 
 architecture Dataflow of sequencer is
 
+signal row_base_i : integer range 0 to 10240;
+signal row_indx   : integer range 0 to 10240;
 signal row        : integer range 0 to 10240;
 signal col        : integer range 0 to 10240;
 signal addr       : integer range 0 to 10240;
@@ -48,7 +51,10 @@ signal cursor_ctr : integer range 0 to 20000000 := 0;
 begin
 
 -- character place on screen:
-row  <= conv_integer(unsigned(Y))/16;  -- row = y/16;
+row_base_i <= conv_integer(unsigned(ROW_BASE));
+row_indx   <= conv_integer(unsigned(Y))/16;  -- row = y/16;
+row <= row_base_i + row_indx when row_base_i + row_indx < 25 else
+       row_base_i + row_indx - 25;
 col  <= conv_integer(unsigned(X))/8;   -- col = x/8;
 addr <= row*80+col; -- the address of the character in VRAM0.
 
@@ -85,7 +91,7 @@ with fg_or_bg select tcolor <= fg when '1',
                                bg when others;
 
 -- apply cursor
-xcolor <= fg when (row = conv_integer(cursor_row) and
+xcolor <= fg when (row_indx = conv_integer(cursor_row) and
                    col = conv_integer(cursor_col) and
                    cursor_vis and
                    font_row > 13) else tcolor;

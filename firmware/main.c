@@ -1,4 +1,11 @@
 #include "vga.h"
+#include "pit.h"
+
+int ticks;
+
+void newsec() {
+    print_fmt("0x%x seconds passed.\n", ++ticks);
+}
 
 int main() {
 
@@ -7,19 +14,27 @@ int main() {
     /* initialize VGA... */
     clear_screen(0x0E, 0x0E, 0x0E);
 
-    /* test */
+    /* interrupt test */
+    /*__asm__("mfc0 %0, $12":"=r"(reg));
+    print_fmt("reg: %x\n", reg);
+    __asm__("mtc0 %0, $12"::"r"(0xABCDDCBF));
     __asm__("mfc0 %0, $12":"=r"(reg));
     print_fmt("reg: %x\n", reg);
-    __asm__("mtc0 %0, $12"::"r"(0xABCDDCBA));
-    __asm__("mfc0 %0, $12":"=r"(reg));
-    print_fmt("reg: %x\n", reg);
+
+    ticks = 0;
+    pit_write(50000000);
+
+    __asm__("lui $v0, 0xBE00;"
+            "ori $v0, $v0, 0x0000;"
+            "ori $v1, $0, '*';"
+            " j ."); */
 
     /* initialize keyboard */
     kbd_init();
 
     /* print header */
     print_fmt("****************************");
-    fmt_attr = 0x0E;
+    fmt_attr = 0x0F;
     print_fmt(" MIPS COMPUTER FOR CSED ");
     fmt_attr = 0x0E;
     print_fmt("****************************");

@@ -134,17 +134,17 @@ signal dADDR      : STD_LOGIC_VECTOR (31 downto 0);
 signal dDin       : STD_LOGIC_VECTOR (31 downto 0);
 signal dDout      : STD_LOGIC_VECTOR (31 downto 0);
 signal dDTYPE     : STD_LOGIC_VECTOR ( 2 downto 0);
+
 begin
 
 iADDR(11 downto 0) <= cpu_iADDR(11 downto 0);
 dADDR(11 downto 0) <= cpu_dADDR(11 downto 0);
 
 U1: clkdiv   port map (CLK, CLK50MHz, CLK25MHz, CLK2MHz, CLK1MHz, CACHE_EN);
-
 U2: pipeline port map (CLK25MHz, STALL, IRQ, NMI, IAK, NAK,
                        cpu_iMEME, iRW, cpu_iADDR, iDin, iDout, iDTYPE,
                        cpu_dMEME, dRW, cpu_dADDR, dDin, dDout, dDTYPE);
-U3: tlb      port map (CLK,
+U3: tlb      port map (CLK50MHz,
                        cpu_iMEME, iRW, cpu_iADDR(31 downto 12),
                        cpu_dMEME, dRW, cpu_dADDR(31 downto 12),
                        iMEME, iADDR(31 downto 12), iCacheable,

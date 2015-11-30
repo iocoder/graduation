@@ -107,3 +107,15 @@ start:
     nop
     jal   main
     break
+
+.org 0x180
+    /*sw    $v1, 0x00($v0)
+    addi  $v0, 2*/
+    jal   newsec
+    j     .
+    nop
+    nop
+    nop
+    nop
+    nop
+
