@@ -38,6 +38,7 @@ end component;
 
 component pipeline is
     Port (
+        CLK50  : in  STD_LOGIC;
         CLK    : in  STD_LOGIC;
         STALL  : in  STD_LOGIC;
         IRQ    : in  STD_LOGIC;
@@ -141,7 +142,7 @@ iADDR(11 downto 0) <= cpu_iADDR(11 downto 0);
 dADDR(11 downto 0) <= cpu_dADDR(11 downto 0);
 
 U1: clkdiv   port map (CLK, CLK50MHz, CLK25MHz, CLK2MHz, CLK1MHz, CACHE_EN);
-U2: pipeline port map (CLK25MHz, STALL, IRQ, NMI, IAK, NAK,
+U2: pipeline port map (CLK50MHz, CLK25MHz, STALL, IRQ, NMI, IAK, NAK,
                        cpu_iMEME, iRW, cpu_iADDR, iDin, iDout, iDTYPE,
                        cpu_dMEME, dRW, cpu_dADDR, dDin, dDout, dDTYPE);
 U3: tlb      port map (CLK50MHz,

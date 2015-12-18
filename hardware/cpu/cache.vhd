@@ -127,6 +127,10 @@ signal dcache_wr_v      : std_logic;
 signal dcache_wr_data   : std_logic_vector(31 downto 0);
 signal dcache_wr_tag    : std_logic_vector(TAG_BITS-1 downto 0);
 
+-- detect cache hits
+signal icache_hit : boolean;
+signal dcache_hit : boolean;
+
 begin
 
 --------------------------------------------------------------------------------
@@ -144,6 +148,13 @@ C2: cachearray port map (
     dcache_wr_v, dcache_wr_data, dcache_wr_tag,
     dcache_rd_v, dcache_rd_data, dcache_rd_tag
 );
+
+
+-- detect cache hits
+icache_hit <= icache_rd_v = '1' and
+              icache_rd_tag = iADDR(TAG_HIGH downto TAG_LOW);
+dcache_hit <= dcache_rd_v = '1' and
+              dcache_rd_tag = dADDR(TAG_HIGH downto TAG_LOW);
 
 --------------------------------------------------------------------------------
 --                        FINITE STATE MACHINE                                --
@@ -163,8 +174,6 @@ C2: cachearray port map (
 --
 process(CLK)
 
-variable icache_hit : boolean;
-variable dcache_hit : boolean;
 variable buf_empty  : boolean := true;
 
 function extract(dtype : in STD_LOGIC_VECTOR (2  downto 0);
@@ -236,12 +245,11 @@ end cacheable;
 
 begin
 
+    -- note: unrolling this state machine has corrupted the design
+    -- the design worked well when this FSM was rolled and
+    -- cachearray worked on falling edge.
+
     if ( CLK='0' and CLK'event and CACHE_EN = '1' ) then
-        -- detect cache hits
-        icache_hit := icache_rd_v = '1' and
-                      icache_rd_tag = iADDR(TAG_HIGH downto TAG_LOW);
-        dcache_hit := dcache_rd_v = '1' and
-                      dcache_rd_tag = dADDR(TAG_HIGH downto TAG_LOW);
         -- execute fsm
         if (phase = 0) then
             -------------------
@@ -253,44 +261,30 @@ begin
             -------------------------------
             -- cache hit/miss processing --
             -------------------------------
-            -- process cache hits/misses:
+            -- assume cache hit happened in both caches
+            iDout <= icache_rd_data;
+            dDout <= extract(dDTYPE, dADDR, dcache_rd_data);
+
+            -- detect cache misses:
+            buf_empty := true;
             if (iMEME = '1') then
-                if (iRW = '0' and icache_hit) then
-                    -- icache hit and read
-                    iDout <= icache_rd_data;
-                else
-                    -- icache miss or write through
+                if (iRW = '1' or not icache_hit) then
+                    -- icache miss
                     buf0.USED  <= true;
-                    buf0.RW    <= iRW;
-                    buf0.ADDR  <= iADDR;
-                    buf0.DATA  <= iDin;
-                    buf0.DTYPE <= iDTYPE;
-                    buf0.DSRC  <= '0';
-                    buf_head   <= 0;
-                    buf_cycle  <= 0;
+                    buf_empty := false;
+                end if;
+            end if;
+            if (dMEME = '1') then
+                if (dRW = '1' or not dcache_hit) then
+                    -- dcache miss
+                    buf1.USED  <= true;
                     buf_empty := false;
                 end if;
             end if;
 
-            if (dMEME = '1') then
-                if (dRW = '0' and dcache_hit) then
-                    -- dcache hit and read
-                    dDout <= extract(dDTYPE, dADDR, dcache_rd_data);
-                else
-                    -- dcache miss or write through
-                    buf1.USED  <= true;
-                    buf1.RW    <= dRW;
-                    buf1.ADDR  <= dADDR;
-                    buf1.DATA  <= dDin;
-                    buf1.DTYPE <= dDTYPE;
-                    buf1.DSRC  <= '1';
-                    buf_head   <= 0;
-                    buf_cycle  <= 0;
-                    buf_empty  := false;
-                end if;
-            end if;
-
             -- determine next phase
+            -- (iMEME = '0' or (iRW = '0' and icache_hit)) and
+            --    (dMEME = '0' or (dRW = '0' and dcache_hit))
             if (buf_empty) then
                 -- no cache misses.
                 phase <= 0;
@@ -299,7 +293,37 @@ begin
                 phase <= 2;
                 STALLout <= '1';
             end if;
+
         elsif (phase = 2) then
+
+            -- icache miss or write through
+            buf0.RW    <= iRW;
+            buf0.ADDR  <= iADDR;
+            buf0.DATA  <= iDin;
+            buf0.DTYPE <= iDTYPE;
+            buf0.DSRC  <= '0';
+
+            -- dcache miss or write through
+            buf1.RW    <= dRW;
+            buf1.ADDR  <= dADDR;
+            buf1.DATA  <= dDin;
+            buf1.DTYPE <= dDTYPE;
+            buf1.DSRC  <= '1';
+
+            -- reset buffer head
+            buf_head   <= 0;
+            buf_cycle  <= 0;
+
+            -- jump to next phase
+            phase <= 3;
+
+        elsif (phase = 3) then
+
+            -- note: removing this state corrupts the design cuz
+            -- CLK25 and CLK50 of pipeline become no longer synced.
+            phase <= 4;
+
+        elsif (phase = 4) then
             -----------------------
             -- buffer processing --
             -----------------------
@@ -343,11 +367,11 @@ begin
                     end if;
                 end if;
             elsif (buf_cycle < 25) then
-                if (buf_cycle > 3 and RDY = '1') then
-                    buf_cycle <= 25;
-                else
+--                 if (buf_cycle > 3 and RDY = '1') then
+--                     buf_cycle <= 25;
+--                 else
                     buf_cycle <= buf_cycle + 1;
-                end if;
+--                 end if;
             elsif (buf_cycle = 25) then
                 -- read in data if read operation
                 if (cur_buf.RW = '0') then
@@ -430,7 +454,7 @@ begin
                 end if;
                 buf_cycle <= 0;
             end if;
-        elsif (phase = 3) then
+        elsif (phase = 5) then
             phase <= 0;
         end if;
 

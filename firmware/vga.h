@@ -10,6 +10,7 @@ extern char attr;
 extern char fmt_attr;
 extern char scan_attr;
 
+void write_to_vga(int index, char data);
 void clear_screen(char _attr, char _fmt_attr, char _scan_attr);
 void print_char(char c, char attr);
 void print_int(unsigned int num, char attr);

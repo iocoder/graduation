@@ -3,6 +3,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use work.cpu_pkg.all;
+library unisim;
+use unisim.vcomponents.all;
 
 entity clkdiv is
     Port (
@@ -26,6 +28,12 @@ signal oCLK3_150MHz : STD_LOGIC := '0';
 signal oCLK1_5MHz   : STD_LOGIC := '0';
 signal oCLK25MHz    : STD_LOGIC := '0';
 signal oCLK50MHz    : STD_LOGIC := '0';
+signal bCLK25MHz    : STD_LOGIC := '0';
+signal bCLK50MHz    : STD_LOGIC := '0';
+
+attribute clock_signal : string;
+attribute clock_signal of oCLK50MHz : signal is "yes";
+attribute clock_signal of oCLK25MHz : signal is "yes";
 
 signal counter1MHz  : integer := 24;
 signal counter2MHz  : integer := 11;
@@ -84,8 +92,11 @@ begin
 
 end process;
 
-CLK50MHz <= oCLK6_25MHz;
-CLK25MHz <= oCLK3_150MHz;
+bufg0 : bufg port map(i=>oCLK50MHz, o=>bCLK50MHz);
+bufg1 : bufg port map(i=>oCLK25MHz, o=>bCLK25MHz);
+
+CLK50MHz <= bCLK50MHz;
+CLK25MHz <= bCLK25MHz;
 CLK2MHz  <= oCLK2MHz;
 CLK1MHz  <= oCLK1MHz;
 

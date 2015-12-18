@@ -41,6 +41,15 @@ begin
 process (CLK)
 begin
     if (CLK = '1' and CLK'event ) then
+        if (CS = '1') then
+            if (A = "00" & x"FFD") then
+                ROW_BASE_REG <= Din;
+            elsif (A = "00" & x"FFE") then
+                CURSOR_ROW_REG <= Din;
+            elsif (A = "00" & x"FFF") then
+                CURSOR_COL_REG <= Din;
+            end if;
+        end if;
         if (CS = '1' and LASTCS = '0') then
             VRAM0Read  <= CS and (NOT RW) and (NOT A(0)) and (NOT A(13));
             VRAM1Read  <= CS and (NOT RW) and (    A(0)) and (NOT A(13));
@@ -52,13 +61,6 @@ begin
             VRAM3Write <= CS and (    RW) and (    A(0)) and (    A(13));
             VRAMAddr(11 downto 0) <= A(12 downto 1);
             VRAMDataOut <= Din;
-            if (A = "00" & x"FFD") then
-                ROW_BASE_REG <= Din;
-            elsif (A = "00" & x"FFE") then
-                CURSOR_ROW_REG <= Din;
-            elsif (A = "00" & x"FFF") then
-                CURSOR_COL_REG <= Din;
-            end if;
         elsif (CS = '0') then
             VRAM0Read  <= '0';
             VRAM1Read  <= '0';
@@ -70,11 +72,12 @@ begin
             VRAM3Write <= '0';
         end if;
         Dout <= VRAM0DataIn or VRAM1DataIn or VRAM2DataIn or VRAM3DataIn;
-        ROW_BASE   <= ROW_BASE_REG;
-        CURSOR_ROW <= CURSOR_ROW_REG;
-        CURSOR_COL <= CURSOR_COL_REG;
         LASTCS <= CS;
     end if;
 end process;
+
+ROW_BASE   <= ROW_BASE_REG;
+CURSOR_ROW <= CURSOR_ROW_REG;
+CURSOR_COL <= CURSOR_COL_REG;
 
 end Behavioral;

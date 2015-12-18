@@ -6,6 +6,7 @@ use work.cpu_pkg.all;
 
 entity pipeline is
     Port (
+        CLK50  : in  STD_LOGIC;
         CLK    : in  STD_LOGIC;
         STALL  : in  STD_LOGIC;
         IRQ    : in  STD_LOGIC;
@@ -126,11 +127,15 @@ signal   id_is_beq      : STD_LOGIC := '0';
 signal   id_is_bne      : STD_LOGIC := '0';
 signal   id_is_blez     : STD_LOGIC := '0';
 signal   id_is_bgtz     : STD_LOGIC := '0';
+signal   id_pc          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_pc4         : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_imm32       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_shl         : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_val_of_rs   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_val_of_rt   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   id_cop0_regrd  : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   id_val1        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   id_val2        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_braddr      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_jmpaddr     : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_jraddr      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -140,6 +145,8 @@ signal   id_is_lez      : STD_LOGIC := '0';
 signal   id_is_gtz      : STD_LOGIC := '0';
 signal   id_is_mfc0     : STD_LOGIC := '0';
 signal   id_is_mtc0     : STD_LOGIC := '0';
+signal   id_is_rfe      : STD_LOGIC := '0';
+signal   id_is_cop0     : STD_LOGIC := '0';
 signal   id_pc_src      : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal   id_if_flush    : STD_LOGIC := '0';
 signal   id_ctrlsig_in  : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
@@ -150,9 +157,15 @@ signal   id_stall       : STD_LOGIC := '0';
 signal   id_ifclk       : STD_LOGIC := '1';
 signal   id_pcclk       : STD_LOGIC := '1';
 signal   id_exception   : STD_LOGIC := '0';
+signal   id_regfile_p1  : STD_LOGIC := '0';
+signal   id_regfile_p2  : STD_LOGIC := '0';
 signal   id_regfile     : regfile_t := (others => x"00000000");
+signal   id_regfile1    : regfile_t := (others => x"00000000");
+signal   id_regfile2    : regfile_t := (others => x"00000000");
 attribute ram_style: string;
-attribute ram_style of id_regfile : signal is "distributed";
+attribute ram_style of id_regfile : signal is "block";
+attribute ram_style of id_regfile1 : signal is "block";
+attribute ram_style of id_regfile2 : signal is "block";
 
 -- EX
 signal   ex_hi          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -208,15 +221,54 @@ signal   wb_exception   : STD_LOGIC := '0';
 
 -- coprocessor registers:
 constant IEc            : integer := 0;
+constant KUc            : integer := 1;
+constant IEp            : integer := 2;
+constant KUp            : integer := 3;
+constant IEo            : integer := 4;
+constant KUo            : integer := 5;
 
-signal   SR             : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
-signal   CAUSE          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
-signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+constant IR             : STD_LOGIC_VECTOR (4 downto 0) := "00000";
+
+signal   SR             : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 12
+signal   CAUSE          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 13
+signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 14
+
+signal   CAUSE_tmp      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   EPC_tmp        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
 signal   got_rising     : std_logic := '0';
 signal   got_falling    : std_logic := '0';
 
 begin
+
+--------------------------------------------------------------------------------
+--                             CLOCK PHASES                                   --
+--------------------------------------------------------------------------------
+
+-- process(CLK50)
+-- begin
+--
+--     if (CLK50 = '1' and CLK50'event) then
+--         if (phase0 = '0') then
+--             phase0 <= '1';
+--             phase2 <= '0';
+--         else
+--             phase0 <= '0';
+--             phase2 <= '1';
+--         end if;
+--     end if;
+--
+--     if (CLK50 = '0' and CLK50'event) then
+--         if (phase1 = '0') then
+--             phase1 <= '1';
+--             phase3 <= '0';
+--         else
+--             phase1 <= '0';
+--             phase3 <= '1';
+--         end if;
+--     end if;
+--
+-- end process;
 
 --       _   _   _   _   _
 -- CLK _| |_| |_| |_| |_| |
@@ -242,7 +294,7 @@ begin
             -- if exception conditions are satisfied, next cycle is
             -- an exception fetch, and all stages before and including the
             -- exception-source stage shall be flushed.
-            if (if_pc = x"BFC00180") then
+            if (if_exphndl = '1') then
                 -- exception served
                 if_exception <= '0';
                 IAK <= '1';
@@ -251,9 +303,28 @@ begin
                 -- deactivate interrupt ack
                 IAK <= '0';
                 exception <= '0';
-            elsif (IRQ = '1' and SR(IEc) = '1') then
-                -- IRQ
+            elsif (IRQ = '1' and SR(IEc) = '1' and if_exception='0') then
+                -- IRQ happened!
                 if_exception <= '1';
+                -- store EPC and CAUSE
+                if (id_is_jr='1' or id_is_jalr='1' or
+                    is_branchregimm(id_opcode) or is_jmp(id_opcode) or
+                    is_branch(id_opcode)) then
+                    -- branch instruction in ID stage
+                    EPC <= id_pc;
+                    CAUSE <= x"80000000";
+                else
+                    EPC <= if_pc;
+                    CAUSE <= x"00000000";
+                end if;
+--                 if (id_ctrlsig_in(BRANCH)='1') then
+--                     -- branch instruction in ID stage
+--                     EPC <= id_pc;
+--                     CAUSE <= x"80000000";
+--                 else
+--                     EPC <= if_pc;
+--                     CAUSE <= x"00000000";
+--                 end if;
             end if;
             got_falling <= got_rising;
         end if;
@@ -341,11 +412,13 @@ begin
         elsif (if_exception='1') then
             -- flush ID
             id_instr     <= x"00000000";
+            id_pc        <= if_pc;
             id_pc4       <= if_pc4;
         else
             -- normal operation
             if (id_ifclk = '1') then
                 id_instr     <= if_instr;
+                id_pc        <= if_pc;
                 id_pc4       <= if_pc4;
             end if;
         end if;
@@ -365,6 +438,8 @@ impure function read_cop0_reg(indx : in STD_LOGIC_VECTOR (4  downto 0))
     begin
         case indx is
             when "01100" => retval := SR;
+            when "01101" => retval := CAUSE;
+            when "01110" => retval := EPC;
             when others  =>
         end case;
         return retval;
@@ -380,54 +455,39 @@ procedure write_cop0_reg(indx : in STD_LOGIC_VECTOR (4  downto 0);
 end write_cop0_reg;
 
 begin
-    if ( CLK = '0' and CLK'event ) then
-        -- handle register file operations
-        if (wb_ctrlsig(REG_WRITE) = '1' and wb_rk /= "00000") then
-            -- write & read
-            id_regfile(conv_integer(wb_rk)) <= wb_value_of_rk;
-            if (wb_rk = id_rs) then
-                val_of_rs := wb_value_of_rk;
-            else
-                val_of_rs := id_regfile(conv_integer(id_rs));
-            end if;
-            if (wb_rk = id_rt) then
-                val_of_rt := wb_value_of_rk;
-            else
-                val_of_rt := id_regfile(conv_integer(id_rt));
-            end if;
-        else
-            -- read only (no write)
-            val_of_rs := id_regfile(conv_integer(id_rs));
-            val_of_rt := id_regfile(conv_integer(id_rt));
-        end if;
 
-        -- evaluate values of id_val_of_rs and id_val_of_rt
-        if (is_cop0(id_opcode)) then
-            -- cop0 instruction
-            if (id_is_mfc0='1') then
-                -- MFC0: move from c0 register
-                if (wb_is_mtc0='1' and wb_rk=id_rd) then
-                    -- wb is writing and id is reading the same thing
-                    id_val_of_rs <= wb_value_of_rk;
-                else
-                    id_val_of_rs <= read_cop0_reg(id_rd);
-                end if;
-                id_val_of_rt <= x"00000000";
-            elsif (id_is_mtc0='1') then
-                -- MTC0: move to c0 register
-                id_val_of_rs <= x"00000000";
-                id_val_of_rt <= val_of_rt;
+    if (CLK50 = '0' and CLK50'event) then
+        if (id_regfile_p1 = '0') then
+            -- write to regfile
+            if (wb_ctrlsig(REG_WRITE) = '1' and wb_rk /= "00000") then
+                id_regfile1(conv_integer(wb_rk)) <= wb_value_of_rk;
+                id_regfile2(conv_integer(wb_rk)) <= wb_value_of_rk;
             end if;
+            id_regfile_p1 <= '1';
         else
-            -- move results to data signals
-            id_val_of_rs <= val_of_rs;
-            id_val_of_rt <= val_of_rt;
-        end if;
-        -- cop0 registers writeback
-        if (wb_is_mtc0='1') then
-            write_cop0_reg(wb_rk, wb_value_of_rk);
+            -- read from regfile
+            id_val1 <= id_regfile1(conv_integer(id_rs));
+            id_val2 <= id_regfile2(conv_integer(id_rt));
+            id_regfile_p1 <= '0';
         end if;
     end if;
+
+    if (CLK = '0' and CLK'event) then
+        if (if_exphndl='1' and if_exception='1') then
+            -- disable interrupts
+            SR(5 downto 0) <= SR(3 downto 0) & "00";
+        elsif (id_is_rfe='1') then
+            SR(3 downto 0) <= SR(5 downto 2);
+        elsif (wb_is_mtc0='1') then
+            -- write to coprocessor registers
+            write_cop0_reg(wb_rk, wb_value_of_rk);
+        else
+            -- read from coprocessor registers
+            id_cop0_regrd <= read_cop0_reg(id_rd);
+        end if;
+
+    end if;
+
 end process;
 
 -- combinational logic
@@ -470,6 +530,16 @@ id_is_lez   <= alu_lts(id_val_of_rs, x"00000000")(0) OR id_is_zero;
 id_is_gtz   <= NOT id_is_lez;
 id_is_mfc0  <= '1' when is_cop0(id_opcode) and id_rs = "00000" else '0';
 id_is_mtc0  <= '1' when is_cop0(id_opcode) and id_rs = "00100" else '0';
+id_is_rfe   <= '1' when is_cop0(id_opcode) and id_rs = "10000"
+                                           and id_funct = "010000" else '0';
+id_is_cop0  <= '1' when is_cop0(id_opcode) else '0';
+
+-- register file outputs
+id_val_of_rs <= id_val1 when id_is_cop0='0' else
+                id_cop0_regrd when id_is_mfc0='1' else
+                x"00000000";
+id_val_of_rt <= id_val2 when (id_is_cop0='0' or id_is_mtc0='1') else
+                x"00000000";
 
 -- generate control signals
 id_ctrlsig_in(REG_DEST) <=
@@ -603,9 +673,11 @@ id_stall <= '1' when
     (id_is_mtc0 = '1' and (
      (ex_ctrlsig(REG_WRITE) ='1' and ex_rk /="00000" and ex_rk =id_rt) or
      (mem_ctrlsig(REG_WRITE)='1' and mem_rk/="00000" and mem_rk=id_rt))) or
-    -- mfc0 needs to wait for mtc0
-    (id_is_mfc0 = '1' and (ex_is_mtc0='1' or mem_is_mtc0='1'))
-
+    -- mfc0/mtc0 need to introduce 3 bubbles in the pipeline
+    ((id_is_mfc0='1' or id_is_mtc0='1' or id_is_rfe='1') and
+     (ex_instr /= x"00000000" or mem_instr /= x"00000000" or
+      wb_instr /= x"00000000"))
+    -- any other case shouldn't need a stall
     else '0';
 id_ifclk <= NOT id_stall;
 id_pcclk <= NOT id_stall;
