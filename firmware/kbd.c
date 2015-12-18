@@ -163,11 +163,7 @@ int next_write() {
 
 char get_from_buf() {
     int ret;
-    while (buf_write == buf_read) {
-        int kbd_data;
-        while(!(kbd_data = kbd[KBD_DATA]));
-        scproc(kbd_data);
-    }
+    while (buf_write == buf_read);
     ret = buf[buf_read];
     buf_read = next_read();
     return ret;
@@ -410,7 +406,10 @@ void scproc(unsigned char scancode) {
 
 void kbd_irq() {
     /* The keyboard has just interrupted our cpu */
-    scproc(kbd[KBD_DATA]);
+    int kbd_data;
+    while (kbd_data = kbd[KBD_DATA]) {
+        scproc(kbd_data);
+    }
 }
 
 /*****************************************************************************/

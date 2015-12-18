@@ -43,7 +43,7 @@ begin
 process (CLK)
 begin
 
-    if ( CLK = '1' and CLK'event ) then
+    if ( CLK = '0' and CLK'event ) then
         if (RW = '1') then
             cache_arr_v(conv_integer(WR_ADDR))    <= Vin;
             cache_arr_data(conv_integer(WR_ADDR)) <= Din;

@@ -245,6 +245,8 @@ end cacheable;
 
 begin
 
+    -- TODO: set cachearray clock to rising edge.
+
     if ( CLK='0' and CLK'event and CACHE_EN = '1' ) then
         -- execute fsm
         if (phase = 0) then
@@ -257,10 +259,6 @@ begin
             -------------------------------
             -- cache hit/miss processing --
             -------------------------------
-            -- assume cache hit happened in both caches
-            iDout <= icache_rd_data;
-            dDout <= extract(dDTYPE, dADDR, dcache_rd_data);
-
             -- detect cache misses:
             buf_empty := true;
             if (iMEME = '1') then
@@ -268,6 +266,8 @@ begin
                     -- icache miss
                     buf0.USED  <= true;
                     buf_empty := false;
+                else
+                    iDout <= icache_rd_data;
                 end if;
             end if;
             if (dMEME = '1') then
@@ -275,6 +275,8 @@ begin
                     -- dcache miss
                     buf1.USED  <= true;
                     buf_empty := false;
+                else
+                    dDout <= extract(dDTYPE, dADDR, dcache_rd_data);
                 end if;
             end if;
 

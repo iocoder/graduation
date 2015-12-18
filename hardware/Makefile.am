@@ -132,6 +132,15 @@ nvcsim:
 	nvc -e tlc_sim
 	nvc -r --load=../vhdsim/vhdsim.so --wave=waveform.gw tlc_sim
 
+timing:
+	LD_LIBRARY_PATH=/opt/Xilinx/10.1/ISE/lib/lin \
+	XILINX=/opt/Xilinx/10.1/ISE \
+	/opt/Xilinx/10.1/ISE/bin/lin/_timingan_old -ngd \
+	/home/Files/Projects/graduation/build/hardware/_ngd/mipscomp.ngd \
+	/home/Files/Projects/graduation/build/hardware/_par/mipscomp.ncd \
+	/home/Files/Projects/graduation/build/hardware/_map/mipscomp.pcf \
+	/home/Files/Projects/graduation/build/hardware/_trc/mipscomp.twr
+
 prog: $(BIT_DIR)/final.bit
 	djtgcfg enum
 	djtgcfg init -d Nexys2

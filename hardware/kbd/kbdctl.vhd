@@ -52,7 +52,13 @@ signal SENSE     : STD_LOGIC := '0';
 signal LASTSENSE : STD_LOGIC := '0';
 signal LASTEN    : STD_LOGIC := '0';
 signal PACKET    : STD_LOGIC_VECTOR (7 downto 0) := x"00";
-signal IOPORT    : STD_LOGIC_VECTOR (7 downto 0) := x"00";
+
+type kbdbuf_t is array (0 to 15) of STD_LOGIC_VECTOR (7 downto 0);
+signal kbdbuf    : kbdbuf_t := (others => x"00");
+signal buf_front : integer range 0 to 100 := 0;
+signal buf_back  : integer range 0 to 100 := 0;
+attribute ram_style: string;
+attribute ram_style of kbdbuf : signal is "distributed";
 
 begin
 
@@ -63,7 +69,7 @@ LED  <= PACKET;
 
 process (CLK)
 begin
-    if (CLK = '1' and CLK'event ) then
+    if (CLK = '0' and CLK'event ) then
         if (SENSE = '1') then
             LASTSENSE <= '1';
         else
@@ -76,19 +82,36 @@ begin
             LASTEN <= '0';
         end if;
 
+        if (IAK='1' and not (SENSE = '1' and LASTSENSE = '0')) then
+            INT <= '0';
+        end if;
+
         if (SENSE = '1' and LASTSENSE = '0') then
             -- a scancode has arrived
-            IOPORT <= PACKET;        -- save a copy of the scancode
-            if (EN = '1') then
-                DATA <= PACKET;
+            kbdbuf(buf_front) <= PACKET;
+            if (buf_front = 15) then
+                buf_front <= 0;
+            else
+                buf_front <= buf_front + 1;
             end if;
-        elsif (EN = '1' and LASTEN = '0') then
+            INT <= '1';
+        end if;
+
+        if (EN = '1' and LASTEN = '0') then
             -- data cycle started
-            DATA   <= IOPORT;        -- output IOPORT register
+            if (buf_back = buf_front) then
+                DATA <= x"00";
+            else
+                DATA <= kbdbuf(buf_back);
+                if (buf_back = 15) then
+                    buf_back <= 0;
+                else
+                    buf_back <= buf_back + 1;
+                end if;
+            end if;
         elsif (EN = '0' and LASTEN = '1') then
             -- data cycle ended
             DATA   <= x"00";
-            IOPORT <= x"00";         -- invalidate buffer
         end if;
     end if;
 end process;

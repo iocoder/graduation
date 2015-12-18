@@ -136,6 +136,22 @@ component pit is
         RDY      : out   STD_LOGIC := '1');
 end component;
 
+component pic is
+    Port (
+        CLK      : in    STD_LOGIC;
+        IRQ_in   : in    STD_LOGIC_VECTOR (7 downto 0);
+        IAK_out  : out   STD_LOGIC_VECTOR (7 downto 0);
+        IRQ_out  : out   STD_LOGIC := '0';
+        IAK_in   : in    STD_LOGIC;
+        CS       : in    STD_LOGIC;
+        RW       : in    STD_LOGIC; -- 0: read, 1: write
+        Din      : in    STD_LOGIC_VECTOR (31 downto 0);
+        Dout     : out   STD_LOGIC_VECTOR (31 downto 0);
+        DTYPE    : in    STD_LOGIC_VECTOR ( 2 downto 0);
+        RDY      : out   STD_LOGIC := '1'
+    );
+end component;
+
 -- CPU signals
 signal IRQ          : STD_LOGIC := '0';
 signal NMI          : STD_LOGIC := '0';
@@ -146,7 +162,6 @@ signal NAK          : STD_LOGIC := '0';
 signal MEME         : STD_LOGIC := '0';
 signal RW           : STD_LOGIC := '0';
 signal Address      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
-signal RAMAddress   : STD_LOGIC_VECTOR (23 downto 0) := x"000000";
 signal VGAAddress   : STD_LOGIC_VECTOR (13 downto 0) := "00" & x"000";
 signal DataCPUToMem : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataMemToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -154,19 +169,22 @@ signal DataRAMToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataVGAToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataKBDToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataPITToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal DataPICToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DTYPE        : STD_LOGIC_VECTOR ( 2 downto 0) := "000";
 signal RAM_CS       : STD_LOGIC := '0';
 signal ROM_CS       : STD_LOGIC := '0';
 signal VGA_CS       : STD_LOGIC := '0';
 signal KBD_CS       : STD_LOGIC := '0';
 signal PIT_CS       : STD_LOGIC := '0';
+signal PIC_CS       : STD_LOGIC := '0';
 signal MEM_RDY      : STD_LOGIC := '0';
 signal VGA_RDY      : STD_LOGIC := '0';
 signal KBD_RDY      : STD_LOGIC := '0';
 signal PIT_RDY      : STD_LOGIC := '0';
-signal PIT_IRQ      : STD_LOGIC := '0';
-signal KBD_IRQ      : STD_LOGIC := '0';
+signal PIC_RDY      : STD_LOGIC := '0';
 signal RDY          : STD_LOGIC := '0';
+signal IRQ_to_PIC   : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
+signal IAK_from_PIC : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 
 begin
 
@@ -175,6 +193,7 @@ begin
 -- 0x1E000000 - 0x1E000FFF : VGA
 -- 0x1E800000 - 0x1E800FFF : KBD
 -- 0x1E801000 - 0x1E801FFF : PIT
+-- 0x1E802000 - 0x1E802FFF : PIC
 -- 0x1F000000 - 0x1FFFFFFF : ROM
 
 -- memory decoding
@@ -183,27 +202,28 @@ ROM_CS <= MEME when Address(31 downto 24)  = x"1F"    else '0';
 VGA_CS <= MEME when Address(31 downto 12)  = x"1E000" else '0';
 KBD_CS <= MEME when Address(31 downto 12)  = x"1E800" else '0';
 PIT_CS <= MEME when Address(31 downto 12)  = x"1E801" else '0';
+PIC_CS <= MEME when Address(31 downto 12)  = x"1E802" else '0';
 DataMemToCPU <= DataRAMToCPU when ROM_CS = '1' or RAM_CS = '1' else
                 DataVGAToCPU when VGA_CS = '1' else
                 DataKBDToCPU when KBD_CS = '1' else
                 DataPITToCPU when PIT_CS = '1' else
+                DataPICToCPU when PIC_CS = '1' else
                 x"00000000";
 RDY <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
        VGA_RDY when VGA_CS = '1' else
        KBD_RDY when KBD_CS = '1' else
        PIT_RDY when PIT_CS = '1' else
+       PIC_RDY when PIC_CS = '1' else
        '0';
-RAMAddress <= Address(23 downto 0);
 VGAAddress <= "00" & Address(11 downto 0);
-IRQ <= PIT_IRQ;
 
 -- subblocks
 U1: cpu    port map (CLK, IRQ, NMI, IAK, NAK,
                      MEME, RW, Address, DataMemToCPU, DataCPUToMem, DTYPE, RDY);
 U2: memif  port map (CLK,
-                     RAM_CS, ROM_CS, RW, RAMAddress, DataCPUToMem(31 downto 0),
-                     DataRAMToCPU(31 downto 0), DTYPE, MEM_RDY,
-                     ADDR, DATA, OE, WE,
+                     RAM_CS, ROM_CS, RW, Address(23 downto 0),
+                     DataCPUToMem(31 downto 0), DataRAMToCPU(31 downto 0),
+                     DTYPE, MEM_RDY, ADDR, DATA, OE, WE,
                      MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
                      ST_STS, RP, ST_CE);
 U3: vga    port map (CLK, VGA_CS, RW, VGAAddress, DataCPUToMem(7 downto 0),
@@ -211,8 +231,10 @@ U3: vga    port map (CLK, VGA_CS, RW, VGAAddress, DataCPUToMem(7 downto 0),
                      R, G, B, HS, VS);
 U4: kbdctl port map (CLK, PS2CLK, PS2DATA, LED,
                      KBD_CS, RW, DataKBDToCPU(7 downto 0), KBD_RDY,
-                     KBD_IRQ, '0');
-U5: pit    port map (CLK, PIT_IRQ, IAK,
+                     IRQ_to_PIC(1), IAK_from_PIC(1));
+U5: pit    port map (CLK, IRQ_to_PIC(0), IAK_from_PIC(0),
                      PIT_CS, RW, DataCPUToMem, DataPITToCPU, DTYPE, PIT_RDY);
+U6: pic    port map (CLK, IRQ_to_PIC, IAK_from_PIC, IRQ, IAK,
+                     PIC_CS, RW, DataCPUToMem, DataPICToCPU, DTYPE, PIC_RDY);
 
 end Structural;

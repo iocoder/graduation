@@ -127,6 +127,7 @@ signal   id_is_beq      : STD_LOGIC := '0';
 signal   id_is_bne      : STD_LOGIC := '0';
 signal   id_is_blez     : STD_LOGIC := '0';
 signal   id_is_bgtz     : STD_LOGIC := '0';
+signal   id_is_branch   : STD_LOGIC := '0';
 signal   id_pc          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_pc4         : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   id_imm32       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -241,35 +242,6 @@ signal   got_falling    : std_logic := '0';
 
 begin
 
---------------------------------------------------------------------------------
---                             CLOCK PHASES                                   --
---------------------------------------------------------------------------------
-
--- process(CLK50)
--- begin
---
---     if (CLK50 = '1' and CLK50'event) then
---         if (phase0 = '0') then
---             phase0 <= '1';
---             phase2 <= '0';
---         else
---             phase0 <= '0';
---             phase2 <= '1';
---         end if;
---     end if;
---
---     if (CLK50 = '0' and CLK50'event) then
---         if (phase1 = '0') then
---             phase1 <= '1';
---             phase3 <= '0';
---         else
---             phase1 <= '0';
---             phase3 <= '1';
---         end if;
---     end if;
---
--- end process;
-
 --       _   _   _   _   _
 -- CLK _| |_| |_| |_| |_| |
 --      ^   ^   ^   ^   ^    Rising : CPU starts new cycle.
@@ -308,7 +280,8 @@ begin
                 if_exception <= '1';
                 -- store EPC and CAUSE
                 if (id_is_jr='1' or id_is_jalr='1' or
-                    is_branchregimm(id_opcode) or is_jmp(id_opcode) or
+                    is_branchregimm(id_opcode) or
+                    is_jmp(id_opcode) or
                     is_branch(id_opcode)) then
                     -- branch instruction in ID stage
                     EPC <= id_pc;
@@ -317,14 +290,6 @@ begin
                     EPC <= if_pc;
                     CAUSE <= x"00000000";
                 end if;
---                 if (id_ctrlsig_in(BRANCH)='1') then
---                     -- branch instruction in ID stage
---                     EPC <= id_pc;
---                     CAUSE <= x"80000000";
---                 else
---                     EPC <= if_pc;
---                     CAUSE <= x"00000000";
---                 end if;
             end if;
             got_falling <= got_rising;
         end if;
@@ -405,23 +370,47 @@ iDout    <= x"00000000";
 
 -- register transfer
 process(CLK)
+
+variable id_next_instr  : STD_LOGIC_VECTOR (31 downto 0);
+variable id_next_opcode : STD_LOGIC_VECTOR ( 5 downto 0);
+variable id_next_funct  : STD_LOGIC_VECTOR ( 5 downto 0);
+
 begin
     if (CLK = '1' and CLK'event and STALL = '0') then
         if (id_exception='1') then
             -- don't move
+            id_next_instr := id_instr;
         elsif (if_exception='1') then
             -- flush ID
-            id_instr     <= x"00000000";
-            id_pc        <= if_pc;
-            id_pc4       <= if_pc4;
+            id_instr      <= x"00000000";
+            id_next_instr := x"00000000";
+            id_pc         <= if_pc;
+            id_pc4        <= if_pc4;
         else
             -- normal operation
             if (id_ifclk = '1') then
-                id_instr     <= if_instr;
-                id_pc        <= if_pc;
-                id_pc4       <= if_pc4;
+                id_instr      <= if_instr;
+                id_next_instr := if_instr;
+                id_pc         <= if_pc;
+                id_pc4        <= if_pc4;
+            else
+                id_next_instr := id_instr;
             end if;
         end if;
+
+        id_next_opcode := id_next_instr(31 downto 26);
+        id_next_funct  := id_next_instr( 5 downto 0);
+
+        if ((id_next_opcode="000000" and id_next_funct="001000") or
+            (id_next_opcode="000000" and id_next_funct="001001") or
+            is_branchregimm(id_next_opcode) or
+            is_jmp(id_next_opcode) or
+            is_branch(id_next_opcode)) then
+            id_is_branch <= '1';
+        else
+            id_is_branch <= '0';
+        end if;
+
     end if;
 end process;
 

@@ -1,15 +1,14 @@
 #include "vga.h"
+#include "kbd.h"
 #include "pit.h"
+#include "pic.h"
 
 int ticks;
 char chr;
 
-void handle_interrupt() {
-    write_to_vga(0, chr++);
-}
-
 void newsec() {
     print_fmt("0x%x seconds passed.\n", ++ticks);
+    //__asm__("nop; nop; nop;");
 }
 
 void print_status() {
@@ -30,6 +29,35 @@ void print_epc() {
     print_fmt("EPC: %x\n", reg);
 }
 
+void handle_interrupt() {
+    switch (pic_read()) {
+        case 0:
+            write_to_vga(0, chr++);
+            break;
+        case 1:
+            kbd_irq();
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        default:
+            break;
+    }
+    //print_epc();
+    //print_cause();
+    //print_fmt("int source: %x\n", pic_read());
+    pic_enable();
+}
+
 void do_rfe() {
     __asm__("rfe");
 }
@@ -41,6 +69,9 @@ int main() {
     /* initialize VGA... */
     clear_screen(0x0E, 0x0E, 0x0E);
 
+    /* initialize PIC */
+    pic_init();
+
     /* interrupt test */
     __asm__("mfc0 %0, $12":"=r"(reg));
     print_fmt("reg: %x\n", reg);
@@ -51,10 +82,6 @@ int main() {
 
     ticks = 0;
     pit_write(500000);
-
-    __asm__("lui $v0, 0xBE00;"
-            "ori $v0, $v0, 0x0000;"
-            "ori $v1, $0, '*';");
 
     /* initialize keyboard */
     kbd_init();

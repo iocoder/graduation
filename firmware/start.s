@@ -110,6 +110,7 @@ start:
 
 .org 0x180
     .set noat
+    .set noreorder
 
     addi  $sp, -4*32
 
@@ -147,6 +148,7 @@ start:
     sw    $31, 4*31($sp)
 
     jal   handle_interrupt
+    nop
 
     lw    $0,  4* 0($sp)
     lw    $1,  4* 1($sp)
@@ -184,5 +186,6 @@ start:
     addi  $sp, 4*32
 
     mfc0  $k0, $14
-    rfe
+
     jr    $k0
+    rfe
