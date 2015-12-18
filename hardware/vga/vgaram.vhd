@@ -3,24 +3,24 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity vgaram1 is
+entity vgaram is
     Port (CLK           : in  STD_LOGIC;
           -- sequencer port:
           SeqReadEnable : in  STD_LOGIC;
-          SeqAddr       : in  STD_LOGIC_VECTOR (11 downto 0);
+          SeqAddr       : in  STD_LOGIC_VECTOR (10 downto 0);
           SeqDataOut    : out STD_LOGIC_VECTOR ( 7 downto 0) := "00000000";
           -- GU port:
           GUReadEnable  : in  STD_LOGIC;
           GUWriteEnable : in  STD_LOGIC;
-          GUAddr        : in  STD_LOGIC_VECTOR (11 downto 0);
+          GUAddr        : in  STD_LOGIC_VECTOR (10 downto 0);
           GUDataIn      : in  STD_LOGIC_VECTOR ( 7 downto 0);
           GUDataOut     : out STD_LOGIC_VECTOR ( 7 downto 0));
-end vgaram1;
+end vgaram;
 
-architecture Behavioral of vgaram1 is
+architecture Behavioral of vgaram is
 
 type ram_t is array (0 to 2047) of STD_LOGIC_VECTOR (7 downto 0);
-signal ram : ram_t := (others => x"1F");
+signal ram : ram_t := (others => x"00");
 
 begin
 

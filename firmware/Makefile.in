@@ -127,7 +127,7 @@ AWK = @AWK@
 CC = mipsel-linux-gnu-gcc
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = -mno-abicalls -fno-builtin -nostartfiles -nostdlib \
-	-nodefaultlibs -mno-check-zero-division -mips1
+	-nodefaultlibs -mno-check-zero-division -mips1 -I$(abs_srcdir)
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@

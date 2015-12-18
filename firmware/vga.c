@@ -8,6 +8,7 @@ char scan_attr;
 int  row;
 int  col;
 int  row_base;
+extern unsigned char font[256*16];
 
 void write_to_vga(int index, char data) {
     if (index >= 0xFFD) {
@@ -34,6 +35,9 @@ void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
         write_to_vga(i++, 0);
         write_to_vga(i++, attr);
     }
+    /* load font */
+    for (i = 0; i < 0x1000; i++)
+      vga[0x1000+i] = font[i];
 }
 
 void scroll() {
@@ -162,3 +166,7 @@ void print_fmt(char *fmt, ...) {
         }
     }
 }
+
+__asm__(".section .rodata         ");
+__asm__("font:                    ");
+__asm__(".incbin \"font8x16.fon\" ");

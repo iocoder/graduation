@@ -91,7 +91,7 @@ component vga is
            -- System Bus
            CS   : in  STD_LOGIC;
            RW   : in  STD_LOGIC;
-           A    : in  STD_LOGIC_VECTOR (13 downto 0);
+           A    : in  STD_LOGIC_VECTOR (12 downto 0);
            Din  : in  STD_LOGIC_VECTOR (7 downto 0);
            Dout : out STD_LOGIC_VECTOR (7 downto 0);
            RDY  : out STD_LOGIC := '0';
@@ -162,7 +162,6 @@ signal NAK          : STD_LOGIC := '0';
 signal MEME         : STD_LOGIC := '0';
 signal RW           : STD_LOGIC := '0';
 signal Address      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
-signal VGAAddress   : STD_LOGIC_VECTOR (13 downto 0) := "00" & x"000";
 signal DataCPUToMem : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataMemToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal DataRAMToCPU : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -190,19 +189,19 @@ begin
 
 ------------- memory map -------------
 -- 0x00000000 - 0x00FFFFFF : RAM
--- 0x1E000000 - 0x1E000FFF : VGA
+-- 0x1E000000 - 0x1E001FFF : VGA
 -- 0x1E800000 - 0x1E800FFF : KBD
 -- 0x1E801000 - 0x1E801FFF : PIT
 -- 0x1E802000 - 0x1E802FFF : PIC
 -- 0x1F000000 - 0x1FFFFFFF : ROM
 
 -- memory decoding
-RAM_CS <= MEME when Address(31 downto 24)  = x"00"    else '0';
-ROM_CS <= MEME when Address(31 downto 24)  = x"1F"    else '0';
-VGA_CS <= MEME when Address(31 downto 12)  = x"1E000" else '0';
-KBD_CS <= MEME when Address(31 downto 12)  = x"1E800" else '0';
-PIT_CS <= MEME when Address(31 downto 12)  = x"1E801" else '0';
-PIC_CS <= MEME when Address(31 downto 12)  = x"1E802" else '0';
+RAM_CS <= MEME when Address(31 downto 24)  = x"00"         else '0';
+ROM_CS <= MEME when Address(31 downto 24)  = x"1F"         else '0';
+VGA_CS <= MEME when Address(31 downto 13)  = x"1E00"&"000" else '0';
+KBD_CS <= MEME when Address(31 downto 12)  = x"1E800"      else '0';
+PIT_CS <= MEME when Address(31 downto 12)  = x"1E801"      else '0';
+PIC_CS <= MEME when Address(31 downto 12)  = x"1E802"      else '0';
 DataMemToCPU <= DataRAMToCPU when ROM_CS = '1' or RAM_CS = '1' else
                 DataVGAToCPU when VGA_CS = '1' else
                 DataKBDToCPU when KBD_CS = '1' else
@@ -215,7 +214,6 @@ RDY <= MEM_RDY when ROM_CS = '1' or RAM_CS = '1' else
        PIT_RDY when PIT_CS = '1' else
        PIC_RDY when PIC_CS = '1' else
        '0';
-VGAAddress <= "00" & Address(11 downto 0);
 
 -- subblocks
 U1: cpu    port map (CLK, IRQ, NMI, IAK, NAK,
@@ -226,7 +224,8 @@ U2: memif  port map (CLK,
                      DTYPE, MEM_RDY, ADDR, DATA, OE, WE,
                      MT_ADV, MT_CLK, MT_UB, MT_LB, MT_CE, MT_CRE, MT_WAIT,
                      ST_STS, RP, ST_CE);
-U3: vga    port map (CLK, VGA_CS, RW, VGAAddress, DataCPUToMem(7 downto 0),
+U3: vga    port map (CLK, VGA_CS, RW,
+                     Address(12 downto 0), DataCPUToMem(7 downto 0),
                      DataVGAToCPU(7 downto 0), VGA_RDY,
                      R, G, B, HS, VS);
 U4: kbdctl port map (CLK, PS2CLK, PS2DATA, LED,
