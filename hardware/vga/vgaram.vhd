@@ -20,7 +20,7 @@ end vgaram;
 architecture Behavioral of vgaram is
 
 type ram_t is array (0 to 2047) of STD_LOGIC_VECTOR (7 downto 0);
-signal ram : ram_t := (others => x"00");
+signal ram : ram_t := (others => x"1F");
 
 begin
 
