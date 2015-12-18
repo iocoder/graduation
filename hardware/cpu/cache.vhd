@@ -245,10 +245,6 @@ end cacheable;
 
 begin
 
-    -- note: unrolling this state machine has corrupted the design
-    -- the design worked well when this FSM was rolled and
-    -- cachearray worked on falling edge.
-
     if ( CLK='0' and CLK'event and CACHE_EN = '1' ) then
         -- execute fsm
         if (phase = 0) then
@@ -283,8 +279,6 @@ begin
             end if;
 
             -- determine next phase
-            -- (iMEME = '0' or (iRW = '0' and icache_hit)) and
-            --    (dMEME = '0' or (dRW = '0' and dcache_hit))
             if (buf_empty) then
                 -- no cache misses.
                 phase <= 0;
