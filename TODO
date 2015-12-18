@@ -2,14 +2,3 @@ Suggested TODO list:
 ---------------------
 
 - TLB
-
-- Does combining the CLK processes in pipeline into a single process increase
-maximum clock frequency and remove possible hazards?
-
-- distributed registers
-
-- digital analyzer
-
-- mips vhdl core
-
-- tamweel
