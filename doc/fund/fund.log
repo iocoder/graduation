@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2014.2.13)  30 NOV 2015 16:59
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2014.2.13)  18 DEC 2015 19:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -486,15 +486,15 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Warning: No \author given.
 
 LaTeX Font Info:    Font shape `LAE/cmr/m/n' will be
-(Font)              scaled to size 17.99998pt on input line 17.
+(Font)              scaled to size 17.99998pt on input line 18.
 LaTeX Font Info:    Font shape `LAE/cmr/bx/n' in size <14.4> not available
-(Font)              Font shape `LAE/cmr/b/n' tried instead on input line 17.
+(Font)              Font shape `LAE/cmr/b/n' tried instead on input line 18.
 LaTeX Font Info:    Font shape `LAE/cmr/b/n' will be
-(Font)              scaled to size 17.99998pt on input line 17.
+(Font)              scaled to size 17.99998pt on input line 18.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 25.
+(Font)              <7> on input line 45.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 25.
+(Font)              <5> on input line 45.
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./fund.aux)
@@ -559,17 +559,17 @@ ion: may change)
 Here is how much of TeX's memory you used:
  4091 strings out of 493311
  39022 string characters out of 6143650
- 114042 words of memory out of 5000000
+ 116042 words of memory out of 5000000
  7477 multiletter control sequences out of 15000+600000
  32776 words of font info for 30 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 26i,6n,23p,361b,199s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 26i,6n,23p,509b,199s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/arabi/ararabeyes.enc}</usr/share/texmf
 -dist/fonts/type1/arabi/arabeyes/ae_almateen.pfb></usr/share/texmf-dist/fonts/t
 ype1/arabi/arabeyes/ae_almohanad_bold.pfb></usr/share/texmf-dist/fonts/type1/pu
 blic/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb>
-Output written on fund.pdf (1 page, 39858 bytes).
+Output written on fund.pdf (1 page, 57148 bytes).
 PDF statistics:
  25 PDF objects out of 1000 (max. 8388607)
  17 compressed objects within 1 object stream

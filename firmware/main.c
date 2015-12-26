@@ -62,18 +62,67 @@ void do_rfe() {
     __asm__("rfe");
 }
 
+void card() {
+    /* print machine card */
+    fmt_attr = 0x0F;
+    print_fmt("\n");
+    print_fmt(" Alexandria University,\n");
+    print_fmt(" Faculty of Engineering,\n");
+    print_fmt(" Computer and Systems Eng. Dept.\n");
+    print_fmt("\n");
+    print_fmt("     *************************************\n");
+    print_fmt("     * ");
+    fmt_attr = 0x0A;
+    print_fmt(       "MIPS Microcomputer System on FPGA");
+    fmt_attr = 0x0F;
+    print_fmt(" *\n");
+    print_fmt("     *************************************\n");
+    print_fmt("\n");
+}
+
+void post() {
+    int old_col, size = 0x18000;
+    fmt_attr = 0x0F;
+    print_fmt("MIPS-I 32-Bit CPU at 50MHz\n");
+    print_fmt("Memory Test: 0x");
+    while (1) {
+        old_col = col;
+        ((char *) size)[0] = 0xAA;
+        ((char *) size)[1] = 0x55;
+        ((char *) size)[2] = 0xAA;
+        ((char *) size)[3] = 0x55;
+        if (*((int *)size) == 0x55AA55AA) {
+            print_fmt("%xKB", size/1024);
+        } else {
+            /* no more ram */
+            break;
+        }
+        col = old_col;
+        size+=1024*4;
+    }
+    print_fmt("%xKB OK", size/1024);
+    print_fmt("\n");
+    print_fmt("\n");
+}
+
+void boot() {
+    fmt_attr = 0x0C;
+    print_fmt("No valid bootable medium found! drop to BIOS shell...\n\n");
+    fmt_attr = 0x0F;
+}
+
 int main() {
 
-    int reg;
+    //int reg;
 
     /* initialize VGA... */
-    clear_screen(0x0E, 0x0E, 0x0E);
+    clear_screen(0x0F, 0x0F, 0x0F);
 
     /* initialize PIC */
-    pic_init();
+    //pic_init();
 
     /* interrupt test */
-    __asm__("mfc0 %0, $12":"=r"(reg));
+    /*__asm__("mfc0 %0, $12":"=r"(reg));
     print_fmt("reg: %x\n", reg);
     __asm__("mtc0 %0, $12"::"r"(0xABCDDCBF));
     __asm__("mfc0 %0, $12":"=r"(reg):"r"(0xFFFFFFFF));
@@ -81,13 +130,13 @@ int main() {
     chr = 0;
 
     ticks = 0;
-    pit_write(500000);
+    pit_write(500000);*/
 
     /* initialize keyboard */
     kbd_init();
 
     /* print header */
-    print_fmt("****************************");
+    /*print_fmt("****************************");
     fmt_attr = 0x0F;
     print_fmt(" MIPS COMPUTER FOR CSED ");
     fmt_attr = 0x0E;
@@ -97,7 +146,13 @@ int main() {
     print_fmt("-> VGA RAM: 8+32KB\n");
     print_fmt("****************************");
     print_fmt("****************************");
-    print_fmt("************************");
+    print_fmt("************************");*/
+
+    draw_logo();
+    card();
+    post();
+    boot();
+    shell();
 
     /* test cache stupidity */
     /*int *stupid = (int *) 0xF0000000;
@@ -117,9 +172,6 @@ int main() {
     }
     print_hex(i, 0x0E);
     while(1);*/
-
-    /* start shell */
-    shell();
 
     /* return 0 */
     return 0;

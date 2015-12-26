@@ -4996,7 +4996,7 @@ done
 
 
 # Config files.
-ac_config_files="$ac_config_files Makefile firmware/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile"
+ac_config_files="$ac_config_files Makefile logo/Makefile firmware/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile"
 
 
 # Generate output files.
@@ -5743,6 +5743,7 @@ do
   case $ac_config_target in
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "logo/Makefile") CONFIG_FILES="$CONFIG_FILES logo/Makefile" ;;
     "firmware/Makefile") CONFIG_FILES="$CONFIG_FILES firmware/Makefile" ;;
     "hardware/Makefile") CONFIG_FILES="$CONFIG_FILES hardware/Makefile" ;;
     "mipsemu/Makefile") CONFIG_FILES="$CONFIG_FILES mipsemu/Makefile" ;;

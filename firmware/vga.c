@@ -23,6 +23,15 @@ void write_to_vga(int index, char data) {
     }
 }
 
+void write_char(int row, int col, char chr, char attr) {
+    write_to_vga(row*160+col*2+0, chr);
+    write_to_vga(row*160+col*2+1, attr);
+}
+
+void write_font(int ascii, int row_indx, char data) {
+    vga[0x1000+ascii*16+row_indx] = data;
+}
+
 void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
     int i = row = col = row_base = 0;
     attr = _attr;

@@ -36,6 +36,7 @@ AC_CHECK_FUNCS([strtoul])
 
 # Config files.
 AC_CONFIG_FILES([Makefile
+                 logo/Makefile
                  firmware/Makefile
                  hardware/Makefile
                  mipsemu/Makefile

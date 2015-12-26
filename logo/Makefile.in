@@ -85,7 +85,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-subdir = firmware
+subdir = logo
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -124,11 +124,9 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CC = mipsel-linux-gnu-gcc
+CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = -mno-abicalls -fno-builtin -nostartfiles -nostdlib \
-	-nodefaultlibs -mno-check-zero-division -mips1 -I$(abs_srcdir) \
-	-I../logo
+CFLAGS = -shared -fPIC -I$(abs_srcdir)
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -207,22 +205,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AS = mipsel-linux-gnu-as
-LD = mipsel-linux-gnu-ld
-OD = mipsel-linux-gnu-objdump
-OC = mipsel-linux-gnu-objcopy
-AFLAGS = 
-LSCRIPT = $(abs_srcdir)/$(OBJECT).ld
-LFLAGS = -Wl,-T$(LSCRIPT)
-OBJECT = firmware
-CFILES = $(shell find $(abs_srcdir)   -name "*.c"   -printf "%f\n" 2>/dev/null)
-HFILES = $(shell find $(abs_srcdir)   -name "*.h"   -printf "%f\n" 2>/dev/null)
-SFILES = $(shell find $(abs_srcdir)   -name "*.s"   -printf "%f\n" 2>/dev/null)
-IFILES = $(shell find $(abs_builddir) -name "*.si"  -printf "%f\n" 2>/dev/null)
-OFILES = $(shell find $(abs_builddir) -name "*.o"   -printf "%f\n" 2>/dev/null)
-BFILES = $(shell find $(abs_builddir) -name "*.bin" -printf "%f\n" 2>/dev/null)
-COBJ = $(shell echo $(CFILES) | sed 's/\.c/\.o/g')
-SOBJ = $(shell echo $(SFILES) | sed 's/\.s/\.o/g')
+SCRIPT = $(abs_srcdir)/generate.py
+PNGFILE = $(abs_srcdir)/logo.png
+TXTFILE = logo.txt
+BINFILE = logo.bin
 all: all-am
 
 .SUFFIXES:
@@ -235,9 +221,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu firmware/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu logo/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu firmware/Makefile
+	  $(AUTOMAKE) --gnu logo/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -408,26 +394,13 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-all: $(OBJECT).bin
+all: $(BINFILE)
 
-%.o:%.s Makefile
-	$(CC) $(CFLAGS) $(AFLAGS) -c -o $@ $<
-
-%.o:%.c $(HFILES) Makefile
-	$(CC) $(CFLAGS) -S -o $(shell basename $< | sed 's/\.c/\.si/g') $<
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-$(OBJECT).bin: $(COBJ) $(SOBJ) $(LSCRIPT) Makefile
-	$(CC) $(CFLAGS) $(LFLAGS) -o $(OBJECT).elf $(COBJ) $(SOBJ)
-	$(OC) -O binary $(OBJECT).elf $@
-	dd oflag=append conv=notrunc if=/dev/zero of=$@ bs=1 \
-		count=$$((32768-`stat -c%s $@`))
-
-dump:
-	$(OD) -D -m mips $(OBJECT).elf
+$(BINFILE): $(SCRIPT) $(PNGFILE)
+	$(SCRIPT) $(PNGFILE) $(TXTFILE) $(BINFILE)
 
 clean-local:
-	rm -rf $(OFILES) $(IFILES) $(BFILES) $(OBJECT).bin $(OBJECT).elf
+	rm -rf $(TXTFILE) $(BINFILE)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

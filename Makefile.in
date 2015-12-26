@@ -286,7 +286,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = hardware firmware mipsemu vhdsim
+SUBDIRS = logo hardware firmware mipsemu vhdsim
 all: all-recursive
 
 .SUFFIXES:
@@ -742,24 +742,28 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-emu:
-	make -C firmware
-	make -C mipsemu
-	cd mipsemu && ./mipsemu ../firmware/firmware.bin
-
-sim:
-	make -C vhdsim
-	make -C firmware
-	make -C hardware nvcsim
-
 prog:
+	make -C logo
 	make -C firmware
 	make -C hardware
 	make -C ../upload prog FILE=../build/firmware/firmware.bin \
 		ADDR=0xC00000 SIZE=0x8000
 	make -C hardware prog
 
+emu:
+	make -C logo
+	make -C firmware
+	make -C mipsemu
+	cd mipsemu && ./mipsemu ../firmware/firmware.bin
+
+sim:
+	make -C vhdsim
+	make -C logo
+	make -C firmware
+	make -C hardware nvcsim
+
 dump:
+	make -C logo
 	make -C firmware dump
 
 clean-local:
