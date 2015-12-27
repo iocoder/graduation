@@ -44,6 +44,18 @@ void clear_screen() {
         write_to_vga(i++, 0);
         write_to_vga(i++, attr);
     }
+    /* load font */
+    for (i = 0; i < 0x1000; i++)
+      vga[0x1000+i] = font[i];
+}
+
+void move_cursor(int new_col, int new_row) {
+    col = new_col;
+    row = new_row;
+    if (cursor_shown) {
+        write_to_vga(0xFFE, row);
+        write_to_vga(0xFFF, col);
+    }
 }
 
 void hide_cursor() {
@@ -68,9 +80,6 @@ void vga_init() {
     cursor_shown = 1;
     /* clear screen */
     clear_screen();
-    /* load font */
-    for (i = 0; i < 0x1000; i++)
-      vga[0x1000+i] = font[i];
 }
 
 void scroll() {
@@ -173,6 +182,11 @@ void print_fmt(char *fmt, ...) {
     for (i = 0; fmt[i] != 0; i++) {
         if (fmt[i] == '%') {
             switch (fmt[++i]) {
+                case 'a':
+                    addr = (void *)(((int) addr)+4);
+                    fmt_attr = *((char *) addr);
+                    break;
+
                 case 'c':
                     addr = (void *)(((int) addr)+4);
                     print_char(*((char *) addr), fmt_attr);

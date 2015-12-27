@@ -23,7 +23,7 @@ $(shell cd $(CSD) && find ./loader -name "*.c" 2>/dev/null | sed 's/\.c/\.o/g')
 	$(QCC) $(QCFLAGS) -c -o $@ $<
 
 loader.bin: $(LOADER_SRC) $(LOADER_LD)
-	$(QCC) $(LOADER_LFLAGS) -o loader.elf $(LOADER_SRC) $(LIBS)
+	$(QCC) $(QCFLAGS) $(LOADER_LFLAGS) -o loader.elf $(LOADER_SRC) $(LIBS)
 	$(QOC) -O binary loader.elf $@
 
 diskboot/mbr.o: diskboot/mbr.s Makefile

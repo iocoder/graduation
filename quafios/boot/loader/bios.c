@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  -> BIOS structure.                                  | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,20 +26,16 @@
  *
  */
 
-#include <sys/bootinfo.h>
 #include "../../../firmware/bios.h"
 
-extern bootinfo_t *bootinfo;
+bios_t bios __attribute__((section(".bss")));
 
-int main() {
-
-    /* initialize bios structure */
-    bios_init();
-
-    /* show menu */
-    show_menu();
-
-    /* done */
-    return 0;
-
+void bios_init() {
+    int i;
+    char *ptr;
+    /* get ptr to BIOS structure */
+    __asm__("or %0, $0, $gp":"=r"(ptr));
+    /* copy into bios variable */
+    for (i = 0; i < sizeof(bios_t); i++)
+        ((char *) &bios)[i] = ptr[i];
 }

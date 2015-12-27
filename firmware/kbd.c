@@ -416,6 +416,10 @@ void kbd_irq() {
 /*                              SCANNING                                     */
 /*****************************************************************************/
 
+char getc() {
+    return get_from_buf();
+}
+
 void scan_char(char *c) {
     *c = get_from_buf();
     print_char(*c, scan_attr);

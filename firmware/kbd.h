@@ -6,6 +6,7 @@
 #define KBD_DATA        0
 #define KBD_STATUS      1
 
+char getc();
 void scan_char(char *c);
 void scan_str(char *str);
 int scan_int(int *num);

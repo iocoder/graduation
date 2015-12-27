@@ -16,23 +16,23 @@ export RUN_DIR=$(prefix)/run
 export TSD=$(shell realpath $(top_srcdir))/quafios
 export TBD=$(shell realpath $(top_builddir))/quafios
 
-export QCC=mipsel-linux-gnu-gcc -mips1
+export QCC=mipsel-linux-gnu-gcc
 export QAS=mipsel-linux-gnu-as
 export QLD=mipsel-linux-gnu-ld
 export QOC=mipsel-linux-gnu-objcopy
 
 export QCFLAGS = -fno-stack-protector -fno-exceptions \
-	  -fno-zero-initialized-in-bss \
+	  -fno-zero-initialized-in-bss -mno-abicalls \
 	  -ffunction-sections -fno-builtin -Wno-pointer-to-int-cast -Werror \
+	  -nostartfiles -nostdlib -nodefaultlibs \
 	  -nostdinc -pedantic \
-	  -Wno-implicit-function-declaration -std=c89 \
+	  -mips1 -Wno-implicit-function-declaration -std=c89 \
 	  -Iinclude \
 	  -I$(TSD)/kernel/include \
 	  -I$(TSD)/qlibc/include \
 	  -I$(TSD)/gui/include
 
-export QLFLAGS = -nostartfiles -nostdlib -nodefaultlibs -pedantic \
-                 -L$(TBD)/qlibc/lib -L$(TBD)/gui/lib
+export QLFLAGS = -L$(TBD)/qlibc/lib -L$(TBD)/gui/lib
 
 export KERNEL_INCLUDE = \
 	$(shell find $(TSD)/kernel/include -name "*.h" 2>/dev/null)
@@ -78,9 +78,9 @@ setup:
 diskimg:
 	make install prefix=`pwd`/disk
 	mkdir -p `pwd`/iso
-	dd if=/dev/zero of=disk.img bs=1M count=8 &> /dev/null
-	echo -e "o\nn\np\n1\n2048\n\na\nw\n" | fdisk disk.img > /dev/null
-	tools/mkdiskfs disk disk.img $(shell uuidgen) 1048576
+	dd if=/dev/zero of=disk.img bs=256K count=1 &> /dev/null
+	echo -e "o\nn\np\n1\n63\n\na\nw\n" | fdisk disk.img > /dev/null
+	tools/mkdiskfs disk disk.img $(shell uuidgen) 32256
 
 isolive: diskimg
 	gzip disk.img -c > iso/ramdisk.gz

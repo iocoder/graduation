@@ -15,6 +15,7 @@ void write_to_vga(int index, char data);
 void write_char(int row, int col, char chr, char attr);
 void write_font(int ascii, int row_indx, char data);
 void clear_screen();
+void move_cursor(int new_col, int new_row);
 void hide_cursor();
 void show_cursor();
 void vga_init();

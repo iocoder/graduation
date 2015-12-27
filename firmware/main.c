@@ -3,6 +3,8 @@
 #include "pit.h"
 #include "pic.h"
 #include "isr.h"
+#include "rom.h"
+#include "sdcard.h"
 
 int main() {
 
@@ -20,6 +22,15 @@ int main() {
 
     /* initialize keyboard */
     kbd_init();
+
+    /* initialize ROM */
+    rom_init();
+
+    /* initialize SDCard */
+    sdcard_init();
+
+    /* initialize BIOS structure */
+    bios_init();
 
     /* draw faculty logo */
     draw_logo();

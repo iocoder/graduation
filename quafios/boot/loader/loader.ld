@@ -2,7 +2,7 @@ ENTRY(main)
 
 SECTIONS {
 
-	. = 0x0008000;
+	. = 0x80008000;
 
 	.text   : {*(.text.main) *(.text)}
 	.rodata : {*(.rodata            )}
