@@ -1,11 +1,13 @@
-SUBDIRS=logo hardware firmware mipsemu vhdsim
+SUBDIRS=logo quafios hardware firmware mipsemu vhdsim upload
 
 prog:
+	make -C quafios
 	make -C logo
 	make -C firmware
 	make -C hardware
-	make -C ../upload prog FILE=../build/firmware/firmware.bin \
-		ADDR=0xC00000 SIZE=0x8000
+	make -C upload
+	make -C quafios diskimg
+	make -C upload prog
 	make -C hardware prog
 
 emu:

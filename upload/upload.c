@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dpcdecl.h>
 #include <dmgr.h>
 #include <depp.h>
@@ -192,33 +193,11 @@ int main(int argc, char *argv[]) {
     unsigned int size;
     int err;
     /* check arguments */
-    if (argc != 4) {
+    if (argc != 4 && !(argc == 2 && !strcmp(argv[1], "erase"))) {
         fprintf(stderr, "Error: Your arguments are invalid.\n");
         fprintf(stderr, "Usage: %s <file> BASE_ADDR SIZE\n", argv[0]);
         return -3;
     }
-    /* read arguments */
-    sscanf(argv[2], "%i", &addr);
-    if (addr % 2) {
-        fprintf(stderr, "Error: Address must be even.\n");
-        return -3;
-    }
-    sscanf(argv[3], "%i", &size);
-    if (size % 2) {
-        fprintf(stderr, "Error: Size must be even.\n");
-        return -3;
-    }
-    /* open the file */
-    if (!(f = fopen(argv[1], "r"))) {
-        fprintf(stderr, "Error: cannot open the file.\n");
-        return -4;
-    }
-    /* allocate memory */
-    buf = malloc(size);
-    /* read the file */
-    fread(buf, size, 1, f);
-    /* close the file */
-    fclose(f);
     /* try to open the device */
     if (!DmgrOpen(&hif, "Nexys2")) {
         fprintf(stderr, "Cannot open the device!\n");
@@ -226,17 +205,43 @@ int main(int argc, char *argv[]) {
     }
     /* enable EPP protocol */
     DeppEnable(hif);
-    /* erase the flash rom */
-    rom_erase(hif);
-    /* print information */
-    printf("Uploading %s to flash ROM.\n", argv[1]);
-    printf("Address: 0x%06X, Size: 0x%06X\n", addr, size);
-    /* write the file */
-    rom_write_bulk(hif, addr, buf, size);
-    /* verify */
-    err = rom_verify_bulk(hif, addr, buf, size);
-    /* deallocate the buffer */
-    free(buf);
+    /* program file/erase ROM */
+    if (strcmp(argv[1], "erase")) {
+        /* read arguments */
+        sscanf(argv[2], "%i", &addr);
+        if (addr % 2) {
+            fprintf(stderr, "Error: Address must be even.\n");
+            return -3;
+        }
+        sscanf(argv[3], "%i", &size);
+        if (size % 2) {
+            fprintf(stderr, "Error: Size must be even.\n");
+            return -3;
+        }
+        /* open the file */
+        if (!(f = fopen(argv[1], "r"))) {
+            fprintf(stderr, "Error: cannot open the file.\n");
+            return -4;
+        }
+        /* allocate memory */
+        buf = malloc(size);
+        /* read the file */
+        fread(buf, size, 1, f);
+        /* close the file */
+        fclose(f);
+        /* print information */
+        printf("Uploading %s to flash ROM.\n", argv[1]);
+        printf("Address: 0x%06X, Size: 0x%06X\n", addr, size);
+        /* write the file */
+        rom_write_bulk(hif, addr, buf, size);
+        /* verify */
+        err = rom_verify_bulk(hif, addr, buf, size);
+        /* deallocate the buffer */
+        free(buf);
+    } else {
+        /* erase the flash rom */
+        rom_erase(hif);
+    }
     /* disable EPP protocol */
     DeppDisable(hif);
     /* close the device */

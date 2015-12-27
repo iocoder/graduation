@@ -38,9 +38,13 @@ AC_CHECK_FUNCS([strtoul])
 AC_CONFIG_FILES([Makefile
                  logo/Makefile
                  firmware/Makefile
+                 quafios/Makefile
+                 quafios/boot/Makefile
+                 quafios/tools/Makefile
                  hardware/Makefile
                  mipsemu/Makefile
-                 vhdsim/Makefile])
+                 vhdsim/Makefile
+                 upload/Makefile])
 
 # Generate output files.
 AC_OUTPUT

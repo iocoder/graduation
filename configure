@@ -4996,7 +4996,7 @@ done
 
 
 # Config files.
-ac_config_files="$ac_config_files Makefile logo/Makefile firmware/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile"
+ac_config_files="$ac_config_files Makefile logo/Makefile firmware/Makefile quafios/Makefile quafios/boot/Makefile quafios/tools/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile upload/Makefile"
 
 
 # Generate output files.
@@ -5745,9 +5745,13 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "logo/Makefile") CONFIG_FILES="$CONFIG_FILES logo/Makefile" ;;
     "firmware/Makefile") CONFIG_FILES="$CONFIG_FILES firmware/Makefile" ;;
+    "quafios/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/Makefile" ;;
+    "quafios/boot/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/boot/Makefile" ;;
+    "quafios/tools/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/tools/Makefile" ;;
     "hardware/Makefile") CONFIG_FILES="$CONFIG_FILES hardware/Makefile" ;;
     "mipsemu/Makefile") CONFIG_FILES="$CONFIG_FILES mipsemu/Makefile" ;;
     "vhdsim/Makefile") CONFIG_FILES="$CONFIG_FILES vhdsim/Makefile" ;;
+    "upload/Makefile") CONFIG_FILES="$CONFIG_FILES upload/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
