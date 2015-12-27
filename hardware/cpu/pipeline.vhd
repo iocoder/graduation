@@ -171,6 +171,11 @@ attribute ram_style of id_regfile2 : signal is "block";
 -- EX
 signal   ex_hi          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   ex_lo          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   ex_op1         : STD_LOGIC_VECTOR (31 downto 0);
+signal   ex_op2         : STD_LOGIC_VECTOR (31 downto 0);
+signal   ex_mulres      : STD_LOGIC_VECTOR (63 downto 0);
+signal   ex_busy        : integer := 0;
+signal   ex_phase       : integer := 0;
 signal   ex_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   ex_rs          : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
 signal   ex_rt          : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
@@ -240,6 +245,9 @@ signal   EPC_tmp        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   got_rising     : std_logic := '0';
 signal   got_falling    : std_logic := '0';
 
+signal   int_busy       : boolean := false;
+signal   iSTALL         : STD_LOGIC;
+
 begin
 
 --       _   _   _   _   _
@@ -249,35 +257,27 @@ begin
 --                                    TLB has translated address and cache
 --                                    has moved to phase 1
 
+iSTALL <= '1' when STALL='1' or ex_busy = 1 or int_busy else '0';
+
 --------------------------------------------------------------------------------
 --                              EXCEPTIONS                                    --
 --------------------------------------------------------------------------------
 
--- -- exception handler
+-- exception handler
 process(CLK)
 begin
 
-    if (CLK = '1' and CLK'event and STALL='0') then
+    if (CLK = '1' and CLK'event and iSTALL='0') then
         got_rising <= not got_rising;
     end if;
 
     if (CLK = '0' and CLK'event) then
-        if (got_falling /= got_rising) then
+        if (got_falling /= got_rising or int_busy) then
             -- if exception conditions are satisfied, next cycle is
             -- an exception fetch, and all stages before and including the
             -- exception-source stage shall be flushed.
-            if (if_exphndl = '1') then
-                -- exception served
-                if_exception <= '0';
-                IAK <= '1';
-                exception <= '1';
-            elsif (exception='1') then
-                -- deactivate interrupt ack
-                IAK <= '0';
-                exception <= '0';
-            elsif (IRQ = '1' and SR(IEc) = '1' and if_exception='0') then
-                -- IRQ happened!
-                if_exception <= '1';
+            if (int_busy) then
+                int_busy <= false;
                 -- store EPC and CAUSE
                 if (id_is_jr='1' or id_is_jalr='1' or
                     is_branchregimm(id_opcode) or
@@ -290,6 +290,19 @@ begin
                     EPC <= if_pc;
                     CAUSE <= x"00000000";
                 end if;
+            elsif (if_exphndl = '1') then
+                -- exception served
+                if_exception <= '0';
+                IAK <= '1';
+                exception <= '1';
+            elsif (exception='1') then
+                -- deactivate interrupt ack
+                IAK <= '0';
+                exception <= '0';
+            elsif (IRQ = '1' and SR(IEc) = '1' and if_exception='0') then
+                -- IRQ happened!
+                if_exception <= '1';
+                int_busy <= true;
             end if;
             got_falling <= got_rising;
         end if;
@@ -307,7 +320,7 @@ process(CLK)
 variable handle_exception : boolean := false;
 
 begin
-    if (CLK = '1' and CLK'event and STALL = '0') then
+    if (CLK = '1' and CLK'event and iSTALL = '0') then
 
         handle_exception := false;
 
@@ -376,7 +389,7 @@ variable id_next_opcode : STD_LOGIC_VECTOR ( 5 downto 0);
 variable id_next_funct  : STD_LOGIC_VECTOR ( 5 downto 0);
 
 begin
-    if (CLK = '1' and CLK'event and STALL = '0') then
+    if (CLK = '1' and CLK'event and iSTALL = '0') then
         if (id_exception='1') then
             -- don't move
             id_next_instr := id_instr;
@@ -697,7 +710,7 @@ id_pc_src <=
 -- register transfer
 process(CLK)
 begin
-    if (CLK = '1' and CLK'event and STALL = '0') then
+    if (CLK = '1' and CLK'event and iSTALL = '0') then
         if (ex_exception='1') then
             -- don't move
         elsif (id_exception='1' or id_ifclk = '0') then
@@ -797,11 +810,79 @@ with ex_aluop
                             alu_sll(ex_alu1, ex_alu2)       when ALUOP_SLLV,
                             alu_srl(ex_alu1, ex_alu2)       when ALUOP_SRLV,
                             alu_sra(ex_alu1, ex_alu2)       when ALUOP_SRAV,
+                            ex_hi                           when ALUOP_MFHI,
+                            ex_lo                           when ALUOP_MFLO,
                             x"00000000"                     when others;
 
--- TODO: multiplication and division
+process(CLK)
 
--- TODO: move from/to LO/HI regs
+variable N : unsigned(31 downto 0);
+variable D : unsigned(31 downto 0);
+variable Q : unsigned(31 downto 0);
+variable R : unsigned(31 downto 0);
+
+begin
+
+    if (CLK = '0' and CLK'event ) then
+
+        if (ex_busy = 0) then
+
+            if (ex_aluop = ALUOP_MULT  or
+                ex_aluop = ALUOP_MULTU or
+                ex_aluop = ALUOP_DIV   or
+                ex_aluop = ALUOP_DIVU) then
+                -- start multiplication/division FSM
+                ex_op1    <= ex_alu1;
+                ex_op2    <= ex_alu2;
+                ex_mulres <= x"0000000000000000";
+                N := unsigned(ex_alu1);
+                D := unsigned(ex_alu2);
+                Q := x"00000000";
+                R := x"00000000";
+                ex_busy   <= 1;
+            elsif (ex_aluop = ALUOP_MTLO) then
+                ex_lo <= ex_alu1;
+            elsif (ex_aluop = ALUOP_MTHI) then
+                ex_hi <= ex_alu1;
+            end if;
+            ex_phase <= 0;
+
+        elsif (ex_aluop = ALUOP_MULT or ex_aluop = ALUOP_MULTU) then
+
+            -- multiplication
+            if (ex_phase = 0) then
+                if (ex_aluop = ALUOP_MULT) then
+                    ex_mulres <= alu_mul(ex_op1, ex_op2);
+                else
+                    ex_mulres <= alu_mulu(ex_op1, ex_op2);
+                end if;
+            elsif (ex_phase = 1) then
+                ex_lo   <= ex_mulres(31 downto 0);
+                ex_hi   <= ex_mulres(63 downto 32);
+                ex_busy <= 0;
+            end if;
+            ex_phase  <= ex_phase + 1;
+
+        elsif (ex_aluop = ALUOP_DIV or ex_aluop = ALUOP_DIVU) then
+
+            -- division
+            if (ex_phase < 32) then
+                R := R(30 downto 0) & N(31-ex_phase);
+                if R >= D then
+                    R := R - D;
+                    Q(31-ex_phase) := '1';
+                end if;
+            elsif (ex_phase = 32) then
+                ex_lo   <= std_logic_vector(Q);
+                ex_hi   <= std_logic_vector(R);
+                ex_busy <= 0;
+            end if;
+            ex_phase  <= ex_phase + 1;
+
+        end if;
+
+    end if;
+end process;
 
 --------------------------------------------------------------------------------
 --                               MEM STAGE                                    --
@@ -810,7 +891,7 @@ with ex_aluop
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and STALL = '0') then
+    if ( CLK = '1' and CLK'event and iSTALL = '0') then
         if (mem_exception='1') then
             -- don't move
         elsif (ex_exception='1') then
@@ -866,7 +947,7 @@ mem_data_out <= signext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTE  else
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and STALL = '0') then
+    if ( CLK = '1' and CLK'event and iSTALL = '0') then
         if (mem_exception='1') then
             -- introduce a bubble in WB
             wb_instr     <= x"00000000";

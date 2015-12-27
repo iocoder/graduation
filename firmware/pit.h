@@ -5,5 +5,7 @@
 
 int pit_read();
 void pit_write(int count);
+void pit_irq();
+void pit_init();
 
 #endif

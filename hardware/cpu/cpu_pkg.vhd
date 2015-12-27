@@ -51,6 +51,18 @@ package cpu_pkg is
     function alu_sra (alu1: in STD_LOGIC_VECTOR(31 downto 0);
                       alu2: in STD_LOGIC_VECTOR(31 downto 0))
              return STD_LOGIC_VECTOR;
+    function alu_mul (alu1: in STD_LOGIC_VECTOR(31 downto 0);
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR;
+    function alu_mulu(alu1: in STD_LOGIC_VECTOR(31 downto 0);
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR;
+    function alu_div (alu1: in integer;
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR;
+    function alu_rem (alu1: in STD_LOGIC_VECTOR(31 downto 0);
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR;
     -- decoding functions
     function is_alureg (opcode: in STD_LOGIC_VECTOR(5 downto 0))
              return boolean;
@@ -249,6 +261,50 @@ package body cpu_pkg is
             to_integer(unsigned(alu1(4 downto 0)))));
         return output;
     end alu_sra;
+
+    -- alu mul
+    function alu_mul (alu1: in STD_LOGIC_VECTOR(31 downto 0);
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR is
+    variable output : STD_LOGIC_VECTOR(63 downto 0);
+    begin
+        output := std_logic_vector(signed(alu1) * signed(alu2));
+        return output;
+    end alu_mul;
+
+    -- alu mulu
+    function alu_mulu(alu1: in STD_LOGIC_VECTOR(31 downto 0);
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR is
+    variable output : STD_LOGIC_VECTOR(63 downto 0);
+    begin
+        output := std_logic_vector(unsigned(alu1) * unsigned(alu2));
+        return output;
+    end alu_mulu;
+
+    -- alu div
+    function alu_div (alu1: in integer;
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR is
+        variable first  : STD_LOGIC_VECTOR(31 downto 0) := x"00000001";
+        variable output : STD_LOGIC_VECTOR(31 downto 0);
+    begin
+        output :=
+            std_logic_vector(
+                signed(shift_left(unsigned(first),alu1))/
+                signed(alu2));
+        return output;
+    end alu_div;
+
+    -- alu rem
+    function alu_rem (alu1: in STD_LOGIC_VECTOR(31 downto 0);
+                      alu2: in STD_LOGIC_VECTOR(31 downto 0))
+             return STD_LOGIC_VECTOR is
+    variable output : STD_LOGIC_VECTOR(31 downto 0);
+    begin
+        --output := std_logic_vector(signed(alu1) rem signed(alu2));
+        return output;
+    end alu_rem;
 
     -- is alureg opcode
     function is_alureg (opcode: in STD_LOGIC_VECTOR(5 downto 0))

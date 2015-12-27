@@ -8,6 +8,7 @@ char scan_attr;
 int  row;
 int  col;
 int  row_base;
+int  cursor_shown;
 extern unsigned char font[256*16];
 
 void write_to_vga(int index, char data) {
@@ -32,18 +33,41 @@ void write_font(int ascii, int row_indx, char data) {
     vga[0x1000+ascii*16+row_indx] = data;
 }
 
-void clear_screen(char _attr, char _fmt_attr, char _scan_attr) {
+void clear_screen() {
     int i = row = col = row_base = 0;
-    attr = _attr;
-    fmt_attr = _fmt_attr;
-    scan_attr = _scan_attr;
     write_to_vga(0xFFD, row_base);
-    write_to_vga(0xFFE, row);
-    write_to_vga(0xFFF, col);
+    if (cursor_shown) {
+        write_to_vga(0xFFE, row);
+        write_to_vga(0xFFF, col);
+    }
     while (i < 160*25) {
         write_to_vga(i++, 0);
         write_to_vga(i++, attr);
     }
+}
+
+void hide_cursor() {
+    cursor_shown = 0;
+    write_to_vga(0xFFE, 0xFF);
+    write_to_vga(0xFFF, 0xFF);
+}
+
+void show_cursor() {
+    cursor_shown = 1;
+    write_to_vga(0xFFE, row);
+    write_to_vga(0xFFF, col);
+}
+
+void vga_init() {
+    int i;
+    /* initialize colors */
+    attr = 0x0F;
+    fmt_attr = 0x0F;
+    scan_attr = 0x0E;
+    /* show cursor by default */
+    cursor_shown = 1;
+    /* clear screen */
+    clear_screen();
     /* load font */
     for (i = 0; i < 0x1000; i++)
       vga[0x1000+i] = font[i];
@@ -90,8 +114,10 @@ void print_char(char c, char attr) {
         scroll();
         row = 24;
     }
-    write_to_vga(0xFFE, row);
-    write_to_vga(0xFFF, col);
+    if (cursor_shown) {
+        write_to_vga(0xFFE, row);
+        write_to_vga(0xFFF, col);
+    }
 }
 
 void print_int(unsigned int num, char attr) {
