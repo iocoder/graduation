@@ -2,14 +2,6 @@
 #include "disk.h"
 #include "diskfs.h"
 
-#define READ_UNALIGNED_INT(n)    ((((unsigned char *) &n)[0]<< 0) | \
-                                  (((unsigned char *) &n)[1]<< 8) | \
-                                  (((unsigned char *) &n)[2]<<16) | \
-                                  (((unsigned char *) &n)[3]<<24))
-
-#define READ_UNALIGNED_SHORT(n)  ((((unsigned char *) &n)[0]<< 0) | \
-                                  (((unsigned char *) &n)[1]<< 8))
-
 diskfs_sb_t *sb = (diskfs_sb_t *) 0x80004000;
 static uint8_t *buffer = (uint8_t *) 0x80005000; /* temporary buffer... */
 static int diskid, diskfirst;
@@ -24,10 +16,8 @@ int32_t strcmp(const char *str1, const char *str2) {
 
 void read_cluster(diskfs_sb_t *sb, diskfs_pos_t clus, void *dest) {
     disk_readsects(diskid,
-                   (int32_t)(diskfirst+
-                            (clus*READ_UNALIGNED_SHORT(sb->block_size)/512)+
-                            2),
-                   (int32_t)READ_UNALIGNED_SHORT(sb->block_size)/512,
+                   (int32_t)(diskfirst+(clus*sb->block_size/512)+2),
+                   (int32_t)sb->block_size/512,
                    dest);
 }
 
@@ -38,10 +28,8 @@ void read_inode(diskfs_sb_t *disksb, diskfs_inode_t *inode, diskfs_ino_t ino) {
     /* calculate the location of the cluster that
      * contains the desired inode.
      */
-    uint32_t inodes_per_cluster =
-        READ_UNALIGNED_SHORT(disksb->block_size)/sizeof(diskfs_inode_t);
-    diskfs_blk_t cluster = ino/inodes_per_cluster+
-                           READ_UNALIGNED_INT(disksb->inode_start);
+    uint32_t inodes_per_cluster = disksb->block_size/sizeof(diskfs_inode_t);
+    diskfs_blk_t cluster = ino/inodes_per_cluster+disksb->inode_start;
 
     /* read the cluster into memory: */
     read_cluster(disksb, cluster, buffer);
@@ -96,7 +84,7 @@ void read_file_block(diskfs_sb_t *sb,
     diskfs_blk_t blk = get_file_block(sb, inode, blk_off);
     if (!blk) {
         int32_t i;
-        for(i = 0; i < READ_UNALIGNED_SHORT(sb->block_size); i++)
+        for(i = 0; i < sb->block_size; i++)
             ((uint8_t *) buf)[i] = 0;
     } else {
         read_cluster(sb, blk, buf);
@@ -106,8 +94,7 @@ void read_file_block(diskfs_sb_t *sb,
 diskfs_ino_t lookup(diskfs_sb_t *sb, diskfs_inode_t *inode, char *name) {
 
     diskfs_dirent_t *dirents = (diskfs_dirent_t *) buffer;
-    int32_t dirents_per_block =
-        READ_UNALIGNED_SHORT(sb->block_size)/sizeof(diskfs_dirent_t);
+    int32_t dirents_per_block = sb->block_size/sizeof(diskfs_dirent_t);
     int32_t i = 0; /* counter for blocks. */
     int32_t j = 0; /* counter for dirents per block. */
 
@@ -189,9 +176,9 @@ int diskfs_loadfile(int id, int firstsect, char *path, uint32_t base) {
     print_fmt("Loading %s (inode %d) to 0x%x...", path, ino, base);
     read_inode(sb, &inode, ino);
     for (i = 0; i < inode.blocks; i++) {
-        uint8_t *dest=(uint8_t*)(base+i*READ_UNALIGNED_SHORT(sb->block_size));
+        uint8_t *dest=(uint8_t*)(base+i*sb->block_size);
         read_file_block(sb,&inode, i, buffer);
-        for (j = 0; j < READ_UNALIGNED_SHORT(sb->block_size); j++)
+        for (j = 0; j < sb->block_size; j++)
             dest[j] = buffer[j];
     }
     print_fmt(" done\n");

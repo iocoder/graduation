@@ -21,12 +21,11 @@ export QAS=mipsel-linux-gnu-as
 export QLD=mipsel-linux-gnu-ld
 export QOC=mipsel-linux-gnu-objcopy
 
-export QCFLAGS = -fno-stack-protector -fno-exceptions \
-	  -fno-zero-initialized-in-bss -mno-abicalls \
+export QCFLAGS = -mno-abicalls -mips1 -mpatfree \
+	  -fno-zero-initialized-in-bss -fno-stack-protector -fno-exceptions \
 	  -ffunction-sections -fno-builtin -Wno-pointer-to-int-cast -Werror \
-	  -nostartfiles -nostdlib -nodefaultlibs \
-	  -nostdinc -pedantic \
-	  -mips1 -Wno-implicit-function-declaration -std=c89 \
+	  -nostartfiles -nostdlib -nodefaultlibs -nostdinc -pedantic \
+	  -Wno-implicit-function-declaration -std=c89 \
 	  -Iinclude \
 	  -I$(TSD)/kernel/include \
 	  -I$(TSD)/qlibc/include \

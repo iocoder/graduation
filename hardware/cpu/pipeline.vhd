@@ -201,6 +201,8 @@ signal   ex_is_mtc0     : STD_LOGIC := '0';
 signal   ex_exception   : STD_LOGIC := '0';
 
 -- MEM
+signal   mem_busy       : boolean := false;
+signal   mem_phase      : integer := 0;
 signal   mem_instr      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_pc4        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_memop      : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
@@ -208,6 +210,8 @@ signal   mem_ctrlsig    : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal   mem_addr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_data_in    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_data_out   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   mem_tmp        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   mem_tmp2       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_rk         : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
 signal   mem_is_mfc0    : STD_LOGIC := '0';
 signal   mem_is_mtc0    : STD_LOGIC := '0';
@@ -257,7 +261,7 @@ begin
 --                                    TLB has translated address and cache
 --                                    has moved to phase 1
 
-iSTALL <= '1' when STALL='1' or ex_busy = 1 or int_busy else '0';
+iSTALL <= '1' when STALL='1' or ex_busy = 1 or int_busy or mem_busy else '0';
 
 --------------------------------------------------------------------------------
 --                              EXCEPTIONS                                    --
@@ -891,31 +895,129 @@ end process;
 -- register transfer
 process(CLK)
 begin
-    if ( CLK = '1' and CLK'event and iSTALL = '0') then
-        if (mem_exception='1') then
-            -- don't move
-        elsif (ex_exception='1') then
-            -- introduce a bubble in MEM
-            mem_instr     <= x"00000000";
-            mem_pc4       <= x"00000000";
-            mem_memop     <= x"00";
-            mem_ctrlsig   <= x"00";
-            mem_addr      <= x"00000000";
-            mem_data_in   <= x"00000000";
-            mem_rk        <= "00000";
-            mem_is_mfc0   <= '0';
-            mem_is_mtc0   <= '0';
-        else
-            -- normal operation
-            mem_instr     <= ex_instr;
-            mem_pc4       <= ex_pc4;
-            mem_memop     <= ex_memop;
-            mem_ctrlsig   <= ex_ctrlsig;
-            mem_addr      <= ex_alu_output;
-            mem_data_in   <= ex_muxop2;
-            mem_rk        <= ex_rk;
-            mem_is_mfc0   <= ex_is_mfc0;
-            mem_is_mtc0   <= ex_is_mtc0;
+    if ( CLK = '1' and CLK'event ) then
+        if (iSTALL = '0') then
+            if (mem_exception='1') then
+                -- don't move
+            elsif (ex_exception='1') then
+                -- introduce a bubble in MEM
+                mem_instr     <= x"00000000";
+                mem_pc4       <= x"00000000";
+                mem_memop     <= x"00";
+                mem_ctrlsig   <= x"00";
+                mem_addr      <= x"00000000";
+                mem_data_in   <= x"00000000";
+                mem_rk        <= "00000";
+                mem_is_mfc0   <= '0';
+                mem_is_mtc0   <= '0';
+            else
+                -- normal operation
+                mem_instr     <= ex_instr;
+                mem_pc4       <= ex_pc4;
+                mem_memop     <= ex_memop;
+                mem_ctrlsig   <= ex_ctrlsig;
+                mem_rk        <= ex_rk;
+                mem_is_mfc0   <= ex_is_mfc0;
+                mem_is_mtc0   <= ex_is_mtc0;
+                if (ex_ctrlsig(MEM_READ)='1' OR
+                    ex_ctrlsig(MEM_WRITE)='1') then
+                    if (ex_memop = MEMOP_LEFT) then
+                        -- first cycle
+                        mem_busy    <= true;
+                        mem_addr    <= ex_alu_output(31 downto 2) & "00";
+                        mem_phase   <= conv_integer(ex_alu_output(1 downto 0));
+                        mem_tmp     <= ex_muxop2;
+                        mem_tmp2    <= ex_muxop2;
+                        if (ex_alu_output(1 downto 0) = "00") then
+                            mem_data_in <= x"000000" & ex_muxop2(31 downto 24);
+                        elsif (ex_alu_output(1 downto 0) = "01") then
+                            mem_data_in <= x"000000" & ex_muxop2(23 downto 16);
+                        elsif (ex_alu_output(1 downto 0) = "10") then
+                            mem_data_in <= x"000000" & ex_muxop2(15 downto  8);
+                        else
+                            mem_data_in <= x"000000" & ex_muxop2( 7 downto  0);
+                        end if;
+                    elsif (ex_memop = MEMOP_RIGHT) then
+                        mem_busy    <= true;
+                        mem_addr    <= ex_alu_output(31 downto 2) & "11";
+                        mem_phase   <= conv_integer(ex_alu_output(1 downto 0));
+                        mem_tmp     <= ex_muxop2;
+                        mem_tmp2    <= ex_muxop2;
+                        if (ex_alu_output(1 downto 0) = "00") then
+                            mem_data_in <= x"000000" & ex_muxop2(31 downto 24);
+                        elsif (ex_alu_output(1 downto 0) = "01") then
+                            mem_data_in <= x"000000" & ex_muxop2(23 downto 16);
+                        elsif (ex_alu_output(1 downto 0) = "10") then
+                            mem_data_in <= x"000000" & ex_muxop2(15 downto  8);
+                        else
+                            mem_data_in <= x"000000" & ex_muxop2( 7 downto  0);
+                        end if;
+                    else
+                        -- normal load/store instruction
+                        mem_busy    <= false;
+                        mem_addr    <= ex_alu_output;
+                        mem_data_in <= ex_muxop2;
+                    end if;
+                else
+                    mem_busy    <= false;
+                    mem_addr    <= ex_alu_output;
+                    mem_data_in <= ex_muxop2;
+                end if;
+            end if;
+        elsif (STALL='0') then
+            -- new cache cycle
+            if (mem_busy) then
+                -- lwl, lwr, swl, swr...
+                if (mem_phase = 0) then
+                    mem_tmp(31 downto 24) <= dDin(7 downto 0);
+                elsif (mem_phase = 1) then
+                    mem_tmp(23 downto 16) <= dDin(7 downto 0);
+                elsif (mem_phase = 2) then
+                    mem_tmp(15 downto  8) <= dDin(7 downto 0);
+                elsif (mem_phase = 3) then
+                    mem_tmp( 7 downto  0) <= dDin(7 downto 0);
+                end if;
+                -- update address and phase
+                if (mem_memop = MEMOP_LEFT) then
+                    if (mem_phase = 1) then
+                        -- next phase = 0
+                        mem_data_in <= x"000000" & mem_tmp2(31 downto 24);
+                    elsif (mem_phase = 2) then
+                        -- next phase = 1
+                        mem_data_in <= x"000000" & mem_tmp2(23 downto 16);
+                    elsif (mem_phase = 3) then
+                        -- next phase = 2
+                        mem_data_in <= x"000000" & mem_tmp2(15 downto  8);
+                    end if;
+                    if (mem_phase = 0) then
+                        -- done
+                        mem_busy <= false;
+                    else
+                        -- next step
+                        mem_addr  <= alu_add(mem_addr, x"00000001");
+                        mem_phase <= mem_phase - 1;
+                    end if;
+                elsif (mem_memop = MEMOP_RIGHT) then
+                    if (mem_phase = 0) then
+                        -- next phase = 1
+                        mem_data_in <= x"000000" & mem_tmp2(23 downto 16);
+                    elsif (mem_phase = 1) then
+                        -- next phase = 2
+                        mem_data_in <= x"000000" & mem_tmp2(15 downto  8);
+                    elsif (mem_phase = 2) then
+                        -- next phase = 3
+                        mem_data_in <= x"000000" & mem_tmp2( 7 downto  0);
+                    end if;
+                    if (mem_phase = 3) then
+                        -- done
+                        mem_busy <= false;
+                    else
+                        -- next step
+                        mem_addr  <= alu_sub(mem_addr, x"00000001");
+                        mem_phase <= mem_phase + 1;
+                    end if;
+                end if;
+            end if;
         end if;
     end if;
 end process;
@@ -923,12 +1025,14 @@ end process;
 -- interfacing dMEM component
 dMEME        <= mem_ctrlsig(MEM_READ) OR mem_ctrlsig(MEM_WRITE);
 dRW          <= mem_ctrlsig(MEM_WRITE);
-dADDR        <= mem_addr(31 downto 0);
+dADDR        <= mem_addr(31 downto 0) ;
 dDout        <= mem_data_in;
 
 -- specify type
 dDTYPE(0)    <= '1' when (mem_memop = MEMOP_BYTE or
-                          mem_memop = MEMOP_BYTEU) else '0';
+                          mem_memop = MEMOP_BYTEU or
+                          mem_memop = MEMOP_LEFT or
+                          mem_memop = MEMOP_RIGHT) else '0';
 dDTYPE(1)    <= '1' when (mem_memop = MEMOP_HALF or
                           mem_memop = MEMOP_HALFU) else '0';
 dDTYPE(2)    <= '1' when (mem_memop = MEMOP_WORD) else '0';
@@ -938,7 +1042,9 @@ mem_data_out <= signext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTE  else
                 unsiext1(dDin( 7 downto 0)) when mem_memop = MEMOP_BYTEU else
                 signext2(dDin(15 downto 0)) when mem_memop = MEMOP_HALF  else
                 unsiext2(dDin(15 downto 0)) when mem_memop = MEMOP_HALFU else
-                         dDin(31 downto 0)  when mem_memop = MEMOP_WORD;
+                         dDin(31 downto 0)  when mem_memop = MEMOP_WORD  else
+                         mem_tmp            when mem_memop = MEMOP_LEFT  else
+                         mem_tmp            when mem_memop = MEMOP_RIGHT;
 
 --------------------------------------------------------------------------------
 --                               WB STAGE                                     --

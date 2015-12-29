@@ -193,9 +193,9 @@ begin
             retval := x"000000" & word(31 downto 24);
         end if;
     elsif (dtype = "010") then
-        if (addr(0) = '0') then
+        if (addr(1) = '0') then
             retval := x"0000" & word(15 downto 0);
-        elsif (addr(0) = '1') then
+        elsif (addr(1) = '1') then
             retval := x"0000" & word(31 downto 16);
         end if;
     else
@@ -222,9 +222,9 @@ begin
             retval:=word(7 downto 0)&orig(23 downto 0);
         end if;
     elsif (dtype = "010") then
-        if (addr(0) = '0') then
+        if (addr(1) = '0') then
             retval := orig(31 downto 16) & word(15 downto 0);
-        elsif (addr(0) = '1') then
+        elsif (addr(1) = '1') then
             retval := word(15 downto 0) & orig(15 downto 0);
         end if;
     else

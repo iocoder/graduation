@@ -18,27 +18,19 @@ typedef struct mbr {
 
 mbr_t mbr;
 
-#define READ_UNALIGNED_INT(n)    ((((unsigned char *) &n)[0]<< 0) | \
-                                  (((unsigned char *) &n)[1]<< 8) | \
-                                  (((unsigned char *) &n)[2]<<16) | \
-                                  (((unsigned char *) &n)[3]<<24))
-
-#define READ_UNALIGNED_SHORT(n)  ((((unsigned char *) &n)[0]<< 0) | \
-                                  (((unsigned char *) &n)[1]<< 8))
-
 int find_boot_part(int id) {
     /* find boot partition in MBR disk (id) */
     int i;
     /* MBR */
     disk_readsect(id, 0, (char *) &mbr);
     /* make sure signature is valid */
-    if (READ_UNALIGNED_SHORT(mbr.signature) == 0xAA55) {
+    if (mbr.signature == 0xAA55) {
         /* loop over partition entries */
         for (i = 0; i < 4; i++) {
             /* partition existing and bootable? */
             if (mbr.partents[i].parttype && mbr.partents[i].status == 0x80) {
                 /* found boot partition */
-                return READ_UNALIGNED_INT(mbr.partents[i].first_lba);
+                return mbr.partents[i].first_lba;
             }
         }
     }
