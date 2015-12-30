@@ -27,7 +27,7 @@ binfile = open(sys.argv[3], "w")
 pixels    = pngfile.load()
 width     = pngfile.size[0]
 height    = pngfile.size[1]
-width_al  = (width+7)&~7
+width_al  = ((width+8)/9)*9
 height_al = (height+15)&~15
 
 # print image information to stdout
@@ -52,9 +52,10 @@ for y in range(0, height_al):
             # pixel is white
             txtfile.write(' ')
             curbyte <<= 1
-        if (x%8 == 7):
-            # write to last 8 pixels to binary file
-            binfile.write(chr(curbyte))
+        if (x%9 == 8):
+            # write to last 9 pixels to binary file
+            binfile.write(chr((curbyte>>0)&0xFF))
+            binfile.write(chr((curbyte>>8)&0xFF))
             curbyte = 0
     curbyte = 0
     txtfile.write('\n')

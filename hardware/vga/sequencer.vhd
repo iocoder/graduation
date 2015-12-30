@@ -11,18 +11,19 @@ entity sequencer is
           CURSOR_COL : in  STD_LOGIC_VECTOR ( 7 downto 0);
           X          : in  STD_LOGIC_VECTOR (15 downto 0);
           Y          : in  STD_LOGIC_VECTOR (15 downto 0);
+          B9         : in  STD_LOGIC := '0';
           VRAM0Read  : out STD_LOGIC := '0';
           VRAM0Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM0Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM0Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           VRAM1Read  : out STD_LOGIC := '0';
           VRAM1Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM1Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM1Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           VRAM2Read  : out STD_LOGIC := '0';
           VRAM2Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM2Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM2Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           VRAM3Read  : out STD_LOGIC := '0';
           VRAM3Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM3Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM3Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           Color      : out STD_LOGIC_VECTOR ( 3 downto 0) := "0000");
 end sequencer;
 
@@ -43,6 +44,7 @@ signal font_index : integer range 0 to 255;
 signal font_row   : integer range 0 to 15;
 signal font_addr  : integer range 0 to 4095;
 
+signal font_bit   : integer range 0 to 15;
 signal fg_or_bg   : STD_LOGIC;
 
 signal cursor_vis : boolean := true;
@@ -86,8 +88,8 @@ VRAM2Addr <= conv_std_logic_vector(font_addr, VRAM2Addr'length);
 VRAM3Addr <= conv_std_logic_vector(font_addr, VRAM3Addr'length);
 
 -- VRAM2Data contains a font row.
-fg_or_bg <= VRAM2Data(7-(conv_integer(unsigned(X)) mod 8)) or
-            VRAM3Data(7-(conv_integer(unsigned(X)) mod 8));
+font_bit <= (8-(conv_integer(unsigned(X)) mod 8)) when B9='0' else 0;
+fg_or_bg <= VRAM2Data(font_bit) or VRAM3Data(font_bit);
 
 -- select color:
 with fg_or_bg select tcolor <= fg when '1',

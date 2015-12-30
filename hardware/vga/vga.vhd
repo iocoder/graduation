@@ -8,9 +8,9 @@ entity vga is
            -- System Bus
            CS   : in  STD_LOGIC;
            RW   : in  STD_LOGIC;
-           A    : in  STD_LOGIC_VECTOR (12 downto 0);
-           Din  : in  STD_LOGIC_VECTOR (7 downto 0);
-           Dout : out STD_LOGIC_VECTOR (7 downto 0);
+           A    : in  STD_LOGIC_VECTOR (13 downto 0);
+           Din  : in  STD_LOGIC_VECTOR (15 downto 0);
+           Dout : out STD_LOGIC_VECTOR (15 downto 0);
            RDY  : out STD_LOGIC := '0';
            -- VGA Port
            R    : out STD_LOGIC_VECTOR (2 downto 0);
@@ -34,9 +34,9 @@ component graphics is
     Port ( CLK         : in  STD_LOGIC;
            CS          : in  STD_LOGIC;
            RW          : in  STD_LOGIC;
-           A           : in  STD_LOGIC_VECTOR (12 downto 0);
-           Din         : in  STD_LOGIC_VECTOR ( 7 downto 0);
-           Dout        : out STD_LOGIC_VECTOR ( 7 downto 0);
+           A           : in  STD_LOGIC_VECTOR (13 downto 0);
+           Din         : in  STD_LOGIC_VECTOR (15 downto 0);
+           Dout        : out STD_LOGIC_VECTOR (15 downto 0);
            VRAM0Read   : out STD_LOGIC;
            VRAM1Read   : out STD_LOGIC;
            VRAM2Read   : out STD_LOGIC;
@@ -46,11 +46,11 @@ component graphics is
            VRAM2Write  : out STD_LOGIC;
            VRAM3Write  : out STD_LOGIC;
            VRAMAddr    : out STD_LOGIC_VECTOR (10 downto 0);
-           VRAM0DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
-           VRAM1DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
-           VRAM2DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
-           VRAM3DataIn : in  STD_LOGIC_VECTOR ( 7 downto 0);
-           VRAMDataOut : out STD_LOGIC_VECTOR ( 7 downto 0);
+           VRAM0DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
+           VRAM1DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
+           VRAM2DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
+           VRAM3DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
+           VRAMDataOut : out STD_LOGIC_VECTOR ( 8 downto 0);
            ROW_BASE    : out STD_LOGIC_VECTOR ( 7 downto 0);
            CURSOR_ROW  : out STD_LOGIC_VECTOR ( 7 downto 0);
            CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0));
@@ -61,13 +61,13 @@ component vgaram is
           -- sequencer port:
           SeqReadEnable : in  STD_LOGIC;
           SeqAddr       : in  STD_LOGIC_VECTOR (10 downto 0);
-          SeqDataOut    : out STD_LOGIC_VECTOR ( 7 downto 0) := "00000000";
+          SeqDataOut    : out STD_LOGIC_VECTOR ( 8 downto 0) := "000000000";
           -- GU port:
           GUReadEnable  : in  STD_LOGIC;
           GUWriteEnable : in  STD_LOGIC;
           GUAddr        : in  STD_LOGIC_VECTOR (10 downto 0);
-          GUDataIn      : in  STD_LOGIC_VECTOR ( 7 downto 0);
-          GUDataOut     : out STD_LOGIC_VECTOR ( 7 downto 0));
+          GUDataIn      : in  STD_LOGIC_VECTOR ( 8 downto 0);
+          GUDataOut     : out STD_LOGIC_VECTOR ( 8 downto 0));
 end component;
 
 component sequencer is
@@ -78,18 +78,19 @@ component sequencer is
           CURSOR_COL : in  STD_LOGIC_VECTOR ( 7 downto 0);
           X          : in  STD_LOGIC_VECTOR (15 downto 0);
           Y          : in  STD_LOGIC_VECTOR (15 downto 0);
+          B9         : in  STD_LOGIC := '0';
           VRAM0Read  : out STD_LOGIC;
           VRAM0Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM0Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM0Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           VRAM1Read  : out STD_LOGIC;
           VRAM1Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM1Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM1Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           VRAM2Read  : out STD_LOGIC;
           VRAM2Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM2Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM2Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           VRAM3Read  : out STD_LOGIC;
           VRAM3Addr  : out STD_LOGIC_VECTOR (10 downto 0);
-          VRAM3Data  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          VRAM3Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
           Color      : out STD_LOGIC_VECTOR ( 3 downto 0));
 end component;
 
@@ -108,7 +109,8 @@ component crt is
           SE  : out STD_LOGIC := '0';
           DE  : out STD_LOGIC := '0';
           X   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          Y   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000");
+          Y   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          B9  : out STD_LOGIC := '0');
 end component;
 
 signal CLK_56MHz       : STD_LOGIC;
@@ -127,11 +129,11 @@ signal VRAM2Write      : STD_LOGIC;
 signal VRAM3Write      : STD_LOGIC;
 
 signal VRAMAddrFromGU  : STD_LOGIC_VECTOR (10 downto 0);
-signal VRAM0DataToGU   : STD_LOGIC_VECTOR ( 7 downto 0);
-signal VRAM1DataToGU   : STD_LOGIC_VECTOR ( 7 downto 0);
-signal VRAM2DataToGU   : STD_LOGIC_VECTOR ( 7 downto 0);
-signal VRAM3DataToGU   : STD_LOGIC_VECTOR ( 7 downto 0);
-signal VRAMDataFromGU  : STD_LOGIC_VECTOR ( 7 downto 0);
+signal VRAM0DataToGU   : STD_LOGIC_VECTOR ( 8 downto 0);
+signal VRAM1DataToGU   : STD_LOGIC_VECTOR ( 8 downto 0);
+signal VRAM2DataToGU   : STD_LOGIC_VECTOR ( 8 downto 0);
+signal VRAM3DataToGU   : STD_LOGIC_VECTOR ( 8 downto 0);
+signal VRAMDataFromGU  : STD_LOGIC_VECTOR ( 8 downto 0);
 
 signal ROW_BASE        : STD_LOGIC_VECTOR ( 7 downto 0);
 signal CURSOR_ROW      : STD_LOGIC_VECTOR ( 7 downto 0);
@@ -141,23 +143,24 @@ signal SE              : STD_LOGIC;
 signal DE              : STD_LOGIC;
 signal X               : STD_LOGIC_VECTOR (15 downto 0);
 signal Y               : STD_LOGIC_VECTOR (15 downto 0);
+signal B9              : STD_LOGIC;
 signal COLOR           : STD_LOGIC_VECTOR ( 3 downto 0);
 
 signal VRAM0ReadEnable : STD_LOGIC;
 signal VRAM0ReadAddr   : STD_LOGIC_VECTOR (10 downto 0);
-signal VRAM0ReadData   : STD_LOGIC_VECTOR ( 7 downto 0);
+signal VRAM0ReadData   : STD_LOGIC_VECTOR ( 8 downto 0);
 
 signal VRAM1ReadEnable : STD_LOGIC;
 signal VRAM1ReadAddr   : STD_LOGIC_VECTOR (10 downto 0);
-signal VRAM1ReadData   : STD_LOGIC_VECTOR ( 7 downto 0);
+signal VRAM1ReadData   : STD_LOGIC_VECTOR ( 8 downto 0);
 
 signal VRAM2ReadEnable : STD_LOGIC;
 signal VRAM2ReadAddr   : STD_LOGIC_VECTOR (10 downto 0);
-signal VRAM2ReadData   : STD_LOGIC_VECTOR ( 7 downto 0);
+signal VRAM2ReadData   : STD_LOGIC_VECTOR ( 8 downto 0);
 
 signal VRAM3ReadEnable : STD_LOGIC;
 signal VRAM3ReadAddr   : STD_LOGIC_VECTOR (10 downto 0);
-signal VRAM3ReadData   : STD_LOGIC_VECTOR ( 7 downto 0);
+signal VRAM3ReadData   : STD_LOGIC_VECTOR ( 8 downto 0);
 
 begin
 
@@ -185,13 +188,13 @@ u5: vgaram    port map (CLK_56MHz,
                         VRAM3Read, VRAM3Write,
                         VRAMAddrFromGU, VRAMDataFromGU, VRAM3DataToGU);
 u6: sequencer port map (CLK_28MHz, SE,
-                        ROW_BASE, CURSOR_ROW, CURSOR_COL, X, Y,
+                        ROW_BASE, CURSOR_ROW, CURSOR_COL, X, Y, B9,
                         VRAM0ReadEnable, VRAM0ReadAddr, VRAM0ReadData,
                         VRAM1ReadEnable, VRAM1ReadAddr, VRAM1ReadData,
                         VRAM2ReadEnable, VRAM2ReadAddr, VRAM2ReadData,
                         VRAM3ReadEnable, VRAM3ReadAddr, VRAM3ReadData,
                         COLOR);
 u7: dac       port map (DE, COLOR, R, G, B);
-u8: crt       port map (CLK_28MHz, HS, VS, SE, DE, X, Y);
+u8: crt       port map (CLK_28MHz, HS, VS, SE, DE, X, Y, B9);
 
 end Structural;

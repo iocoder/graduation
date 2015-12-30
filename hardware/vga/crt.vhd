@@ -10,7 +10,8 @@ entity crt is
           SE  : out STD_LOGIC := '0';
           DE  : out STD_LOGIC := '0';
           X   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          Y   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000");
+          Y   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          B9  : out STD_LOGIC := '0');
 end crt;
 
 architecture Behavioral of crt is
@@ -78,8 +79,10 @@ begin
                 DE    <= '1';
                 SE    <= '1';
                 if (colindx = 7 and enable_spacing) then
+                    B9      <= '1';
                     colindx <= -1;
                 else
+                    B9      <= '0';
                     X       <= conv_std_logic_vector(cur_x, 16);
                     cur_x   <= cur_x + 1;
                     colindx <= colindx + 1;
@@ -139,4 +142,3 @@ begin
 end process;
 
 end Behavioral;
-

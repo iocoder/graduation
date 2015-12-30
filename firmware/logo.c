@@ -3,13 +3,13 @@
 extern struct {
     int width;
     int height;
-    char data[0];
-} logo;
+    unsigned short data[0];
+} __attribute__((packed)) logo;
 
 void draw_logo() {
     /* divide logo into chars */
     int lines = logo.height/16;
-    int chars_per_line = logo.width/8;
+    int chars_per_line = logo.width/9;
     int i, j, k, off = 0, off_sub, ansi=0x80;
     /* print debugging info */
     /*print_fmt("width:  %x\n", logo.width);
