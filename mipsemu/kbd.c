@@ -2,6 +2,7 @@
 
 #include "kbd.h"
 #include "mem.h"
+#include "pic.h"
 
 static unsigned char buf[KBD_BUF_SIZE];
 static int buf_write = 0;
@@ -34,6 +35,7 @@ void add_to_buf(unsigned char c) {
     }
     buf[buf_write] = c;
     buf_write = next_write();
+    pic_irq(1);
 }
 
 unsigned int get_scancode(SDL_Event e) {
@@ -214,23 +216,23 @@ unsigned int get_scancode(SDL_Event e) {
     }
 }
 
-unsigned char kbd_read(unsigned int addr) {
-    if (!(addr&1)) {
+unsigned int kbd_read() {
+    if (buf_read != buf_write) {
         return get_from_buf();
     } else {
-        return buf_read != buf_write;
+        return 0;
     }
 }
 
-void kbd_write(unsigned int addr, unsigned char data) {
+void kbd_write(unsigned int data) {
 
 }
 
 void scproc(SDL_Event e, int release) {
-    if (e.key.keysym.sym == SDLK_UP) {
+    /*if (e.key.keysym.sym == SDLK_UP) {
         if (!release)
             dump_mem();
-    } else {
+    } else {*/
         unsigned int scancode = get_scancode(e);
         unsigned char esc = (scancode>>8)&0xFF;
         unsigned char pkt = (scancode>>0)&0xFF;
@@ -240,7 +242,7 @@ void scproc(SDL_Event e, int release) {
             add_to_buf(esc);
         if (pkt)
             add_to_buf(pkt);
-    }
+    /*}*/
 }
 
 void keydown(SDL_Event e) {
@@ -252,10 +254,6 @@ void keyup(SDL_Event e) {
 }
 
 void kbd_clk() {
-
-    extern int nmi_pulse;
-    if (buf_write != buf_read)
-        nmi_pulse = 1;
 
 }
 

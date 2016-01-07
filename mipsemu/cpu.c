@@ -3,6 +3,7 @@
 #include <string.h>
 #include "cpu.h"
 #include "mem.h"
+#include "pic.h"
 
 /* control signals */
 #define REG_DEST    0
@@ -78,6 +79,8 @@ int cur_step;
 int if_pc;
 int if_pc4;
 int if_instr;
+int if_exphndl;
+int if_exception;
 
 /* ID */
 int id_instr;
@@ -88,11 +91,15 @@ int id_rd;
 int id_ropcode;
 int id_shamt;
 int id_funct;
+int id_is_jr;
+int id_is_jalr;
+int id_pc;
 int id_pc4;
 int id_imm32;
 int id_shl;
 int id_val_of_rs;
 int id_val_of_rt;
+int id_cop0_regrd;
 int id_braddr;
 int id_jmpaddr;
 int id_jraddr;
@@ -100,6 +107,10 @@ int id_is_equal;
 int id_is_zero;
 int id_is_lez;
 int id_is_gtz;
+int id_is_mfc0;
+int id_is_mtc0;
+int id_is_rfe;
+int id_is_cop0;
 int id_pc_src;
 int id_if_flush;
 int id_ctrlsig_in[CTRL_COUNT]; /* ctl unit output */
@@ -109,6 +120,7 @@ int id_ctrlsig[CTRL_COUNT]; /* ctl mux output */
 int id_stall; /* hazard outputs */
 int id_ifclk; /* hazard outputs */
 int id_pcclk; /* hazard outputs */
+int id_exception;
 int id_regfile[32];
 
 /* EX */
@@ -134,6 +146,9 @@ int ex_muxop; /* output of second forwarding mux */
 int ex_alu2; /* input 2 for ALU (muxop or imm?) */
 int ex_alu_output; /* output of ALU */
 int ex_rk; /* output of forth mux */
+int ex_is_mfc0;
+int ex_is_mtc0;
+int ex_exception;
 
 /* MEM */
 int mem_instr;
@@ -144,6 +159,9 @@ int mem_addr;
 int mem_data_in;
 int mem_data_out;
 int mem_rk;
+int mem_is_mfc0;
+int mem_is_mtc0;
+int mem_exception;
 int mem_array[4096];
 
 /* WB */
@@ -154,12 +172,21 @@ int wb_mem_out;
 int wb_alu_out;
 int wb_value_of_rk;
 int wb_rk;
+int wb_is_mfc0;
+int wb_is_mtc0;
+int wb_exception;
+
+/* coprocessor */
+int SR;
+int CAUSE;
+int EPC;
+int irq;
 
 /* I-format instruction mnemonics */
 const char *opcode_to_str[] = {
     "NULL ", "NULL ", "j    ", "jal  ", "beq  ", "bne  ", "blez ", "bgtz ",
     "addi ", "addiu", "slti ", "sltiu", "andi ", "ori  ", "xori ", "lui  ",
-    "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ",
+    "cop0 ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ",
     "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ", "NULL ",
     "lb   ", "lh   ", "lwl  ", "lw   ", "lbu  ", "lhu  ", "lwr  ", "NULL ",
     "sb   ", "sh   ", "swl  ", "sw   ", "NULL ", "NULL ", "swr  ", "NULL ",
@@ -207,6 +234,52 @@ const char *regn[32] = {
     "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
 };
 
+/* TLB read */
+unsigned int tlb_read(unsigned int addr, int size) {
+    if ((addr&0xC0000000) == 0x80000000) {
+        addr &= 0x1FFFFFFF;
+    }
+    return mem_read(addr, size);
+}
+
+/* TLB write */
+void tlb_write(unsigned int addr, unsigned int data, int size) {
+    if ((addr&0xC0000000) == 0x80000000) {
+        addr &= 0x1FFFFFFF;
+    }
+    mem_write(addr, data, size);
+}
+
+/* read coprocessor 0 register */
+int read_cop0_reg(int indx) {
+    switch (indx) {
+        case 12:
+            return SR;
+        case 13:
+            return CAUSE;
+        case 14:
+            return EPC;
+        default:
+            return 0;
+    }
+}
+
+/* write coprocessor 0 register */
+void write_cop0_reg(int indx, int val) {
+    switch (indx) {
+        case 12:
+            SR = val;
+            break;
+        default:
+            ;
+    }
+}
+
+/* trigger irq */
+void cpu_irq() {
+    irq = 1;
+}
+
 /* is alu R-format instruction? */
 int is_alureg(int opcode) {
     return opcode == 0;
@@ -240,6 +313,11 @@ int is_memload(int opcode) {
 /* is memstore instruction? */
 int is_memstore(int opcode) {
     return (opcode & 0xF8) == 0x28;
+}
+
+/* is coprocessor instruct? */
+int is_cop0(int opcode) {
+    return opcode == 0x10;
 }
 
 /* convert opcode/funct into mnemonic */
@@ -521,13 +599,13 @@ void cpu_debug() {
 /* clk */
 int cpu_clk() {
     /* store clk controls */
-    int ifclk = id_ifclk, pcclk = id_pcclk;
+    int ifclk = id_ifclk, pcclk = id_pcclk, handle_exception = 0;
 
     if (halted)
         return 0;
 
     /* increase step */
-    /*if (cur_step == 10) {
+    /*if (cur_step == 100) {
         return 0;
     } else {
         cpu_debug_short();
@@ -535,58 +613,132 @@ int cpu_clk() {
     /*cpu_debug_short();*/
     cur_step++;
 
+    /* IF transition */
+    if (if_exception && !id_instr && !ex_instr && !mem_instr) {
+        /* IF STAGE EXCEPTION */
+        handle_exception = 1;
+    } else if (id_exception && !ex_instr && !mem_instr) {
+        /* ID EXCEPTION */
+        handle_exception = 1;
+    } else if (ex_exception && !mem_instr) {
+        /* EX EXCEPTION */
+        handle_exception = 1;
+    } else if (mem_exception) {
+        /* MEM EXCEPTION */
+        handle_exception = 1;
+    }
+    if (handle_exception) {
+        if_pc      = 0xBFC00180;
+        if_exphndl = 1;
+    } else if (if_exception) {
+        /* Don't Move (Phantogram) */
+    } else {
+        /* normal operation */
+        if (pcclk) {
+            if (id_pc_src == PCSRC_PC4 || if_exphndl) {
+                if_pc = if_pc4;
+            } else if (id_pc_src == PCSRC_BRANCH) {
+                if_pc = id_braddr;
+            } else if (id_pc_src == PCSRC_JMP) {
+                if_pc = id_jmpaddr;
+            } else if (id_pc_src == PCSRC_JR) {
+                if_pc = id_jraddr;
+            } else {
+                /* ? */
+            }
+        }
+        if_exphndl = 0;
+    }
+
     /* process WB stage */
-    wb_instr = mem_instr;
-    wb_pc4 = mem_pc4;
-    wb_ctrlsig[REG_DEST] = mem_ctrlsig[REG_DEST];
-    wb_ctrlsig[ALU_SRC] = mem_ctrlsig[ALU_SRC];
-    wb_ctrlsig[MEM_TO_REG] = mem_ctrlsig[MEM_TO_REG];
-    wb_ctrlsig[REG_WRITE] = mem_ctrlsig[REG_WRITE];
-    wb_ctrlsig[MEM_READ] = mem_ctrlsig[MEM_READ];
-    wb_ctrlsig[MEM_WRITE] = mem_ctrlsig[MEM_WRITE];
-    wb_ctrlsig[BRANCH] = mem_ctrlsig[BRANCH];
-    wb_mem_out = mem_data_out;
-    wb_alu_out = mem_addr;
-    wb_value_of_rk = wb_ctrlsig[MEM_TO_REG]?wb_mem_out:wb_alu_out;
-    wb_rk = mem_rk;
+    if (mem_exception) {
+        /* introduce a bubble in WB */
+        wb_instr    = 0;
+        wb_pc4      = 0;
+        wb_ctrlsig[REG_DEST]   = 0;
+        wb_ctrlsig[ALU_SRC]    = 0;
+        wb_ctrlsig[MEM_TO_REG] = 0;
+        wb_ctrlsig[REG_WRITE]  = 0;
+        wb_ctrlsig[MEM_READ]   = 0;
+        wb_ctrlsig[MEM_WRITE]  = 0;
+        wb_ctrlsig[BRANCH]     = 0;
+        wb_mem_out  = 0;
+        wb_alu_out  = 0;
+        wb_rk       = 0;
+        wb_is_mfc0  = 0;
+        wb_is_mtc0  = 0;
+    } else {
+        wb_instr = mem_instr;
+        wb_pc4 = mem_pc4;
+        wb_ctrlsig[REG_DEST] = mem_ctrlsig[REG_DEST];
+        wb_ctrlsig[ALU_SRC] = mem_ctrlsig[ALU_SRC];
+        wb_ctrlsig[MEM_TO_REG] = mem_ctrlsig[MEM_TO_REG];
+        wb_ctrlsig[REG_WRITE] = mem_ctrlsig[REG_WRITE];
+        wb_ctrlsig[MEM_READ] = mem_ctrlsig[MEM_READ];
+        wb_ctrlsig[MEM_WRITE] = mem_ctrlsig[MEM_WRITE];
+        wb_ctrlsig[BRANCH] = mem_ctrlsig[BRANCH];
+        wb_mem_out = mem_data_out;
+        wb_alu_out = mem_addr;
+        wb_value_of_rk = wb_ctrlsig[MEM_TO_REG]?wb_mem_out:wb_alu_out;
+        wb_rk = mem_rk;
+        wb_is_mfc0 = mem_is_mfc0;
+        wb_is_mtc0 = mem_is_mtc0;
+    }
     if (wb_ctrlsig[REG_WRITE] && wb_rk)
         id_regfile[wb_rk] = wb_value_of_rk;
 
     /* process MEM stage */
-    mem_instr = ex_instr;
-    mem_pc4 = ex_pc4;
-    mem_memop = ex_memop;
-    mem_ctrlsig[REG_DEST] = ex_ctrlsig[REG_DEST];
-    mem_ctrlsig[ALU_SRC] = ex_ctrlsig[ALU_SRC];
-    mem_ctrlsig[MEM_TO_REG] = ex_ctrlsig[MEM_TO_REG];
-    mem_ctrlsig[REG_WRITE] = ex_ctrlsig[REG_WRITE];
-    mem_ctrlsig[MEM_READ] = ex_ctrlsig[MEM_READ];
-    mem_ctrlsig[MEM_WRITE] = ex_ctrlsig[MEM_WRITE];
-    mem_ctrlsig[BRANCH] = ex_ctrlsig[BRANCH];
-    mem_addr = ex_alu_output;
-    mem_data_in = ex_muxop;
+    if (mem_exception) {
+        /* don't move */
+    } else if (ex_exception) {
+        /* introduce a bubble in MEM */
+        mem_instr   = 0;
+        mem_pc4     = 0;
+        mem_memop   = 0;
+        mem_ctrlsig[REG_DEST]   = 0;
+        mem_ctrlsig[ALU_SRC]    = 0;
+        mem_ctrlsig[MEM_TO_REG] = 0;
+        mem_ctrlsig[REG_WRITE]  = 0;
+        mem_ctrlsig[MEM_READ]   = 0;
+        mem_ctrlsig[MEM_WRITE]  = 0;
+        mem_ctrlsig[BRANCH]     = 0;
+        mem_addr    = 0;
+        mem_data_in = 0;
+        mem_rk      = 0;
+        mem_is_mfc0 = 0;
+        mem_is_mtc0 = 0;
+    } else {
+        mem_instr = ex_instr;
+        mem_pc4 = ex_pc4;
+        mem_memop = ex_memop;
+        mem_ctrlsig[REG_DEST] = ex_ctrlsig[REG_DEST];
+        mem_ctrlsig[ALU_SRC] = ex_ctrlsig[ALU_SRC];
+        mem_ctrlsig[MEM_TO_REG] = ex_ctrlsig[MEM_TO_REG];
+        mem_ctrlsig[REG_WRITE] = ex_ctrlsig[REG_WRITE];
+        mem_ctrlsig[MEM_READ] = ex_ctrlsig[MEM_READ];
+        mem_ctrlsig[MEM_WRITE] = ex_ctrlsig[MEM_WRITE];
+        mem_ctrlsig[BRANCH] = ex_ctrlsig[BRANCH];
+        mem_addr = ex_alu_output;
+        mem_data_in = ex_muxop;
+        mem_rk = ex_rk;
+        mem_is_mfc0 = ex_is_mfc0;
+        mem_is_mtc0 = ex_is_mtc0;
+    }
     if (mem_ctrlsig[MEM_WRITE]) {
         int addr, byte, half, word;
         switch (mem_memop) {
             case MEMOP_BYTE:
-                addr = mem_addr&(~3);
-                byte = mem_addr&3;
-                word = mem_read(addr);
-                ((unsigned char *) &word)[byte] = mem_data_in & 0xFF;
+                tlb_write(mem_addr, mem_data_in, 0);
                 break;
             case MEMOP_HALF:
-                addr = mem_addr&(~1);
-                half = mem_addr&1;
-                word = mem_read(addr);
-                ((unsigned short *) &word)[half] = mem_data_in & 0xFFFF;
+                tlb_write(mem_addr, mem_data_in, 1);
                 break;
             case MEMOP_LEFT:
                 printf("SWL not implemented!!!\n");
                 exit(0);
                 break;
             case MEMOP_WORD:
-                addr = mem_addr;
-                word = mem_data_in;
+                tlb_write(mem_addr, mem_data_in, 2);
                 break;
             case MEMOP_RIGHT:
                 printf("SWR not implemented!!!\n");
@@ -596,51 +748,48 @@ int cpu_clk() {
                 /* exception */
                 break;
         }
-        mem_write(addr, word);
     }
     if (mem_ctrlsig[MEM_READ]) {
-        char byte;
-        unsigned char ubyte;
-        short half;
-        unsigned short uhalf;
-        int word = mem_read(mem_addr);
         switch (mem_memop) {
             case MEMOP_BYTE:
-                byte = ((char *)&word)[mem_addr&3];
-                mem_data_out = (int) byte;
+                mem_data_out = (int) ((char)tlb_read(mem_addr,0));
                 break;
             case MEMOP_HALF:
-                half = ((short *)&word)[mem_addr&1];
-                mem_data_out = (int) half;
+                mem_data_out = (int) ((short)tlb_read(mem_addr,1));
                 break;
             case MEMOP_LEFT:
+                mem_data_out = (unsigned int)
+                                ((unsigned char)tlb_read(mem_addr,0));
                 printf("LWL not implemented!!!\n");
-                exit(0);
+                //exit(0);
                 break;
             case MEMOP_WORD:
-                mem_data_out = word;
+                mem_data_out = tlb_read(mem_addr,2);
                 break;
             case MEMOP_BYTEU:
-                ubyte = ((unsigned char *)&word)[mem_addr&3];
-                mem_data_out = (unsigned int) ubyte;
+                mem_data_out = (unsigned int)
+                                ((unsigned char)tlb_read(mem_addr,0));
                 break;
             case MEMOP_HALFU:
-                uhalf = ((unsigned short *)&word)[mem_addr&1];
-                mem_data_out = (unsigned int) uhalf;
+                mem_data_out = (unsigned int)
+                                ((unsigned short)tlb_read(mem_addr,1));
                 break;
             case MEMOP_RIGHT:
+                mem_data_out = (unsigned int)
+                                ((unsigned char)tlb_read(mem_addr,0));
                 printf("LWR not implemented!!!\n");
-                exit(0);
+                //exit(0);
                 break;
             default:
                 /* exception */
                 break;
         }
     }
-    mem_rk = ex_rk;
 
     /* process EX stage */
-    if (!ifclk) {
+    if (ex_exception) {
+        /* don't move */
+    } else if (id_exception || !ifclk) {
         /* introudce bubble */
         ex_instr = 0;
         ex_pc4 = 0;
@@ -660,6 +809,8 @@ int cpu_clk() {
         ex_val_of_rs = 0;
         ex_val_of_rt = 0;
         ex_imm32 = 0;
+        ex_is_mfc0 = 0;
+        ex_is_mtc0 = 0;
     } else {
         /* get instruction normally */
         ex_instr = id_instr;
@@ -677,9 +828,21 @@ int cpu_clk() {
         ex_ctrlsig[MEM_READ] = id_ctrlsig[MEM_READ];
         ex_ctrlsig[MEM_WRITE] = id_ctrlsig[MEM_WRITE];
         ex_ctrlsig[BRANCH] = id_ctrlsig[BRANCH];
-        ex_val_of_rs = id_val_of_rs;
-        ex_val_of_rt = id_val_of_rt;
+        if (!id_is_cop0) {
+            ex_val_of_rs = id_val_of_rs;
+        } else if (id_is_mfc0) {
+            ex_val_of_rs = id_cop0_regrd;
+        } else {
+            ex_val_of_rs = 0;
+        }
+        if (!id_is_cop0 || id_is_mtc0) {
+            ex_val_of_rt = id_val_of_rt;
+        } else {
+            ex_val_of_rt = 0;
+        }
         ex_imm32 = id_imm32;
+        ex_is_mfc0 = id_is_mfc0;
+        ex_is_mtc0 = id_is_mtc0;
     }
     ex_fu_mux1 = 0;
     ex_fu_mux2 = 0;
@@ -722,7 +885,7 @@ int cpu_clk() {
             break;
         case ALUOP_EXP:
             /* not implemented */
-            printf("HALTED!\n");
+            printf("HALTED! (%s:%d)\n", __FILE__, __LINE__);
             cpu_debug_short();
             halted = 1;
             break;
@@ -818,31 +981,21 @@ int cpu_clk() {
     }
     ex_rk = ex_ctrlsig[REG_DEST]?ex_rd:ex_rt;
 
-    /* IF */
-    if (pcclk) {
-        switch (id_pc_src) {
-            case PCSRC_PC4:
-                if_pc = if_pc4;
-                break;
-            case PCSRC_BRANCH:
-                if_pc = id_braddr;
-                break;
-            case PCSRC_JMP:
-                if_pc = id_jmpaddr;
-                break;
-            case PCSRC_JR:
-                if_pc = id_jraddr;
-                break;
-            case PCSRC_EXP:
-                /* not implemented */
-                break;
-        }
-    }
-
     /* ID */
-    if (ifclk) {
-        id_instr = if_instr;
-        id_pc4 = if_pc4;
+    if (id_exception) {
+        /* don't move */
+    } else if (if_exception) {
+        /* flush ID */
+        id_instr = 0;
+        id_pc    = if_pc4-4;
+        id_pc4   = if_pc4;
+    } else {
+        /* normal operation */
+        if (ifclk) {
+            id_instr = if_instr;
+            id_pc    = if_pc4-4;
+            id_pc4   = if_pc4;
+        }
     }
     id_opcode = (id_instr>>26)&0x3F;
     id_rs = (id_instr>>21)&0x1F;
@@ -855,6 +1008,8 @@ int cpu_clk() {
     id_ropcode = (id_instr>>16)&0x1F;
     id_shamt = (id_instr>>6)&0x1F;
     id_funct = (id_instr>>0)&0x3F;
+    id_is_jr = id_opcode==0x00 && id_funct==0x08;
+    id_is_jalr = id_opcode==0x00 && id_funct==0x09;
     if (id_opcode == 3 || (!id_opcode && id_funct == 9) ||
         (id_opcode == 1 && id_ropcode == 16) ||
         (id_opcode == 1 && id_ropcode == 17)) {
@@ -874,6 +1029,10 @@ int cpu_clk() {
     id_is_zero = (id_val_of_rs == 0);
     id_is_lez = (id_val_of_rs <= 0);
     id_is_gtz = (id_val_of_rs > 0);
+    id_is_mfc0 = is_cop0(id_opcode) & (id_rs ==  0);
+    id_is_mtc0 = is_cop0(id_opcode) & (id_rs ==  4);
+    id_is_rfe  = is_cop0(id_opcode) & (id_rs == 16) & (id_funct == 16);
+    id_is_cop0 = is_cop0(id_opcode);
     if (is_alureg(id_opcode)) {
         id_ctrlsig_in[REG_DEST]   = 1;
         id_ctrlsig_in[ALU_SRC]    = (id_funct == 8 || id_funct == 9);
@@ -1052,6 +1211,19 @@ int cpu_clk() {
         id_ctrlsig_in[BRANCH]     = 0;
         id_aluop = ALUOP_ADD;
         id_memop = id_opcode & 7;
+    } else if (is_cop0(id_opcode)) {
+        id_ctrlsig_in[REG_DEST]   = id_is_mtc0;
+        id_ctrlsig_in[ALU_SRC]    = 0;
+        id_ctrlsig_in[MEM_TO_REG] = 0;
+        id_ctrlsig_in[REG_WRITE]  = id_is_mfc0;
+        id_ctrlsig_in[MEM_READ]   = 0;
+        id_ctrlsig_in[MEM_WRITE]  = 0;
+        id_ctrlsig_in[BRANCH]     = 0;
+        if (id_is_mfc0 || id_is_mtc0) {
+            id_aluop = ALUOP_ADD;
+        } else {
+            id_aluop = ALUOP_NOP;
+        }
     } else {
         id_ctrlsig_in[REG_DEST]   = 0;
         id_ctrlsig_in[ALU_SRC]    = 0;
@@ -1064,7 +1236,8 @@ int cpu_clk() {
     }
     if ((ex_ctrlsig[MEM_READ] && ex_rk &&
         ((ex_rk == id_rs) ||
-         ((ex_rk == id_rt) && (!id_ctrlsig_in[MEM_READ])))) ||
+         ((ex_rk == id_rt) && (!id_ctrlsig_in[MEM_READ]))))
+        ||
         ((id_opcode == 0x04 || id_opcode == 0x05 ||
           id_opcode == 0x06 || id_opcode == 0x07 ||
           id_opcode == 0x01 || id_opcode == 0x02 || id_opcode == 0x03 ||
@@ -1072,7 +1245,10 @@ int cpu_clk() {
          ((ex_ctrlsig[REG_WRITE] && ex_rk &&
           (ex_rk == id_rs || (id_opcode != 1 && ex_rk == id_rt))) ||
           (mem_ctrlsig[REG_WRITE] && mem_rk &&
-          (mem_rk == id_rs || (id_opcode != 1 && mem_rk == id_rt)))))) {
+          (mem_rk == id_rs || (id_opcode != 1 && mem_rk == id_rt)))))
+        ||
+        ((id_is_mfc0 || id_is_mtc0 || id_is_rfe) &&
+         (ex_instr || mem_instr || wb_instr))) {
         /* hazard, stall the pipeline */
         id_stall = 1;
         id_ifclk = 0;
@@ -1141,9 +1317,48 @@ int cpu_clk() {
         id_pc_src = PCSRC_PC4;
     }
 
-    /* IF again */
+    /* IF */
     if_pc4 = if_pc + 4;
-    if_instr = mem_read(if_pc);
+    if_instr = tlb_read(if_pc, 2);
+
+    /* coprocessor handling (on the falling edge) */
+    if (if_exphndl && if_exception) {
+        /* disable interrupts */
+        SR <<= 2;
+    } else if (id_is_rfe) {
+        /* return from exception */
+        SR = (SR & 0xFFFFFFF0)|((SR>>2)&0xF);
+    } else if (wb_is_mtc0) {
+        write_cop0_reg(wb_rk, wb_value_of_rk);
+    } else {
+        id_cop0_regrd = read_cop0_reg(id_rd);
+    }
+
+    /* handle exceptions (falling edge) */
+    /* if exception conditions are satisfied, next cycle is
+     * an exception fetch, and all stages before and including the
+     * exception-source stage shall be flushed.
+     */
+    if (if_exphndl) {
+        /* exception served */
+        if_exception = 0;
+        irq = 0;
+        pic_iak();
+    } else if (irq && (SR&1) && !if_exception) {
+        /* IRQ happened! */
+        if_exception = 1;
+        if (id_is_jr || id_is_jalr ||
+            is_branchregimm(id_opcode) ||
+            is_jmp(id_opcode) ||
+            is_branch(id_opcode)) {
+            /* branch instruction in ID stage */
+            EPC = id_pc;
+            CAUSE = 0x80000000;
+        } else {
+            EPC = if_pc;
+            CAUSE = 0x00000000;
+        }
+    }
 
     /* done */
     return 0;
@@ -1158,20 +1373,28 @@ void cpu_init() {
     cur_step = 0;
 
     /* IF */
-    if_pc = 0;
-    if_pc4 = 4;
-    if_instr = mem_read(if_pc);
+    if_pc = 0xBFC00000;
+    if_pc4 = if_pc+4;
+    if_instr = tlb_read(if_pc, 2);
+    if_exphndl = 0;
+    if_exception = 0;
 
     /* ID */
     id_rs = 0;
     id_rt = 0;
+    id_pc = 0;
     id_pc4 = 0;
     id_imm32 = 0;
     id_shl = 0;
     id_braddr = 0;
     id_val_of_rs = 0;
     id_val_of_rt = 0;
+    id_cop0_regrd = 0;
     id_is_equal = 0;
+    id_is_mfc0 = 0;
+    id_is_mtc0 = 0;
+    id_is_rfe = 0;
+    id_is_cop0 = 0;
     id_pc_src = 0;
     id_if_flush = 0;
     id_ctrlsig_in[REG_DEST] = 0;
@@ -1191,6 +1414,7 @@ void cpu_init() {
     id_stall = 0; /* hazard outputs */
     id_ifclk = 1; /* hazard outputs */
     id_pcclk = 1; /* hazard outputs */
+    id_exception = 0;
     for (i = 0; i < 32; i++)
         id_regfile[i] = 0;
 
@@ -1214,6 +1438,9 @@ void cpu_init() {
     ex_alu2 = 0; /* input 2 for ALU */
     ex_alu_output = 0; /* output of ALU */
     ex_rk = 0; /* output of forth mux */
+    ex_is_mfc0 = 0;
+    ex_is_mtc0 = 0;
+    ex_exception = 0;
 
     /* MEM */
     mem_ctrlsig[REG_DEST] = 0;
@@ -1227,6 +1454,9 @@ void cpu_init() {
     mem_data_in = 0;
     mem_data_out = 0;
     mem_rk = 0;
+    mem_is_mfc0 = 0;
+    mem_is_mtc0 = 0;
+    mem_exception = 0;
 
     /* WB */
     wb_ctrlsig[REG_DEST] = 0;
@@ -1240,5 +1470,14 @@ void cpu_init() {
     wb_alu_out = 0;
     wb_value_of_rk = 0;
     wb_rk = 0;
+    wb_is_mfc0 = 0;
+    wb_is_mtc0 = 0;
+    wb_exception = 0;
+
+    /* coprocessor */
+    SR = 0;
+    CAUSE = 0;
+    EPC = 0;
+    irq = 0;
 
 }

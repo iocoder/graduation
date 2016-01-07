@@ -4,7 +4,9 @@ extern struct {
     int width;
     int height;
     unsigned short data[0];
-} __attribute__((packed)) logo;
+} logo;
+
+/* NOTE: if logo got corrupted, add __attribute__((packed)) */
 
 void draw_logo() {
     /* divide logo into chars */
@@ -31,6 +33,7 @@ void draw_logo() {
 }
 
 __asm__(".section .rodata     ");
+__asm__(".align 4             ");
 __asm__("logo:                ");
 __asm__(".incbin \"logo.bin\" ");
 

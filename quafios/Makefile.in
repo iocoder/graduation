@@ -265,7 +265,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = boot tools
+SUBDIRS = boot nes tools
 REMOVE_EMPTY_DIR = @SUBDIRS=;\
 	IFS=$$'\n'; \
 	v=$$(find $(1)/ -type d | tac);\
@@ -599,7 +599,7 @@ export QAS=mipsel-linux-gnu-as
 export QLD=mipsel-linux-gnu-ld
 export QOC=mipsel-linux-gnu-objcopy
 
-export QCFLAGS = -mno-abicalls -mips1 -mpatfree \
+export QCFLAGS = -mno-abicalls -mips1 \
 	  -fno-zero-initialized-in-bss -fno-stack-protector -fno-exceptions \
 	  -ffunction-sections -fno-builtin -Wno-pointer-to-int-cast -Werror \
 	  -nostartfiles -nostdlib -nodefaultlibs -nostdinc -pedantic \

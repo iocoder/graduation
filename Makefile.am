@@ -11,10 +11,11 @@ prog:
 	make -C hardware prog
 
 emu:
+	make -C quafios diskimg
 	make -C logo
 	make -C firmware
 	make -C mipsemu
-	cd mipsemu && ./mipsemu ../firmware/firmware.bin
+	cd mipsemu && ./mipsemu ../firmware/firmware.bin ../quafios/disk.img
 
 sim:
 	make -C vhdsim

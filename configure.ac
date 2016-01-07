@@ -40,6 +40,7 @@ AC_CONFIG_FILES([Makefile
                  firmware/Makefile
                  quafios/Makefile
                  quafios/boot/Makefile
+                 quafios/nes/Makefile
                  quafios/tools/Makefile
                  hardware/Makefile
                  mipsemu/Makefile

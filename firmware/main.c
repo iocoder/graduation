@@ -14,11 +14,11 @@ int main() {
     /* initialize ISR */
     isr_init();
 
-    /* initialize PIT */
-    pit_init();
-
     /* initialize VGA... */
     vga_init();
+
+    /* initialize PIT */
+    pit_init();
 
     /* initialize keyboard */
     kbd_init();

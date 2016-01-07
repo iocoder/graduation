@@ -7,7 +7,7 @@
 extern SDL_Surface* screen;
 unsigned char chr[80*30];
 unsigned char att[80*30];
-extern unsigned char font[256][16];
+unsigned short font[256][16];
 int close_thread = 0;
 int thread_closed = 0;
 Uint32 palette[] = {
@@ -47,24 +47,34 @@ void update_char(int loc, unsigned char ascii, unsigned char attrib) {
     att[loc] = attrib;
 
     /* update screen */
-    for (j = 0; j < 8; j++)
+    for (j = 0; j < 9; j++)
         for (k = 0; k < 16; k++) {
-            if (j < 8 && (font[ascii][k]&(1<<(7-j)))) {
-                set_fpx(col*8+j, row*16+k, fg);
+            if (font[ascii][k]&(1<<(8-j))) {
+                set_fpx(col*9+j, row*16+k, fg);
             } else {
-                set_fpx(col*8+j, row*16+k, bg);
+                set_fpx(col*9+j, row*16+k, bg);
             }
         }
 
 }
 
-void vga_write(unsigned short addr, unsigned char data) {
+void vga_write(unsigned short addr, unsigned int data) {
 
-    int loc = (addr & 0x1FFF)>>1;
-    if (addr & 1) {
-        update_char(loc, chr[loc], data);
+    int loc;
+    if (addr & 0x1000) {
+        /* font */
+        font[(addr & 0x0FF0)>>4][addr&0x0F] = data;
+    } else if (addr < 4000) {
+        /* data */
+        loc = (addr & 0x0FFF)>>1;
+        if (addr & 1) {
+            update_char(loc, chr[loc], data);
+        } else {
+            update_char(loc, data, att[loc]);
+        }
     } else {
-        update_char(loc, data, att[loc]);
+        /* special registers */
+
     }
 
 }
@@ -87,14 +97,10 @@ void vga_init() {
     int i;
 
     /* initialize screen */
-    for (i = 0; i < 80*30; i++)
-        update_char(i, 0, 0x1F);
+    for (i = 0; i < 80*25; i++)
+        update_char(i, 0, 0x11);
 
     /* instantiate a thread for updating the screen */
     SDL_CreateThread(&vga_update, NULL);
 
 }
-
-__asm__(".section .rodata         ");
-__asm__("font:                    ");
-__asm__(".incbin \"font8x16.fon\" ");

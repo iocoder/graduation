@@ -6,6 +6,8 @@
 #include "cpu.h"
 #include "kbd.h"
 #include "mem.h"
+#include "pit.h"
+#include "pic.h"
 
 SDL_Surface* screen = NULL;
 
@@ -14,9 +16,9 @@ int main(int argc, char *argv[]) {
     SDL_Thread *t;
 
     /* check the arguments */
-    if (argc != 2) {
+    if (argc != 3) {
         fprintf(stderr, "Invalid arguments. Usage: ");
-        fprintf(stderr, "%s <firmware>\n", argv[0]);
+        fprintf(stderr, "%s <firmware> <sdcard.img>\n", argv[0]);
         return -1;
     }
 
@@ -33,14 +35,14 @@ int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     /* Set up screen */
-    screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(720, 400, 32, SDL_SWSURFACE);
 
     /* Set title */
     SDL_WM_SetCaption("MIPS FPGA Computer Emulator", NULL);
 
     /* initialize memory */
-    mem_init(argv[1]);
-    
+    mem_init(argv[1], argv[2]);
+
     /* initialize CPU */
     cpu_init();
 
@@ -49,6 +51,12 @@ int main(int argc, char *argv[]) {
 
     /* initialize keyboard */
     kbd_init();
+
+    /* initialize PIT */
+    pit_init();
+
+    /* initialize PIC */
+    pic_init();
 
     /* create execution thread */
     t = SDL_CreateThread(clock_handler, (void *)NULL);

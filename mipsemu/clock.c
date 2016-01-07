@@ -9,6 +9,7 @@
 #include "cpu.h"
 #include "kbd.h"
 #include "vga.h"
+#include "pit.h"
 
 int exit_now = 0;
 
@@ -39,6 +40,8 @@ int clock_handler(void *ptr) {
             break;
         }
         kbd_clk();
+        pit_clk();
+        pit_clk(); /* doubled because pit_freq = 2 * cpu_freq */
     }
     return 0;
 }

@@ -30,10 +30,12 @@
 #include "../../../firmware/bios.h"
 
 #define printf      bios.vga.print_fmt
+#define putc        bios.vga.print_char
 #define cursor      bios.vga.move_cursor
 #define hide_cursor bios.vga.hide_cursor
 #define cls         bios.vga.clear_screen
 #define getc        bios.kbd.getc
+#define loadfile    bios.diskfs.loadfile
 
 char header[] = {
 0x20, 0x20, 0x20, 0x5F, 0x5F, 0x5F, 0x5F, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
@@ -57,8 +59,8 @@ char header[] = {
 
 int32_t first_line, menu_height;
 
-char *options[] = {"Boot Quafios 2.0.1 (MIPS) in text mode",
-                   "Return to BIOS",
+char *options[] = {"Quafios 2.0.1 (MIPS) in text mode",
+                   "Nintendo Entertainment System (NES) emulator",
                    "Boot from first storage medium",
                    "Reboot"};
 
@@ -135,19 +137,20 @@ void print_footer(int32_t line) {
 
 void print_menu_option(int32_t line, char *str, int32_t selected) {
     int32_t i;
+    char attr;
     cursor(0, line);
     printf("%a", border_attr);
     printf(" %c", 179);
 
     if (selected)
-        printf("%a", 0x2F);
+        printf("%a", attr=0x2F);
     else
-        printf("%a", 0x0F);
+        printf("%a", attr=0x0F);
 
     printf(" %s", str);
 
     for (i = 0; i < 75-strlen(str); i++)
-        printf(" ");
+        putc(' ', attr);
 
     printf("%a", border_attr);
     printf("%c ", 179);
@@ -196,15 +199,19 @@ void show_menu() {
                 }
                 /* down */
                 break;
-            case 28:
+            case 10:
                 /* return */
                 switch (selected_option) {
                     case 0:
                         /*enable_graphics = 0;*/
                         return;
                     case 1:
-                        /*enable_graphics = 1;*/
-                        return;
+                        cls();
+                        if (loadfile(0, 63, "/boot/nes.bin", 0x80010000)) {
+                            printf("NES simulator not found! halting...");
+                            while(1);
+                        }
+                        __asm__("jr %0"::"r"(0x80010000));
                     case 2:
                         cls();
                         /*if (*drivenum == 0x80)
@@ -223,9 +230,7 @@ void show_menu() {
                                 "jmp  $0x0000, $0x7C00"::"d"(dl));*/
                         return;
                     case 3:
-                        cls();
-                        /*__asm__("jmp $0xFFFF, $0x0000");*/
-                        return;
+                        __asm__("jr %0"::"r"(0xBFC00000));
                 }
                 break;
             default:
