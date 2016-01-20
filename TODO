@@ -1,4 +1,8 @@
 Suggested TODO list:
 ---------------------
 
+- is big cache size the reason for high number of slices?
+- note: I increased cache size from 2KB to 8KB, noticed big difference in
+        speed + BRAMs usage became 16 (it was 12 out of 20).
+
 - TLB

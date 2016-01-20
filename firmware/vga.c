@@ -10,9 +10,10 @@ int  col;
 int  row_base;
 int  cursor_shown;
 extern unsigned char font[256*16];
+int  serial_enabled;
 
 void write_to_vga(int index, char data) {
-    if (index >= 0xFFD) {
+    if (index >= 0xFF8) {
         /* special registers */
         vga[index] = data;
     } else {
@@ -78,6 +79,8 @@ void vga_init() {
     scan_attr = 0x0E;
     /* show cursor by default */
     cursor_shown = 1;
+    /* disable serial by default */
+    serial_enabled = 0;
     /* clear screen */
     clear_screen();
 }
@@ -97,6 +100,10 @@ void scroll() {
 }
 
 void print_char(char c, char attr) {
+    if (serial_enabled) {
+        write_to_vga(0xFF8, c);
+        return;
+    }
     if (c == '\n') {
         row++;
         col = 0;
@@ -146,10 +153,14 @@ void print_int(unsigned int num, char attr) {
 
 }
 
-void print_hex(unsigned int num, char attr) {
+void print_hex_size(unsigned int num, char attr, int hexdigits) {
     int i;
-    for (i = 28; i >= 0; i-=4)
+    for (i = (hexdigits-1)*4; i >= 0; i-=4)
         print_char("0123456789ABCDEF"[(num>>i)&0xF], attr);
+}
+
+void print_hex(unsigned int num, char attr) {
+    print_hex_size(num, attr, 8);
 }
 
 void print_str(char *str, char attr) {
@@ -182,6 +193,10 @@ void print_fmt(char *fmt, ...) {
     for (i = 0; fmt[i] != 0; i++) {
         if (fmt[i] == '%') {
             switch (fmt[++i]) {
+                case 'e':
+                    serial_enabled = 1;
+                    break;
+
                 case 'a':
                     addr = (void *)(((int) addr)+4);
                     fmt_attr = *((char *) addr);
@@ -200,6 +215,19 @@ void print_fmt(char *fmt, ...) {
                 case 'x':
                     addr = (void *)(((int) addr)+4);
                     print_hex(*((int *) addr), fmt_attr);
+                    break;
+
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                    addr = (void *)(((int) addr)+4);
+                    print_hex_size(*((int *) addr), fmt_attr, fmt[i++]-'0');
                     break;
 
                 case 's':

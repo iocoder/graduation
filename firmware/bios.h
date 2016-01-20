@@ -2,26 +2,26 @@
 #define _MIPSCOMP_BIOS_H
 
 typedef struct {
-    void (*write_to_vga)(int index, char data);
-    void (*write_char)(int row, int col, char chr, char attr);
-    void (*write_font)(int ascii, int row_indx, short data);
-    void (*clear_screen)();
-    void (*move_cursor)(int new_col, int new_row);
-    void (*hide_cursor)();
-    void (*show_cursor)();
-    void (*print_char)(char c, char attr);
-    void (*print_int)(unsigned int num, char attr);
-    void (*print_hex)(unsigned int num, char attr);
-    void (*print_str)(char *str, char attr);
-    void (*print_hf)(int line, char *str, char attr);
-    void (*print_fmt)(char *fmt, ...);
+    /*00*/ void (*write_to_vga)(int index, char data);
+    /*01*/ void (*write_char)(int row, int col, char chr, char attr);
+    /*02*/ void (*write_font)(int ascii, int row_indx, short data);
+    /*03*/ void (*clear_screen)();
+    /*04*/ void (*move_cursor)(int new_col, int new_row);
+    /*05*/ void (*hide_cursor)();
+    /*06*/ void (*show_cursor)();
+    /*07*/ void (*print_char)(char c, char attr);
+    /*08*/ void (*print_int)(unsigned int num, char attr);
+    /*09*/ void (*print_hex)(unsigned int num, char attr);
+    /*0A*/ void (*print_str)(char *str, char attr);
+    /*0B*/ void (*print_hf)(int line, char *str, char attr);
+    /*0C*/ void (*print_fmt)(char *fmt, ...);
 } bios_vga_t;
 
 typedef struct {
-    char (*getc)();
-    void (*scan_char)(char *c);
-    void (*scan_str)(char *str);
-    int  (*scan_int)(int *num);
+    /*0D*/ char (*getc)();
+    /*0E*/ void (*scan_char)(char *c);
+    /*0F*/ void (*scan_str)(char *str);
+    /*10*/ int  (*scan_int)(int *num);
 } bios_kbd_t;
 
 typedef struct {

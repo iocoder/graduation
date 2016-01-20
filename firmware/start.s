@@ -102,7 +102,7 @@ start:
     nop
     nop*/
 
-    lui   $sp, 0x8001
+    lui   $sp, 0x8000
     ori   $sp, $sp, 0x8000
     nop
     jal   main

@@ -10,24 +10,24 @@ entity cachearray is
         CLK      : in  STD_LOGIC;
         -- bus interface
         RW       : in  STD_LOGIC;
-        RD_ADDR  : in  STD_LOGIC_VECTOR (7 downto 0);
-        WR_ADDR  : in  STD_LOGIC_VECTOR (7 downto 0);
+        RD_ADDR  : in  STD_LOGIC_VECTOR (9 downto 0);
+        WR_ADDR  : in  STD_LOGIC_VECTOR (9 downto 0);
         -- inputs
         Vin      : in  STD_LOGIC;
         Din      : in  STD_LOGIC_VECTOR (31 downto 0);
-        TAGin    : in  STD_LOGIC_VECTOR (21 downto 0);
+        TAGin    : in  STD_LOGIC_VECTOR (19 downto 0);
         -- outputs
         Vout     : out STD_LOGIC;
         Dout     : out STD_LOGIC_VECTOR (31 downto 0);
-        TAGout   : out STD_LOGIC_VECTOR (21 downto 0)
+        TAGout   : out STD_LOGIC_VECTOR (19 downto 0)
     );
 end entity;
 
 architecture Behavioral of cachearray is
 
-type cache_v_t    is array (0 to 255) of std_logic;
-type cache_data_t is array (0 to 255) of std_logic_vector(31 downto 0);
-type cache_tag_t  is array (0 to 255) of std_logic_vector(21 downto 0);
+type cache_v_t    is array (0 to 1023) of std_logic;
+type cache_data_t is array (0 to 1023) of std_logic_vector(31 downto 0);
+type cache_tag_t  is array (0 to 1023) of std_logic_vector(19 downto 0);
 
 signal cache_arr_v    : cache_v_t := (others => '0');
 signal cache_arr_data : cache_data_t;

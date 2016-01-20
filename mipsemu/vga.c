@@ -8,6 +8,7 @@ extern SDL_Surface* screen;
 unsigned char chr[80*30];
 unsigned char att[80*30];
 unsigned short font[256][16];
+int base = 0;
 int close_thread = 0;
 int thread_closed = 0;
 Uint32 palette[] = {
@@ -36,15 +37,19 @@ void set_fpx(int x, int y, Uint32 color) {
 
 void update_char(int loc, unsigned char ascii, unsigned char attrib) {
 
-    int row = loc/80;
-    int col = loc%80;
+    int row, col;
+    int j, k;
     Uint32 fg = palette[(attrib>>0)&0xF];
     Uint32 bg = palette[(attrib>>4)&0xF];
-    int j, k;
 
     /* update buffers */
     chr[loc] = ascii;
     att[loc] = attrib;
+
+    /* adjust loc */
+    loc = (loc-base+2000)%2000;
+    row = loc/80;
+    col = loc%80;
 
     /* update screen */
     for (j = 0; j < 9; j++)
@@ -58,8 +63,13 @@ void update_char(int loc, unsigned char ascii, unsigned char attrib) {
 
 }
 
-void vga_write(unsigned short addr, unsigned int data) {
+void refresh() {
+    int i;
+    for (i = 0; i < 2000; i++)
+        update_char(i, chr[i], att[i]);
+}
 
+void vga_write(unsigned short addr, unsigned int data) {
     int loc;
     if (addr & 0x1000) {
         /* font */
@@ -74,9 +84,28 @@ void vga_write(unsigned short addr, unsigned int data) {
         }
     } else {
         /* special registers */
+        if (addr == 0xFFD) {
+            base = data*80;
+            refresh();
+        } else if (addr == 0xFF8) {
+            if (data == 1) {
+                /* debugging */
+                static unsigned int total = 0;
+                static unsigned int last = 0;
+                static unsigned int count = 0;
+                extern unsigned int total_cycles;
+                count++;
+                if (count > 1) {
+                    total += total_cycles-last;
+                    printf("count: %d, avg: %d\n", count, total/count);
+                }
+                last = total_cycles;
 
+            } else {
+                printf("%c", data);
+            }
+        }
     }
-
 }
 
 int vga_update() {

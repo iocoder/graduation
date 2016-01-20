@@ -5,6 +5,7 @@
 
 unsigned int max_counter;
 unsigned int counter;
+unsigned int total_cycles;
 
 void pit_write(unsigned int data) {
     max_counter = data;
@@ -16,6 +17,7 @@ unsigned int pit_read() {
 }
 
 void pit_clk() {
+    total_cycles++;
     if (max_counter) {
         counter++;
         if (counter == max_counter) {
@@ -28,4 +30,5 @@ void pit_clk() {
 void pit_init() {
     max_counter = 0;
     counter = 0;
+    total_cycles = 0;
 }

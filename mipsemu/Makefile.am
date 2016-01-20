@@ -6,7 +6,7 @@ OBJECT=mipsemu
 all: $(OBJECT)
 
 $(OBJECT): $(CFILES) $(HFILES)
-	gcc  -o $@ $(CFLAGS) $(CFILES) -lSDL
+	gcc -o $@ $(CFLAGS) $(CFILES) -lSDL
 
 clean-local:
 	rm -rf $(OBJECT) mem.img

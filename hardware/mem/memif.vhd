@@ -165,7 +165,11 @@ begin
                 LB16    <= '0';
                 UB16    <= '0';
                 EN16    <= '0';
-                counter <= counter + 1;
+                if (EN16b = '0') then
+                    counter <= 14;
+                else
+                    counter <= counter + 1;
+                end if;
             elsif (counter < 14) then
                 -- in phase 2
                 A16     <= A16b;

@@ -66,6 +66,16 @@
 #define PCSRC_JR        0x03
 #define PCSRC_EXP       0x04
 
+/* cache parameters */
+#define CACHE_LINES     1024
+#define OFFSET_BITS     2
+#define INDEX_BITS      10
+#define INDEX_LOW       2
+#define INDEX_HIGH      11
+#define TAG_BITS        20
+#define TAG_LOW         12
+#define TAG_HIGH        31
+
 /* halt */
 int halted;
 
@@ -182,6 +192,14 @@ int CAUSE;
 int EPC;
 int irq;
 
+/* caches */
+unsigned int icache_v   [CACHE_LINES] = {0};
+unsigned int icache_data[CACHE_LINES] = {0};
+unsigned int icache_tag [CACHE_LINES] = {0};
+unsigned int dcache_v   [CACHE_LINES] = {0};
+unsigned int dcache_data[CACHE_LINES] = {0};
+unsigned int dcache_tag [CACHE_LINES] = {0};
+
 /* I-format instruction mnemonics */
 const char *opcode_to_str[] = {
     "NULL ", "NULL ", "j    ", "jal  ", "beq  ", "bne  ", "blez ", "bgtz ",
@@ -234,20 +252,125 @@ const char *regn[32] = {
     "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
 };
 
+/* cache read */
+unsigned int static icache_miss_count = 0;
+unsigned int static icache_access_count = 0;
+unsigned int static icache_stats_enable = 0;
+unsigned int static dcache_miss_count = 0;
+unsigned int static dcache_access_count = 0;
+unsigned int static dcache_stats_enable = 0;
+
+unsigned int cache_read(int which, unsigned int addr, unsigned int size) {
+    unsigned int *cache_v    = which?dcache_v   :icache_v;
+    unsigned int *cache_data = which?dcache_data:icache_data;
+    unsigned int *cache_tag  = which?dcache_tag :icache_tag;
+    unsigned int  offset     = (addr>>0        ) & ((1<<OFFSET_BITS)-1);
+    unsigned int  index      = (addr>>INDEX_LOW) & ((1<<INDEX_BITS )-1);
+    unsigned int  tag        = (addr>>TAG_LOW  ) & ((1<<TAG_BITS   )-1);
+    if (!which && addr == 0x00010000) {
+        //icache_stats_enable++;
+        dcache_stats_enable++;
+    }
+    if (!which && icache_stats_enable)
+        icache_access_count++;
+    if (which && dcache_stats_enable)
+        dcache_access_count++;
+    /* perform cache query */
+    if (!cache_v[index] || cache_tag[index] != tag) {
+        /* cache miss */
+        if (!which && icache_stats_enable) {
+            /* icache miss */
+            icache_miss_count++;
+            printf("icache misses: %d/%d, %d%\n", icache_miss_count,
+                    icache_access_count,
+                    icache_miss_count*100/icache_access_count);
+        } else if (which && dcache_stats_enable) {
+            /* dcache miss */
+            dcache_miss_count++;
+            printf("dcache misses: %d/%d, %d%\n", dcache_miss_count,
+                    dcache_access_count,
+                    dcache_miss_count*100/dcache_access_count);
+        }
+        if ((addr >> 24) == 0x1E) {
+            /* uncacheable */
+            return mem_read(addr, size);
+        } else {
+            /* cacheable */
+            cache_v   [index] = 1;
+            cache_data[index] = mem_read(addr - offset, 2);
+            cache_tag [index] = tag;
+        }
+    }
+    /* read result from cache */
+    switch(size) {
+        case 0:
+            return ((unsigned char *) &cache_data[index])[offset];
+        case 1:
+            return ((unsigned short *) &cache_data[index])[offset/2];
+        case 2:
+            return cache_data[index];
+    }
+}
+
+/* cache write */
+void cache_write(int which, unsigned int addr, unsigned int data, int size) {
+    unsigned int *cache_v    = which?dcache_v   :icache_v;
+    unsigned int *cache_data = which?dcache_data:icache_data;
+    unsigned int *cache_tag  = which?dcache_tag :icache_tag;
+    unsigned int  offset     = (addr>>0        ) & ((1<<OFFSET_BITS)-1);
+    unsigned int  index      = (addr>>INDEX_LOW) & ((1<<INDEX_BITS )-1);
+    unsigned int  tag        = (addr>>TAG_LOW  ) & ((1<<TAG_BITS   )-1);
+    /* write through */
+    mem_write(addr, data, size);
+    /* estimating cache performance */
+    if (which && dcache_stats_enable)
+        dcache_access_count++;
+    if (which && dcache_stats_enable) {
+        /* dcache miss (any write is a miss cuz cache is write through) */
+        dcache_miss_count++;
+        printf("dcache misses: %d/%d, %d%\n", dcache_miss_count,
+                dcache_access_count,
+                dcache_miss_count*100/dcache_access_count);
+    }
+    /* update cache */
+    if (cache_v[index] && cache_tag[index] == tag) {
+        /* cache hit */
+        switch(size) {
+            case 0:
+                ((unsigned char *) &cache_data[index])[offset] = data;
+                break;
+            case 1:
+                ((unsigned short *) &cache_data[index])[offset/2] = data;
+                break;
+            case 2:
+                cache_data[index] = data;
+                break;
+        }
+    } else {
+        /* cache miss */
+        if (size == 2 && (addr >> 24) != 0x1E) {
+            /* cacheable  word */
+            cache_v   [index] = 1;
+            cache_data[index] = data;
+            cache_tag [index] = tag;
+        }
+    }
+}
+
 /* TLB read */
-unsigned int tlb_read(unsigned int addr, int size) {
+unsigned int tlb_read(int which, unsigned int addr, int size) {
     if ((addr&0xC0000000) == 0x80000000) {
         addr &= 0x1FFFFFFF;
     }
-    return mem_read(addr, size);
+    return cache_read(which, addr, size);
 }
 
 /* TLB write */
-void tlb_write(unsigned int addr, unsigned int data, int size) {
+void tlb_write(int which, unsigned int addr, unsigned int data, int size) {
     if ((addr&0xC0000000) == 0x80000000) {
         addr &= 0x1FFFFFFF;
     }
-    mem_write(addr, data, size);
+    cache_write(which, addr, data, size);
 }
 
 /* read coprocessor 0 register */
@@ -601,6 +724,11 @@ int cpu_clk() {
     /* store clk controls */
     int ifclk = id_ifclk, pcclk = id_pcclk, handle_exception = 0;
 
+    if (halted == 1) {
+        cpu_debug_short();
+        halted++;
+    }
+
     if (halted)
         return 0;
 
@@ -728,17 +856,17 @@ int cpu_clk() {
         int addr, byte, half, word;
         switch (mem_memop) {
             case MEMOP_BYTE:
-                tlb_write(mem_addr, mem_data_in, 0);
+                tlb_write(1, mem_addr, mem_data_in, 0);
                 break;
             case MEMOP_HALF:
-                tlb_write(mem_addr, mem_data_in, 1);
+                tlb_write(1, mem_addr, mem_data_in, 1);
                 break;
             case MEMOP_LEFT:
                 printf("SWL not implemented!!!\n");
                 exit(0);
                 break;
             case MEMOP_WORD:
-                tlb_write(mem_addr, mem_data_in, 2);
+                tlb_write(1, mem_addr, mem_data_in, 2);
                 break;
             case MEMOP_RIGHT:
                 printf("SWR not implemented!!!\n");
@@ -752,31 +880,31 @@ int cpu_clk() {
     if (mem_ctrlsig[MEM_READ]) {
         switch (mem_memop) {
             case MEMOP_BYTE:
-                mem_data_out = (int) ((char)tlb_read(mem_addr,0));
+                mem_data_out = (int) ((char)tlb_read(1, mem_addr,0));
                 break;
             case MEMOP_HALF:
-                mem_data_out = (int) ((short)tlb_read(mem_addr,1));
+                mem_data_out = (int) ((short)tlb_read(1, mem_addr,1));
                 break;
             case MEMOP_LEFT:
                 mem_data_out = (unsigned int)
-                                ((unsigned char)tlb_read(mem_addr,0));
+                                ((unsigned char)tlb_read(1, mem_addr,0));
                 printf("LWL not implemented!!!\n");
                 //exit(0);
                 break;
             case MEMOP_WORD:
-                mem_data_out = tlb_read(mem_addr,2);
+                mem_data_out = tlb_read(1, mem_addr,2);
                 break;
             case MEMOP_BYTEU:
                 mem_data_out = (unsigned int)
-                                ((unsigned char)tlb_read(mem_addr,0));
+                                ((unsigned char)tlb_read(1, mem_addr,0));
                 break;
             case MEMOP_HALFU:
                 mem_data_out = (unsigned int)
-                                ((unsigned short)tlb_read(mem_addr,1));
+                                ((unsigned short)tlb_read(1, mem_addr,1));
                 break;
             case MEMOP_RIGHT:
                 mem_data_out = (unsigned int)
-                                ((unsigned char)tlb_read(mem_addr,0));
+                                ((unsigned char)tlb_read(1, mem_addr,0));
                 printf("LWR not implemented!!!\n");
                 //exit(0);
                 break;
@@ -886,7 +1014,6 @@ int cpu_clk() {
         case ALUOP_EXP:
             /* not implemented */
             printf("HALTED! (%s:%d)\n", __FILE__, __LINE__);
-            cpu_debug_short();
             halted = 1;
             break;
         case ALUOP_CPYPC:
@@ -1319,7 +1446,7 @@ int cpu_clk() {
 
     /* IF */
     if_pc4 = if_pc + 4;
-    if_instr = tlb_read(if_pc, 2);
+    if_instr = tlb_read(0, if_pc, 2);
 
     /* coprocessor handling (on the falling edge) */
     if (if_exphndl && if_exception) {
@@ -1375,7 +1502,7 @@ void cpu_init() {
     /* IF */
     if_pc = 0xBFC00000;
     if_pc4 = if_pc+4;
-    if_instr = tlb_read(if_pc, 2);
+    if_instr = tlb_read(0, if_pc, 2);
     if_exphndl = 0;
     if_exception = 0;
 

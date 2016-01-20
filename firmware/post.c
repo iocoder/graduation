@@ -19,7 +19,7 @@ void post() {
             break;
         }
         col = old_col;
-        size+=1024*2;
+        size+=512;
     }
     show_cursor();
     print_fmt("%dKB OK", size/1024);

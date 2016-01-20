@@ -41,16 +41,16 @@ component cachearray is
         CLK      : in  STD_LOGIC;
         -- bus interface
         RW       : in  STD_LOGIC;
-        RD_ADDR  : in  STD_LOGIC_VECTOR (7 downto 0);
-        WR_ADDR  : in  STD_LOGIC_VECTOR (7 downto 0);
+        RD_ADDR  : in  STD_LOGIC_VECTOR (9 downto 0);
+        WR_ADDR  : in  STD_LOGIC_VECTOR (9 downto 0);
         -- inputs
         Vin      : in  STD_LOGIC;
         Din      : in  STD_LOGIC_VECTOR (31 downto 0);
-        TAGin    : in  STD_LOGIC_VECTOR (21 downto 0);
+        TAGin    : in  STD_LOGIC_VECTOR (19 downto 0);
         -- outputs
         Vout     : out STD_LOGIC;
         Dout     : out STD_LOGIC_VECTOR (31 downto 0);
-        TAGout   : out STD_LOGIC_VECTOR (21 downto 0)
+        TAGout   : out STD_LOGIC_VECTOR (19 downto 0)
     );
 end component;
 
@@ -96,15 +96,15 @@ signal cur_buf : buf_entry_t;
 -- +-------+-------+--------+
 -- |  TAG  | INDEX | OFFSET |
 -- +-------+-------+--------+
---    22       8       2
+--    20       10      2
 
-constant CACHE_LINES : integer range 0 to 100000 := 256;
+constant CACHE_LINES : integer range 0 to 100000 := 1024;
 constant OFFSET_BITS : integer range 0 to 100000 := 2;
-constant INDEX_BITS  : integer range 0 to 100000 := 8;
+constant INDEX_BITS  : integer range 0 to 100000 := 10;
 constant INDEX_LOW   : integer range 0 to 100000 := 2;
-constant INDEX_HIGH  : integer range 0 to 100000 := 9;
-constant TAG_BITS    : integer range 0 to 100000 := 22;
-constant TAG_LOW     : integer range 0 to 100000 := 10;
+constant INDEX_HIGH  : integer range 0 to 100000 := 11;
+constant TAG_BITS    : integer range 0 to 100000 := 20;
+constant TAG_LOW     : integer range 0 to 100000 := 12;
 constant TAG_HIGH    : integer range 0 to 100000 := 31;
 
 -- icache interface
@@ -363,11 +363,11 @@ begin
                     end if;
                 end if;
             elsif (buf_cycle < 25) then
---                 if (buf_cycle > 3 and RDY = '1') then
---                     buf_cycle <= 25;
---                 else
+                if (buf_cycle > 3 and RDY = '1') then
+                    buf_cycle <= 25;
+                else
                     buf_cycle <= buf_cycle + 1;
---                 end if;
+                end if;
             elsif (buf_cycle = 25) then
                 -- read in data if read operation
                 if (cur_buf.RW = '0') then
