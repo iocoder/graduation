@@ -1,17 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #include "vga.h"
 
-extern SDL_Surface* screen;
+static SDL_Window* window;
+static SDL_Renderer* renderer;
+static SDL_Texture* texture;
+static Uint32 pixels[720*400];
 unsigned char chr[80*30];
 unsigned char att[80*30];
 unsigned short font[256][16];
 int base = 0;
 int close_thread = 0;
 int thread_closed = 0;
-Uint32 palette[] = {
+static Uint32 palette[] = {
      0x000000,
      0x0000AA,
      0x00AA00,
@@ -31,8 +34,7 @@ Uint32 palette[] = {
 };
 
 void set_fpx(int x, int y, Uint32 color) {
-    Uint32 *pixels = (Uint32 *) screen->pixels;
-    pixels[(y*screen->w)+x] = color;
+    pixels[(y*720)+x] = color;
 }
 
 void update_char(int loc, unsigned char ascii, unsigned char attrib) {
@@ -108,9 +110,15 @@ void vga_write(unsigned short addr, unsigned int data) {
     }
 }
 
+void vga_render() {
+    SDL_UpdateTexture(texture, NULL, &pixels[0], 1);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+}
+
 int vga_update() {
-    while(!close_thread)
-        SDL_Flip(screen);
+    while(!close_thread) {
+    }
     thread_closed = 1;
     return 1;
 }
@@ -125,11 +133,21 @@ void vga_init() {
     FILE *f;
     int i;
 
+    /* create vga window */
+    window = SDL_CreateWindow("MIPS FPGA Computer Emulator",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        720, 400, 0);
+
+    /* create renderer */
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    /* create texture */
+    texture = SDL_CreateTexture(renderer,
+        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+        720, 400);
+
     /* initialize screen */
     for (i = 0; i < 80*25; i++)
         update_char(i, 0, 0x11);
-
-    /* instantiate a thread for updating the screen */
-    SDL_CreateThread(&vga_update, NULL);
 
 }

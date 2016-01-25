@@ -269,7 +269,7 @@ unsigned int cache_read(int which, unsigned int addr, unsigned int size) {
     unsigned int  tag        = (addr>>TAG_LOW  ) & ((1<<TAG_BITS   )-1);
     if (!which && addr == 0x00010000) {
         //icache_stats_enable++;
-        dcache_stats_enable++;
+        //dcache_stats_enable++;
     }
     if (!which && icache_stats_enable)
         icache_access_count++;

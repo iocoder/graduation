@@ -147,6 +147,7 @@ start:
     sw    $30, 4*30($sp)
     sw    $31, 4*31($sp)
 
+    move  $a0, $sp
     jal   handle_interrupt
     nop
 

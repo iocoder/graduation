@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #include "clock.h"
 #include "vga.h"
@@ -8,8 +8,7 @@
 #include "mem.h"
 #include "pit.h"
 #include "pic.h"
-
-SDL_Surface* screen = NULL;
+#include "ppu.h"
 
 int main(int argc, char *argv[]) {
 
@@ -34,17 +33,14 @@ int main(int argc, char *argv[]) {
     /* initialize SDL */
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    /* Set up screen */
-    screen = SDL_SetVideoMode(720, 400, 32, SDL_SWSURFACE);
-
-    /* Set title */
-    SDL_WM_SetCaption("MIPS FPGA Computer Emulator", NULL);
-
     /* initialize memory */
     mem_init(argv[1], argv[2]);
 
     /* initialize CPU */
     cpu_init();
+
+    /* initialize PPU */
+    ppu_init();
 
     /* initialize VGA */
     vga_init();
@@ -59,7 +55,7 @@ int main(int argc, char *argv[]) {
     pic_init();
 
     /* create execution thread */
-    t = SDL_CreateThread(clock_handler, (void *)NULL);
+    t = SDL_CreateThread(clock_handler, (void *)NULL, NULL);
 
     /* run event watcher */
     watch_events(t);

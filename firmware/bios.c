@@ -3,6 +3,7 @@
 #include "disk.h"
 #include "diskfs.h"
 #include "bios.h"
+#include "isr.h"
 
 bios_t bios;
 
@@ -34,6 +35,9 @@ void bios_init() {
 
     /* diskfs routines */
     bios.diskfs.loadfile  = diskfs_loadfile;
+
+    /* isr routines */
+    bios.isr.ptrs         = isr;
 
     /* load gp register with ptr to bios structure */
     __asm__("or $gp, $0, %0"::"r"(&bios));

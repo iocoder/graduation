@@ -43,6 +43,7 @@
 ## s8: base2
 ## t6: '1'
 ## t5: &read_instr
+## t4: &fetch
 
 # set zero/negative flags macro
 .macro     zeron      reg
@@ -59,60 +60,6 @@
 ###################################################
 
 .text
-
-################################################
-#                cpu_cycle                     #
-# ---------------------------------------------#
-# Summary: CPU cycle begins here.              #
-# ---------------------------------------------#
-# Called by: <entry> or <instr>                #
-# ---------------------------------------------#
-# Next call: <isr>, debug, or fetch            #
-################################################
-
-cpu_cycle:
-    # next three lines are used to count no. of instr. per loop
-.if count_enabled
-    lui   $t0, 0x1E00
-    ori   $t1, $0, 1
-    sh    $t1,  0xFF8*2($t0)
-.endif
-    # reset?
-    # j     reset
-    # NMI?
-    # j     nmi
-    # interrupt, interrupts enabled?
-    # j     irq
-    # debug?
-.if debug_enabled
-    j     debug
-.endif
-    # none of the above, just fetch next instruction
-
-################################################
-#                  fetch                       #
-# ---------------------------------------------#
-# Summary: Fetch next instruction and increase #
-#          PC register by 1.                   #
-# ---------------------------------------------#
-# Called by: cpu_cycle or <isr>                #
-# ---------------------------------------------#
-# Next call: <address>                         #
-################################################
-
-# note: fetch must follow cpu_cycle routine code.
-
-fetch:
-    # fetch opcode
-    move   $a0, $s0
-    addiu  $s0, $s0, 1
-    jalr   $t5
-    # jump to addressing mode routine
-    sll    $v0, $v0, 3
-    addu   $v0, $v0, $s5
-    lw     $t2, %lo(__instr)+4($v0)
-    lw     $t3, %lo(__instr)($v0) # placed in delay slot of jr
-    jr     $t2
 
 ################################################
 #                   reset                      #
@@ -133,6 +80,15 @@ reset:
     ori    $t6, $0, 1
     lui    $t5, %hi(rom_instr)
     addiu  $t5, $t5, %lo(rom_instr)
+    lui    $t4, %hi(fetch)
+    addiu  $t4, $t4, %lo(fetch)
+    # register ISR
+    lw     $t0, 0x14*4($gp)
+    lui    $t1, %hi(isr)
+    ori    $t1, $t1, %lo(isr)
+    sw     $t1, 3*4($t0)
+    # initialize 6502 registers
+    ori    $s7, $0, 0xFF
     # read reset vector [PC=ROM[0xFFFC]+(ROM[0xFFFD]<<8)]
     ori    $a0, $0,  0xFFFC
     jal    mem_read
@@ -142,6 +98,97 @@ reset:
     sll    $v0, $v0, 8
     addu   $s0, $s0, $v0
     j      fetch
+
+################################################
+#                    nmi                       #
+# ---------------------------------------------#
+# Summary: handle NMI signal                   #
+# ---------------------------------------------#
+# Called by: cpu_cycle                         #
+# ---------------------------------------------#
+# Next call: fetch                             #
+################################################
+
+nmi:
+    # push PC
+    addiu  $a0, $s7, 0x0FF
+    move   $a1, $s0
+    jal    ram_write2
+    # decrease stack ptr
+    addiu  $s7, $s7, -2
+    andi   $s7, $s7, 0xFF
+    # push P
+    addiu  $a0, $s7, 0x100
+    move   $a1, $s4
+    jal    ram_write
+    # decrease stack ptr
+    addiu  $s7, $s7, -1
+    andi   $s7, $s7, 0xFF
+    # set interrupt disable flag
+    ori    $s4, 0x04
+    # read interrupt vector
+    ori    $a0, $0,  0xFFFA
+    jal    mem_read2
+    move   $s0, $v0
+    # reset t5
+    srl    $t0, $s0, 11
+    andi   $t0, $t0, 28
+    addu   $t5, $s5, $t0
+    lw     $t5, %lo(__instr_routines)($t5)
+    # reset t4
+    lui    $t4, %hi(fetch)
+    addiu  $t4, $t4, %lo(fetch)
+    # fetch next instruction
+    j      fetch
+
+################################################
+#                    isr                       #
+# ---------------------------------------------#
+# Summary: ISR handler                         #
+# ---------------------------------------------#
+# Called by: ISR                               #
+# ---------------------------------------------#
+# Next call: return to ISR                     #
+################################################
+
+isr:
+    # a0 has ptr to register frame in stack
+    lui    $t0, %hi(nmi)
+    addiu  $t0, $t0, %lo(nmi)
+    sw     $t0, 12*4($a0)  # set t4 to nmi
+    jr     $ra
+
+################################################
+#                  fetch                       #
+# ---------------------------------------------#
+# Summary: Fetch next instruction and increase #
+#          PC register by 1.                   #
+# ---------------------------------------------#
+# Called by: cpu_cycle or <isr>                #
+# ---------------------------------------------#
+# Next call: <address>                         #
+################################################
+
+fetch:
+    # debugging info
+.if count_enabled
+    lui   $t0, 0x1E00
+    ori   $t1, $0, 1
+    sh    $t1,  0xFF8*2($t0)
+.endif
+.if debug_enabled
+    jal   debug
+.endif
+    # fetch opcode
+    move   $a0, $s0
+    addiu  $s0, $s0, 1
+    jalr   $t5
+    # jump to addressing mode routine
+    sll    $v0, $v0, 3
+    addu   $v0, $v0, $s5
+    lw     $t2, %lo(__instr)+4($v0)
+    lw     $t3, %lo(__instr)($v0) # placed in delay slot of jr
+    jr     $t2
 
 ################################################
 #                   debug                      #
@@ -173,10 +220,10 @@ debug:
     bios  printf
     #bios  getc
     # enough simulation for today?
-1:  lui   $t0, 0x0000
-    ori   $t0, $t0, 0x8000
-    bne   $t0, $t1, 2f
-    j     .
+1:  #lui   $t0, 0x0000
+    #ori   $t0, $t0, 0x8000
+    #bne   $t0, $t1, 2f
+    #j     .
     # get instruction name
 2:  move  $a0, $s0
     jal   mem_read
@@ -209,7 +256,7 @@ debug:
     addiu $t1, $t1, 1
     sw    $t1, %lo(cur_step)($t0)
     popa
-    j     fetch
+    jr    $ra
 .endif
 
 ################################################
@@ -413,7 +460,7 @@ rel:
     andi   $v1, $v1, 0xFFFF
     addu   $s0, $s0, $v1
     # next cycle
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   absd                       #
@@ -484,7 +531,7 @@ adc_imm:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   and                        #
@@ -506,7 +553,7 @@ and_imm:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   asl                        #
@@ -537,7 +584,7 @@ asl:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 asl_acc:
     # store higher bit in carry
@@ -553,7 +600,7 @@ asl_acc:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   bcc                        #
@@ -569,8 +616,8 @@ bcc:
     # branch on carry clear
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x01
-    bne    $t0, $0,  cpu_cycle
-    j      rel
+    beq    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   bcs                        #
@@ -586,8 +633,8 @@ bcs:
     # branch on carry set
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x01
-    beq    $t0, $0,  cpu_cycle
-    j      rel
+    bne    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   beq                        #
@@ -603,8 +650,8 @@ beq:
     # branch on zero set
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x02
-    beq    $t0, $0,  cpu_cycle
-    j      rel
+    bne    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   bit                        #
@@ -618,7 +665,7 @@ beq:
 
 bit:
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   bmi                        #
@@ -634,8 +681,8 @@ bmi:
     # branch on negative set
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x80
-    beq    $t0, $0,  cpu_cycle
-    j      rel
+    bne    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   bne                        #
@@ -651,8 +698,8 @@ bne:
     # branch on zero clear
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x02
-    bne    $t0, $0,  cpu_cycle
-    j      rel
+    beq    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   bpl                        #
@@ -668,8 +715,8 @@ bpl:
     # branch on negative clear
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x80
-    bne    $t0, $0,  cpu_cycle
-    j      rel
+    beq    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   brk                        #
@@ -682,8 +729,9 @@ bpl:
 ################################################
 
 brk:
+    break
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   bvc                        #
@@ -699,8 +747,8 @@ bvc:
     # branch on overflow clear
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x40
-    bne    $t0, $0,  cpu_cycle
-    j      rel
+    beq    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   bvs                        #
@@ -716,8 +764,8 @@ bvs:
     # branch on overflow set
     addiu  $s0, $s0, 1
     andi   $t0, $s4, 0x40
-    beq    $t0, $0,  cpu_cycle
-    j      rel
+    bne    $t0, $0,  rel
+    jr     $t4
 
 ################################################
 #                   clc                        #
@@ -733,7 +781,7 @@ clc:
     # clear carry flag
     andi   $s4, $s4, 0xFE
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   cld                        #
@@ -749,7 +797,7 @@ cld:
     # clear decimal-mode flag
     andi   $s4, $s4, 0xF7
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   cli                        #
@@ -765,7 +813,7 @@ cli:
     # clear interrupt flag
     andi   $s4, $s4, 0xFB
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   clv                        #
@@ -781,7 +829,7 @@ clv:
     # clear overflow flag
     andi   $s4, $s4, 0xBF
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   cmp                        #
@@ -812,7 +860,7 @@ cmp_imm:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   cpx                        #
@@ -843,7 +891,7 @@ cpx_imm:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   cpy                        #
@@ -874,7 +922,7 @@ cpy_imm:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   dec                        #
@@ -900,7 +948,7 @@ dec:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   dex                        #
@@ -919,7 +967,7 @@ dex:
     # store zero and N flag
     zeron  $s2
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   dey                        #
@@ -938,7 +986,7 @@ dey:
     # store zero and N flag
     zeron  $s3
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   eor                        #
@@ -960,7 +1008,7 @@ eor_imm:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   inc                        #
@@ -986,7 +1034,7 @@ inc:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   inx                        #
@@ -1005,7 +1053,7 @@ inx:
     # store zero and N flag
     zeron  $s2
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   iny                        #
@@ -1024,7 +1072,7 @@ iny:
     # store zero and N flag
     zeron  $s3
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   jmp                        #
@@ -1045,7 +1093,7 @@ jmp:
     addu   $t5, $s5, $t0
     lw     $t5, %lo(__instr_routines)($t5)
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   jsr                        #
@@ -1058,9 +1106,9 @@ jmp:
 ################################################
 
 jsr:
-    # push PC
+    # push PC-1
     addiu  $a0, $s7, 0x0FF
-    move   $a1, $s0
+    addiu  $a1, $s0, -1
     jal    ram_write2
     # decrease stack ptr
     addiu  $s7, $s7, -2
@@ -1073,7 +1121,7 @@ jsr:
     addu   $t5, $s5, $t0
     lw     $t5, %lo(__instr_routines)($t5)
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   lda                        #
@@ -1095,7 +1143,7 @@ lda_imm:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   ldx                        #
@@ -1117,7 +1165,7 @@ ldx_imm:
     # store zero and N flag
     zeron  $s2
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   ldy                        #
@@ -1139,7 +1187,7 @@ ldy_imm:
     # store zero and N flag
     zeron  $s3
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   lsr                        #
@@ -1169,7 +1217,7 @@ lsr:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 lsr_acc:
     # store lower bit in carry
@@ -1184,7 +1232,7 @@ lsr_acc:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   nop                        #
@@ -1198,7 +1246,7 @@ lsr_acc:
 
 nop:
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   ora                        #
@@ -1220,7 +1268,7 @@ ora_imm:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   pha                        #
@@ -1240,7 +1288,7 @@ pha:
     addiu  $s7, $s7, -1
     andi   $s7, $s7, 0xFF
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   php                        #
@@ -1260,7 +1308,7 @@ php:
     addiu  $s7, $s7, -1
     andi   $s7, $s7, 0xFF
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   pla                        #
@@ -1282,7 +1330,7 @@ pla:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   plp                        #
@@ -1295,14 +1343,14 @@ pla:
 ################################################
 
 plp:
-    # pull A
+    # pull P
     addiu  $s7, $s7, 1
     andi   $s7, $s7, 0xFF
     addiu  $a0, $s7, 0x100
     jal    ram_read
     move   $s4, $v0
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   rol                        #
@@ -1335,7 +1383,7 @@ rol:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 rol_acc:
     # shift left and insert carry
@@ -1353,7 +1401,7 @@ rol_acc:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   ror                        #
@@ -1386,7 +1434,7 @@ ror:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ror_acc:
     # shift right and insert carry
@@ -1404,7 +1452,7 @@ ror_acc:
     # store zero and N flag
     zeron  $t1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   rti                        #
@@ -1417,8 +1465,24 @@ ror_acc:
 ################################################
 
 rti:
+    # pull P
+    addiu  $s7, $s7, 1
+    andi   $s7, $s7, 0xFF
+    addiu  $a0, $s7, 0x100
+    jal    ram_read
+    andi   $s4, $v0, 0xEF
+    # pull PC
+    addiu  $a0, $s7, 0x101
+    addiu  $s7, $s7, 2
+    jal    ram_read2
+    move   $s0, $v0
+    # reset t5
+    srl    $t0, $s0, 11
+    andi   $t0, $t0, 28
+    addu   $t5, $s5, $t0
+    lw     $t5, %lo(__instr_routines)($t5)
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   rts                        #
@@ -1431,18 +1495,18 @@ rti:
 ################################################
 
 rts:
-    # pull PC
+    # pull PC-1
     addiu  $a0, $s7, 0x101
     addiu  $s7, $s7, 2
     jal    ram_read2
-    move   $s0, $v0
+    addiu  $s0, $v0, 1
     # reset t5
     srl    $t0, $s0, 11
     andi   $t0, $t0, 28
     addu   $t5, $s5, $t0
     lw     $t5, %lo(__instr_routines)($t5)
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   sbc                        #
@@ -1477,7 +1541,7 @@ sbc_imm:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   sec                        #
@@ -1493,7 +1557,7 @@ sec:
     # set carry flag
     ori    $s4, $s4, 0x01
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   sed                        #
@@ -1509,7 +1573,7 @@ sed:
     # set decimal-mode flag
     ori    $s4, $s4, 0x08
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   sei                        #
@@ -1525,7 +1589,7 @@ sei:
     # set decimal-mode flag
     ori    $s4, $s4, 0x04
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   sta                        #
@@ -1543,7 +1607,7 @@ sta:
     move   $a1, $s1
     jal    mem_write
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   stx                        #
@@ -1561,7 +1625,7 @@ stx:
     move   $a1, $s2
     jal    mem_write
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   sty                        #
@@ -1579,7 +1643,7 @@ sty:
     move   $a1, $s3
     jal    mem_write
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   tax                        #
@@ -1597,7 +1661,7 @@ tax:
     # store zero and N flag
     zeron  $s2
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   tay                        #
@@ -1615,7 +1679,7 @@ tay:
     # store zero and N flag
     zeron  $s3
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   tsx                        #
@@ -1633,7 +1697,7 @@ tsx:
     # store zero and N flag
     zeron  $s2
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   txa                        #
@@ -1651,7 +1715,7 @@ txa:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   txs                        #
@@ -1667,7 +1731,7 @@ txs:
     # load X into S
     move   $s7, $s2
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ################################################
 #                   tya                        #
@@ -1685,7 +1749,7 @@ tya:
     # store zero and N flag
     zeron  $s1
     # fetch next instruction
-    j      cpu_cycle
+    jr     $t4
 
 ###################################################
 #              SECTION: RODATA                    #
@@ -1772,7 +1836,7 @@ _izx:  .string "izx       "
 _iax:  .string "$%2X%2X,x   "
 _iay:  .string "$%2X%2X,y   "
 _rel:  .string "$%0X%2X       "
-_absd: .string "absd      "
+_absd: .string "($%2X%2X)   "
 _izy:  .string "izy       "
 .endif
 

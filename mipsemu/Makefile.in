@@ -396,7 +396,7 @@ uninstall-am:
 all: $(OBJECT)
 
 $(OBJECT): $(CFILES) $(HFILES)
-	gcc -o $@ $(CFLAGS) $(CFILES) -lSDL
+	gcc -o $@ $(CFLAGS) $(CFILES) -lSDL2
 
 clean-local:
 	rm -rf $(OBJECT) mem.img

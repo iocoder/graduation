@@ -18,7 +18,7 @@ int main() {
     vga_init();
 
     /* initialize PIT */
-    pit_init();
+    /*pit_init();*/
 
     /* initialize keyboard */
     kbd_init();

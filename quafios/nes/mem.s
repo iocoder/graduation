@@ -28,12 +28,6 @@ mem_read:
     lw    $t7, %lo(__read_routines)($t7)
     andi  $a0, $a0, 0xFFFF
     jr    $t7
-rom_read:
-    # read word from rom
-    andi  $a0, $a0, 0x7FFF
-    addu  $t0, $a0, $s5
-    lbu   $v0, %lo(__rom)($t0)
-    jr    $ra #leave
 vga_read:
     # read word from vga
     andi  $a0, $a0, 0x1FFF
@@ -69,15 +63,6 @@ mem_read2:
     lw    $t7, %lo(__read2_routines)($t7)
     andi  $a0, $a0, 0xFFFF
     jr    $t7
-rom_read2:
-    # read word from rom
-    andi  $a0, $a0, 0x7FFF
-    addu  $t0, $a0, $s5
-    lbu   $t7, %lo(__rom)+1($t0)
-    lbu   $v0, %lo(__rom)($t0)
-    sll   $t7, $t7, 8
-    addu  $v0, $v0, $t7
-    jr    $ra #leave
 vga_read2:
     # read word from vga
     andi  $a0, $a0, 0x1FFF
@@ -118,16 +103,6 @@ instr_read:
     lw    $t7, %lo(__instr_routines)($t7)
     andi  $a0, $a0, 0xFFFF
     jr    $t7
-rom_instr:
-    # read word from rom
-    andi  $a0, $a0, 0x7FFF
-    addu  $t0, $a0, $s5
-    lbu   $a1, %lo(__rom)+2($t0)
-    lbu   $v1, %lo(__rom)+1($t0)
-    lbu   $v0, %lo(__rom)+0($t0)
-    sll   $a1, $a1, 8
-    addu  $a1, $a1, $v1
-    jr    $ra #leave
 vga_instr:
     # read word from vga
     andi  $a0, $a0, 0x1FFF
@@ -169,9 +144,6 @@ mem_write:
     lw    $t7, %lo(__write_routines)($t7)
     andi  $a0, $a0, 0xFFFF
     jr    $t7
-rom_write:
-    # write word to rom
-    jr    $ra #leave
 vga_write:
     # write word to vga
     andi  $a0, $a0, 0x1FFF
@@ -223,9 +195,6 @@ mem_write2:
     lw    $t7, %lo(__write2_routines)($t7)
     andi  $a0, $a0, 0xFFFF
     jr    $t7
-rom_write2:
-    # write word to rom
-    jr    $ra #leave
 vga_write2:
     # write word to vga
     jr    $ra #leave
@@ -258,8 +227,8 @@ mem_init:
 
 read_routines:
     .word ram_read
-    .word ram_read
-    .word kbd_read
+    .word ppu_read
+    .word ppu_read
     .word vga_read
     .word rom_read
     .word rom_read
@@ -268,8 +237,8 @@ read_routines:
 
 read2_routines:
     .word ram_read2
-    .word ram_read2
-    .word kbd_read2
+    .word ppu_read2
+    .word ppu_read2
     .word vga_read2
     .word rom_read2
     .word rom_read2
@@ -278,8 +247,8 @@ read2_routines:
 
 instr_routines:
     .word ram_instr
-    .word ram_instr
-    .word kbd_instr
+    .word ppu_instr
+    .word ppu_instr
     .word vga_instr
     .word rom_instr
     .word rom_instr
@@ -288,8 +257,8 @@ instr_routines:
 
 write_routines:
     .word ram_write
-    .word ram_write
-    .word kbd_write
+    .word ppu_write
+    .word ppu_write
     .word vga_write
     .word rom_write
     .word rom_write
@@ -298,16 +267,13 @@ write_routines:
 
 write2_routines:
     .word ram_write2
-    .word ram_write2
-    .word kbd_write2
+    .word ppu_write2
+    .word ppu_write2
     .word vga_write2
     .word rom_write2
     .word rom_write2
     .word rom_write2
     .word rom_write2
-
-# ROM
-rom: .incbin "firmware.bin"
 
 # RAM
 .bss

@@ -13,14 +13,21 @@
 ################################################
 
 main:
-    # disable interrupts
-    mtc0   $0, $12
+    # print splash
+    ls     $a0, "%a"
+    ori    $a1, $0 , 0x0A
+    bios   printf
+    lui    $a0, %hi(splash)
+    addiu  $a0, $a0, %lo(splash)
+    bios   printf
+    ls     $a0, "%a"
+    ori    $a1, $0 , 0x0F
+    bios   printf
+    # initialize cartridge
+    jal    cart_init
     # enable serial output
     ls     $a0, "%e"
     bios   printf
-    # show welcome message
-    #ls     $a0, "%eNES over MIPS Emulator 1.0.1\n"
-    #bios   printf
     # initialize memory
     jal    mem_init
     # reset CPU
@@ -41,3 +48,9 @@ main:
 
 entry:
     j      main
+
+# splash screen
+.section "rodata", "a"
+splash:
+    .incbin "splash.txt"
+    .byte    0

@@ -6,6 +6,8 @@
 #include "vga.h"
 #include "pit.h"
 #include "pic.h"
+#include "ppu.h"
+#include "joy.h"
 
 unsigned char ram[0x1000000];
 unsigned char rom[0x1000000];
@@ -55,6 +57,8 @@ unsigned int mem_read(unsigned int addr, int size) {
      * -- 0x1E800000 - 0x1E800FFF : KBD
      * -- 0x1E801000 - 0x1E801FFF : PIT
      * -- 0x1E802000 - 0x1E802FFF : PIC
+     * -- 0x1EC02000 - 0x1EC02007 : PPU
+     * -- 0x1EC04016 - 0x1EC04017 : JOY
      * -- 0x1F000000 - 0x1FFFFFFF : ROM
      */
     if (addr >= 0x00000000 && addr <= 0x00FFFFFF) {
@@ -71,8 +75,14 @@ unsigned int mem_read(unsigned int addr, int size) {
     } else if (addr >= 0x1E802000 && addr <= 0x1E802FFF) {
         /* PIC Memory */
         return pic_read();
+    } else if (addr >= 0x1EC02000 && addr <= 0x1EC02007) {
+        /* PPU Memory */
+        return ppu_reg_read(addr&7);
+    } else if (addr >= 0x1EC04016 && addr <= 0x1EC04017) {
+        /* Controller */
+        return joypad_read(addr&1);
     } else if (addr >= 0x1F000000 && addr <= 0x1FFFFFFF) {
-        /* RAM Memory */
+        /* ROM Memory */
         return read_fun[size](&rom[addr & (sizeof(rom)-1)]);
     }
 }
@@ -84,6 +94,8 @@ void mem_write(unsigned int addr, unsigned int data, int size) {
      * -- 0x1E800000 - 0x1E800FFF : KBD
      * -- 0x1E801000 - 0x1E801FFF : PIT
      * -- 0x1E802000 - 0x1E802FFF : PIC
+     * -- 0x1EC02000 - 0x1EC02FFF : PPU
+     * -- 0x1EC04016 - 0x1EC04017 : JOY
      * -- 0x1F000000 - 0x1FFFFFFF : ROM
      */
     if (addr >= 0x00000000 && addr <= 0x00FFFFFF) {
@@ -101,6 +113,12 @@ void mem_write(unsigned int addr, unsigned int data, int size) {
     } else if (addr >= 0x1E802000 && addr <= 0x1E802FFF) {
         /* PIC Memory */
         pic_write(data);
+    } else if (addr >= 0x1EC02000 && addr <= 0x1EC02007) {
+        /* PPU Memory */
+        ppu_reg_write(addr&7, data);
+    } else if (addr >= 0x1EC04016 && addr <= 0x1EC04017) {
+        /* Controller */
+        joypad_write(data);
     } else if (addr >= 0x1F000000 && addr <= 0x1FFFFFFF) {
         /* ROM Memory */
     }

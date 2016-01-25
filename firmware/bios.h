@@ -25,19 +25,24 @@ typedef struct {
 } bios_kbd_t;
 
 typedef struct {
-    int (*readsect)(int id, int lba, void *buf);
-    int (*readsects)(int id, int lba, int count, void *buf);
+    /*11*/ int (*readsect)(int id, int lba, void *buf);
+    /*12*/ int (*readsects)(int id, int lba, int count, void *buf);
 } bios_disk_t;
 
 typedef struct {
-    int (*loadfile)(int id, int firstsect, char *path, unsigned int base);
+    /*13*/ int (*loadfile)(int id,int firstsect,char *path,unsigned int base);
 } bios_diskfs_t;
+
+typedef struct {
+    /*14*/ void (**ptrs)(int *regs);
+} bios_isr_t;
 
 typedef struct {
     bios_vga_t    vga;
     bios_kbd_t    kbd;
     bios_disk_t   disk;
     bios_diskfs_t diskfs;
+    bios_isr_t    isr;
 } bios_t;
 
 extern bios_t bios;

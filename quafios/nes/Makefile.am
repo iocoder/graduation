@@ -30,6 +30,7 @@ nes.bin: $(OBJ) $(LINKER_SCRIPT)
 
 install-exec-local:
 	$(INSTALL) -D nes.bin $(OBJECT_PREFIX)/nes.bin
+#	$(INSTALL) -D $(CSD)/contra.nes $(OBJECT_PREFIX)/../nes/contra.nes
 
 uninstall-local:
 	rm -f $(OBJECT_PREFIX)/nes.bin
