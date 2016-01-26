@@ -26,7 +26,8 @@ entity graphics is
            VRAMDataOut : out STD_LOGIC_VECTOR ( 8 downto 0);
            ROW_BASE    : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
            CURSOR_ROW  : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
-           CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00");
+           CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
+           MODE        : out STD_LOGIC);
 end graphics;
 
 architecture Behavioral of graphics is
@@ -35,6 +36,7 @@ signal LASTCS         : STD_LOGIC := '0';
 signal ROW_BASE_REG   : STD_LOGIC_VECTOR (7 downto 0):=x"00";
 signal CURSOR_ROW_REG : STD_LOGIC_VECTOR (7 downto 0):=x"00";
 signal CURSOR_COL_REG : STD_LOGIC_VECTOR (7 downto 0):=x"00";
+signal MODE_REG       : STD_LOGIC := '0';
 
 begin
 
@@ -42,26 +44,30 @@ process (CLK)
 begin
     if (CLK = '1' and CLK'event ) then
         if (CS = '1') then
-            if (A = "0" & x"FFD" & "0") then
+            if (A = "0" & x"FFC" & "0") then
+                MODE_REG <= Din(0);
+            elsif (A = "0" & x"FFD" & "0") then
                 ROW_BASE_REG <= Din(7 downto 0);
             elsif (A = "0" & x"FFE" & "0") then
                 CURSOR_ROW_REG <= Din(7 downto 0);
             elsif (A = "0" & x"FFF" & "0") then
                 CURSOR_COL_REG <= Din(7 downto 0);
+            else
+                -- access to any other address
+                if (LASTCS = '0') then
+                    VRAM0Read  <= (NOT RW) and (NOT A(1)) and (NOT A(13));
+                    VRAM1Read  <= (NOT RW) and (    A(1)) and (NOT A(13));
+                    VRAM2Read  <= (NOT RW) and (NOT A(1)) and (    A(13));
+                    VRAM3Read  <= (NOT RW) and (    A(1)) and (    A(13));
+                    VRAM0Write <= (    RW) and (NOT A(1)) and (NOT A(13));
+                    VRAM1Write <= (    RW) and (    A(1)) and (NOT A(13));
+                    VRAM2Write <= (    RW) and (NOT A(1)) and (    A(13));
+                    VRAM3Write <= (    RW) and (    A(1)) and (    A(13));
+                    VRAMAddr(10 downto 0) <= A(12 downto 2);
+                    VRAMDataOut <= Din(8 downto 0);
+                end if;
             end if;
-        end if;
-        if (CS = '1' and LASTCS = '0') then
-            VRAM0Read  <= CS and (NOT RW) and (NOT A(1)) and (NOT A(13));
-            VRAM1Read  <= CS and (NOT RW) and (    A(1)) and (NOT A(13));
-            VRAM2Read  <= CS and (NOT RW) and (NOT A(1)) and (    A(13));
-            VRAM3Read  <= CS and (NOT RW) and (    A(1)) and (    A(13));
-            VRAM0Write <= CS and (    RW) and (NOT A(1)) and (NOT A(13));
-            VRAM1Write <= CS and (    RW) and (    A(1)) and (NOT A(13));
-            VRAM2Write <= CS and (    RW) and (NOT A(1)) and (    A(13));
-            VRAM3Write <= CS and (    RW) and (    A(1)) and (    A(13));
-            VRAMAddr(10 downto 0) <= A(12 downto 2);
-            VRAMDataOut <= Din(8 downto 0);
-        elsif (CS = '0') then
+        else
             VRAM0Read  <= '0';
             VRAM1Read  <= '0';
             VRAM2Read  <= '0';
@@ -80,5 +86,6 @@ end process;
 ROW_BASE   <= ROW_BASE_REG;
 CURSOR_ROW <= CURSOR_ROW_REG;
 CURSOR_COL <= CURSOR_COL_REG;
+MODE       <= MODE_REG;
 
 end Behavioral;

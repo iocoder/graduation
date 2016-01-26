@@ -4,14 +4,15 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity crt is
-    Port (CLK : in  STD_LOGIC;
-          HS  : out STD_LOGIC := '0';
-          VS  : out STD_LOGIC := '0';
-          SE  : out STD_LOGIC := '0';
-          DE  : out STD_LOGIC := '0';
-          X   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          Y   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          B9  : out STD_LOGIC := '0');
+    Port (CLK  : in  STD_LOGIC;
+          MODE : in  STD_LOGIC;
+          HS   : out STD_LOGIC := '0';
+          VS   : out STD_LOGIC := '0';
+          SE   : out STD_LOGIC := '0';
+          DE   : out STD_LOGIC := '0';
+          X    : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          Y    : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          B9   : out STD_LOGIC := '0');
 end crt;
 
 architecture Behavioral of crt is
@@ -25,33 +26,18 @@ signal cur_x    : integer range 0 to 10240 := 0;
 signal cur_y    : integer range 0 to 10240 := 0;
 signal colindx  : integer range -1 to 16   := 0;
 
--- 640x480@60Hz
--- constant HORIZ_TOTAL      : integer := 800;  -- horizontal cycle in pixels
--- constant HORIZ_PULSEWIDTH : integer := 96;   -- pulse width in pixels
--- constant HORIZ_BACKPORCH  : integer := 48;   -- back porch in pixels
--- constant HORIZ_ACTIVE     : integer := 640;  -- active time in pixels
--- constant HORIZ_FRONTPORCH : integer := 16;   -- front porch in pixels
---
--- constant VERTI_TOTAL      : integer := 521;  -- vertical cycle in lines
--- constant VERTI_PULSEWIDTH : integer := 2;    -- pulse width in lines
--- constant VERTI_BACKPORCH  : integer := 29;   -- back porch in lines
--- constant VERTI_ACTIVE     : integer := 480;  -- active time in lines
--- constant VERTI_FRONTPORCH : integer := 10;   -- front porch in lines
+signal HORIZ_TOTAL      : integer;  -- horizontal cycle in pixels
+signal HORIZ_PULSEWIDTH : integer;  -- pulse width in pixels
+signal HORIZ_BACKPORCH  : integer;  -- back porch in pixels
+signal HORIZ_ACTIVE     : integer;  -- active time in pixels
+signal HORIZ_FRONTPORCH : integer;  -- front porch in pixels
+signal VERTI_TOTAL      : integer;  -- vertical cycle in lines
+signal VERTI_PULSEWIDTH : integer;  -- pulse width in lines
+signal VERTI_BACKPORCH  : integer;  -- back porch in lines
+signal VERTI_ACTIVE     : integer;  -- active time in lines
+signal VERTI_FRONTPORCH : integer;  -- front porch in lines
 
--- 720x400@70Hz
-constant HORIZ_TOTAL      : integer := 900;  -- horizontal cycle in pixels
-constant HORIZ_PULSEWIDTH : integer := 108;  -- pulse width in pixels
-constant HORIZ_BACKPORCH  : integer := 51;   -- back porch in pixels
-constant HORIZ_ACTIVE     : integer := 720;  -- active time in pixels
-constant HORIZ_FRONTPORCH : integer := 21;   -- front porch in pixels
-
-constant VERTI_TOTAL      : integer := 449;  -- vertical cycle in lines
-constant VERTI_PULSEWIDTH : integer := 2;    -- pulse width in lines
-constant VERTI_BACKPORCH  : integer := 32;   -- back porch in lines
-constant VERTI_ACTIVE     : integer := 400;  -- active time in lines
-constant VERTI_FRONTPORCH : integer := 15;   -- front porch in lines
-
-signal   enable_spacing   : boolean := true;
+signal enable_spacing   : boolean;
 
 begin
 
@@ -137,6 +123,39 @@ begin
 
         end if;
 
+    end if;
+
+end process;
+
+process (MODE)
+begin
+
+    if (MODE = '0') then
+        -- 720x400@70Hz
+        HORIZ_TOTAL      <= 900;  -- horizontal cycle in pixels
+        HORIZ_PULSEWIDTH <= 108;  -- pulse width in pixels
+        HORIZ_BACKPORCH  <= 51;   -- back porch in pixels
+        HORIZ_ACTIVE     <= 720;  -- active time in pixels
+        HORIZ_FRONTPORCH <= 21;   -- front porch in pixels
+        VERTI_TOTAL      <= 449;  -- vertical cycle in lines
+        VERTI_PULSEWIDTH <= 2;    -- pulse width in lines
+        VERTI_BACKPORCH  <= 32;   -- back porch in lines
+        VERTI_ACTIVE     <= 400;  -- active time in lines
+        VERTI_FRONTPORCH <= 15;   -- front porch in lines
+        enable_spacing   <= true; -- char is 9-column wide.
+    else
+        -- 640x480@60Hz
+        HORIZ_TOTAL      <= 800;  -- horizontal cycle in pixels
+        HORIZ_PULSEWIDTH <= 96;   -- pulse width in pixels
+        HORIZ_BACKPORCH  <= 48;   -- back porch in pixels
+        HORIZ_ACTIVE     <= 640;  -- active time in pixels
+        HORIZ_FRONTPORCH <= 16;   -- front porch in pixels
+        VERTI_TOTAL      <= 521;  -- vertical cycle in lines
+        VERTI_PULSEWIDTH <= 2;    -- pulse width in lines
+        VERTI_BACKPORCH  <= 29;   -- back porch in lines
+        VERTI_ACTIVE     <= 480;  -- active time in lines
+        VERTI_FRONTPORCH <= 10;   -- front porch in lines
+        enable_spacing   <= false; -- char is 8-column wide.
     end if;
 
 end process;

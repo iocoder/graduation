@@ -53,7 +53,8 @@ component graphics is
            VRAMDataOut : out STD_LOGIC_VECTOR ( 8 downto 0);
            ROW_BASE    : out STD_LOGIC_VECTOR ( 7 downto 0);
            CURSOR_ROW  : out STD_LOGIC_VECTOR ( 7 downto 0);
-           CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0));
+           CURSOR_COL  : out STD_LOGIC_VECTOR ( 7 downto 0);
+           MODE        : out STD_LOGIC);
 end component;
 
 component vgaram is
@@ -73,6 +74,7 @@ end component;
 component sequencer is
     Port (CLK        : in  STD_LOGIC;
           SE         : in  STD_LOGIC;
+          MODE       : in  STD_LOGIC;
           ROW_BASE   : in  STD_LOGIC_VECTOR ( 7 downto 0);
           CURSOR_ROW : in  STD_LOGIC_VECTOR ( 7 downto 0);
           CURSOR_COL : in  STD_LOGIC_VECTOR ( 7 downto 0);
@@ -103,14 +105,15 @@ component dac is
 end component;
 
 component crt is
-    Port (CLK : in  STD_LOGIC;
-          HS  : out STD_LOGIC := '0';
-          VS  : out STD_LOGIC := '0';
-          SE  : out STD_LOGIC := '0';
-          DE  : out STD_LOGIC := '0';
-          X   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          Y   : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          B9  : out STD_LOGIC := '0');
+    Port (CLK  : in  STD_LOGIC;
+          MODE : in  STD_LOGIC;
+          HS   : out STD_LOGIC := '0';
+          VS   : out STD_LOGIC := '0';
+          SE   : out STD_LOGIC := '0';
+          DE   : out STD_LOGIC := '0';
+          X    : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          Y    : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          B9   : out STD_LOGIC := '0');
 end component;
 
 signal CLK_56MHz       : STD_LOGIC;
@@ -138,6 +141,7 @@ signal VRAMDataFromGU  : STD_LOGIC_VECTOR ( 8 downto 0);
 signal ROW_BASE        : STD_LOGIC_VECTOR ( 7 downto 0);
 signal CURSOR_ROW      : STD_LOGIC_VECTOR ( 7 downto 0);
 signal CURSOR_COL      : STD_LOGIC_VECTOR ( 7 downto 0);
+signal MODE            : STD_LOGIC;
 
 signal SE              : STD_LOGIC;
 signal DE              : STD_LOGIC;
@@ -170,7 +174,7 @@ u1: graphics  port map (CLK_50MHz, CS, RW, A, Din, Dout,
                         VRAM0Write, VRAM1Write, VRAM2Write, VRAM3Write,
                         VRAMAddrFromGU, VRAM0DataToGU, VRAM1DataToGU,
                         VRAM2DataToGU, VRAM3DataToGU, VRAMDataFromGU,
-                        ROW_BASE, CURSOR_ROW, CURSOR_COL);
+                        ROW_BASE, CURSOR_ROW, CURSOR_COL, MODE);
 u2: vgaram    port map (CLK_56MHz,
                         VRAM0ReadEnable, VRAM0ReadAddr, VRAM0ReadData,
                         VRAM0Read, VRAM0Write,
@@ -188,13 +192,13 @@ u5: vgaram    port map (CLK_56MHz,
                         VRAM3Read, VRAM3Write,
                         VRAMAddrFromGU, VRAMDataFromGU, VRAM3DataToGU);
 u6: sequencer port map (CLK_28MHz, SE,
-                        ROW_BASE, CURSOR_ROW, CURSOR_COL, X, Y, B9,
+                        MODE, ROW_BASE, CURSOR_ROW, CURSOR_COL, X, Y, B9,
                         VRAM0ReadEnable, VRAM0ReadAddr, VRAM0ReadData,
                         VRAM1ReadEnable, VRAM1ReadAddr, VRAM1ReadData,
                         VRAM2ReadEnable, VRAM2ReadAddr, VRAM2ReadData,
                         VRAM3ReadEnable, VRAM3ReadAddr, VRAM3ReadData,
                         COLOR);
 u7: dac       port map (DE, COLOR, R, G, B);
-u8: crt       port map (CLK_28MHz, HS, VS, SE, DE, X, Y, B9);
+u8: crt       port map (CLK_28MHz, MODE, HS, VS, SE, DE, X, Y, B9);
 
 end Structural;

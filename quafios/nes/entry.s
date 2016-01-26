@@ -28,6 +28,11 @@ main:
     # enable serial output
     ls     $a0, "%e"
     bios   printf
+    # switch to NES PPU mode
+    lui    $t0, 0x1E00
+    ori    $t0, $t0, 0x1FF8
+    ori    $t1, $0 , 1
+    sh     $t1, 0($t0)
     # initialize memory
     jal    mem_init
     # reset CPU
