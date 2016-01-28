@@ -95,6 +95,8 @@ component vga is
            Din  : in  STD_LOGIC_VECTOR (15 downto 0);
            Dout : out STD_LOGIC_VECTOR (15 downto 0);
            RDY  : out STD_LOGIC := '0';
+           INT  : out STD_LOGIC := '0';
+           IAK  : in  STD_LOGIC;
            -- VGA Port
            R    : out STD_LOGIC_VECTOR (2 downto 0);
            G    : out STD_LOGIC_VECTOR (2 downto 0);
@@ -193,12 +195,14 @@ begin
 -- 0x1E800000 - 0x1E800FFF : KBD
 -- 0x1E801000 - 0x1E801FFF : PIT
 -- 0x1E802000 - 0x1E802FFF : PIC
+-- 0x1EC02000 - 0x1EC02007 : PPU
 -- 0x1F000000 - 0x1FFFFFFF : ROM
 
 -- memory decoding
 RAM_CS <= MEME when Address(31 downto 24)  = x"00"         else '0';
 ROM_CS <= MEME when Address(31 downto 24)  = x"1F"         else '0';
-VGA_CS <= MEME when Address(31 downto 14)  = x"1E00"&"00"  else '0';
+VGA_CS <= MEME when Address(31 downto 14)  = x"1E00"&"00"  or
+                    Address(31 downto 12)  = x"1EC02"      else '0';
 KBD_CS <= MEME when Address(31 downto 12)  = x"1E800"      else '0';
 PIT_CS <= MEME when Address(31 downto 12)  = x"1E801"      else '0';
 PIC_CS <= MEME when Address(31 downto 12)  = x"1E802"      else '0';
@@ -227,6 +231,7 @@ U2: memif  port map (CLK,
 U3: vga    port map (CLK, VGA_CS, RW,
                      Address(13 downto 0), DataCPUToMem(15 downto 0),
                      DataVGAToCPU(15 downto 0), VGA_RDY,
+                     IRQ_to_PIC(3), IAK_from_PIC(3),
                      R, G, B, HS, VS);
 U4: kbdctl port map (CLK, PS2CLK, PS2DATA, LED,
                      KBD_CS, RW, DataKBDToCPU(7 downto 0), KBD_RDY,

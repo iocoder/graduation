@@ -19,7 +19,7 @@ void pit_write(int count) {
 
 void pit_irq() {
 
-    /*write_to_vga(0, chr++);*/
+    write_to_vga(0, chr++);
     /*print_fmt("0x%x seconds passed.\n", ++ticks);*/
 
 }

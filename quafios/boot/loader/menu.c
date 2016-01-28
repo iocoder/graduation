@@ -204,7 +204,7 @@ void show_menu() {
                 switch (selected_option) {
                     case 0:
                         /*enable_graphics = 0;*/
-                        return;
+                        /*return;*/
                     case 1:
                         cls();
                         if (loadfile(0, 63, "/boot/nes.bin", 0x80010000)) {

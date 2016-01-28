@@ -11,7 +11,8 @@ entity clkgen is
           CLK_56MHz : out STD_LOGIC;
           CLK_50MHz : out STD_LOGIC;
           CLK_28MHz : out STD_LOGIC;
-          CLK_25MHz : out STD_LOGIC);
+          CLK_25MHz : out STD_LOGIC;
+          CLK_12MHz : out STD_LOGIC);
 end clkgen;
 
 architecture Behavioral of clkgen is
@@ -52,7 +53,14 @@ signal oCLK_56MHz : STD_LOGIC := '0';
 signal oCLK_50MHz : STD_LOGIC := '0';
 signal oCLK_28MHz : STD_LOGIC := '0';
 signal oCLK_25MHz : STD_LOGIC := '0';
+signal oCLK_12MHz : STD_LOGIC := '0';
+signal bCLK_12MHz : STD_LOGIC := '0';
 signal HALF       : STD_LOGIC := '0';
+
+attribute clock_signal : string;
+attribute clock_signal of oCLK_50MHz : signal is "yes";
+attribute clock_signal of oCLK_25MHz : signal is "yes";
+attribute clock_signal of oCLK_12MHz : signal is "yes";
 
 signal reset      : integer   := 2;
 
@@ -68,6 +76,16 @@ begin
         oCLK_25MHz <= NOT oCLK_25MHz;
     end if;
 end process;
+
+-- generate 12MHz clock
+process(oCLK_25MHz)
+begin
+    if (oCLK_25MHz = '1' and oCLK_25MHz'event ) then
+        oCLK_12MHz <= NOT oCLK_12MHz;
+    end if;
+end process;
+
+buf12: BUFG port map (oCLK_12MHz, bCLK_12MHz);
 
 -- generate 56MHz clock
 U0: DCM port map (CLKIN    => oCLK_50MHz,
@@ -94,5 +112,6 @@ CLK_56MHz <= oCLK_56MHz;
 CLK_50MHz <= oCLK_50MHz;
 CLK_28MHz <= oCLK_28MHz;
 CLK_25MHz <= oCLK_25MHz;
+CLK_12MHz <= bCLK_12MHz;
 
 end Behavioral;

@@ -4,15 +4,16 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity crt is
-    Port (CLK  : in  STD_LOGIC;
-          MODE : in  STD_LOGIC;
-          HS   : out STD_LOGIC := '0';
-          VS   : out STD_LOGIC := '0';
-          SE   : out STD_LOGIC := '0';
-          DE   : out STD_LOGIC := '0';
-          X    : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          Y    : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
-          B9   : out STD_LOGIC := '0');
+    Port (CLK    : in  STD_LOGIC;
+          MODE   : in  STD_LOGIC;
+          VBLANK : out STD_LOGIC;
+          HS     : out STD_LOGIC := '0';
+          VS     : out STD_LOGIC := '0';
+          SE     : out STD_LOGIC := '0';
+          DE     : out STD_LOGIC := '0';
+          X      : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          Y      : out STD_LOGIC_VECTOR (15 downto 0) := "0000000000000000";
+          B9     : out STD_LOGIC := '0');
 end crt;
 
 architecture Behavioral of crt is
@@ -20,7 +21,7 @@ architecture Behavioral of crt is
 signal hcounter : integer range 0 to 1024 := 0;
 signal vcounter : integer range 0 to 1024 := 0;
 
-signal vblank : STD_LOGIC := '1';
+signal oVBLANK  : STD_LOGIC := '1';
 
 signal cur_x    : integer range 0 to 10240 := 0;
 signal cur_y    : integer range 0 to 10240 := 0;
@@ -53,7 +54,7 @@ begin
             -- Back porch
             HS <= '1';
             if (hcounter = HORIZ_PULSEWIDTH+HORIZ_BACKPORCH-1 and
-                vblank = '0') then
+                oVBLANK = '0') then
                 -- end of back porch cycle
                 SE      <= '1';
                 cur_x   <= cur_x + 1;
@@ -61,7 +62,7 @@ begin
             end if;
         elsif (hcounter < HORIZ_PULSEWIDTH+HORIZ_BACKPORCH+HORIZ_ACTIVE) then
             -- Display time
-            if (vblank = '0') then
+            if (oVBLANK = '0') then
                 DE    <= '1';
                 SE    <= '1';
                 if (colindx = 7 and enable_spacing) then
@@ -103,13 +104,13 @@ begin
                 VS <= '1';
             elsif (vcounter<VERTI_PULSEWIDTH+VERTI_BACKPORCH+VERTI_ACTIVE) then
                 -- Display time
-                vblank <= '0';
+                oVBLANK <= '0';
                 Y      <= conv_std_logic_vector(cur_y, 16);
                 cur_y  <= cur_y + 1;
             else
                 -- Front porch
                 -- Display disabled:
-                vblank <= '1';
+                oVBLANK <= '1';
                 cur_y  <= 0;
                 Y      <= "0000000000000000";
             end if;
@@ -126,6 +127,8 @@ begin
     end if;
 
 end process;
+
+VBLANK <= oVBLANK;
 
 process (MODE)
 begin

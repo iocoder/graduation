@@ -167,5 +167,7 @@ NET "PS2DATA"   LOC = "P11";
 #     TIME CONSTRAINTS       #
 ##############################
 
+NET U3/CLK_56MHz PERIOD = 17ns;
+
 #NET U1/U1/oCLK50MHz PERIOD = 20ns;
 #NET U1/U1/oCLK25MHz PERIOD = 40ns;

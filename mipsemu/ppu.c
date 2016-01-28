@@ -590,9 +590,9 @@ static void refresh() {
                 color_indx = palette[0] & 0x3F;
             else
                 color_indx = palette[AR*4+CC] & 0x3F;
-            set_pixel(x, y, rgb_palette[color_indx][2],
-                            rgb_palette[color_indx][1],
-                            rgb_palette[color_indx][0]);
+            set_pixel(x, y, rgb_palette[color_indx][2], /* b */
+                            rgb_palette[color_indx][1], /* g */
+                            rgb_palette[color_indx][0]  /* r */);
             /* update the counters */
             cFH++;
             if (cFH == 8) {
@@ -735,9 +735,26 @@ void ppu_init() {
         256*3, 240*3);
 
     /* initialize pallette */
-    for (i = 0; i < 64; i++) {
+    /*for (i = 0; i < 64; i++) {
         palette[i&0x1F] = (i&0x1F)*2;
+    }*/
+
+    /* output 8-bit palette */
+    for (i = 0; i < 64; i++) {
+        int r, g, b, color;
+        r = rgb_palette[i][0];
+        g = rgb_palette[i][1];
+        b = rgb_palette[i][2];
+        r = r*8/256;
+        g = g*8/256;
+        b = b*4/256;
+        color = ((r&7)<<5)|((g&7)<<2)|(b&3);
+        printf("\"");
+        for (j = 0; j < 8; j++)
+            printf("%d", (color>>(7-j))&1);
+        printf("\",\n");
     }
+
 
 }
 

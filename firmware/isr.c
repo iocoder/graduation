@@ -57,9 +57,10 @@ void handle_interrupt(int *regs) {
 
 void isr_init() {
     int i;
-    /* initialize status register */
-    __asm__("mtc0 %0, $12"::"r"(0xABCDDCBF));
     /* initialize ISRs with NULL */
     for (i = 0; i < 8; i++)
         isr[i] = 0;
+    /* initialize status register */
+    __asm__("mtc0 %0, $12"::"r"(0xABCDDCBF));
+
 }
