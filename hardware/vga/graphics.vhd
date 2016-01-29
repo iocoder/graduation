@@ -161,7 +161,8 @@ begin
                         SprAddr     <= PPU_SMA_REG;
                         SprDataOut  <= Din(7 downto 0);
                         PPU_SMA_REG <= conv_std_logic_vector(
-                            conv_integer(PPU_SMA_REG)+1,8);
+                            conv_integer(
+                                unsigned(PPU_SMA_REG))+1,8);
                     when "101" =>
                         -- scroll data
                         if (PPU_FF = '0') then

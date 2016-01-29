@@ -156,6 +156,15 @@ void print_menu_option(int32_t line, char *str, int32_t selected) {
     printf("%c ", 179);
 }
 
+void loadnes() {
+    cls();
+    if (loadfile(0, 63, "/boot/nes.bin", 0x80010000)) {
+        printf("NES simulator not found! halting...");
+        while(1);
+    }
+    __asm__("jr %0"::"r"(0x80010000));
+}
+
 void show_menu() {
     int32_t i;
     uint8_t dl;
@@ -206,12 +215,7 @@ void show_menu() {
                         /*enable_graphics = 0;*/
                         /*return;*/
                     case 1:
-                        cls();
-                        if (loadfile(0, 63, "/boot/nes.bin", 0x80010000)) {
-                            printf("NES simulator not found! halting...");
-                            while(1);
-                        }
-                        __asm__("jr %0"::"r"(0x80010000));
+                        loadnes();
                     case 2:
                         cls();
                         /*if (*drivenum == 0x80)

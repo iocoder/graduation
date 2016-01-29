@@ -48,13 +48,17 @@ architecture Dataflow of ppuseq is
 signal  phase   : integer := 0;
 signal  counter : integer := 0;
 
-signal  PatAddr : STD_LOGIC_VECTOR (12 downto 0) := "0" & x"000";
-signal  PatRead : STD_LOGIC := '0';
-signal  PatData : STD_LOGIC_VECTOR (15 downto 0) := x"0000";
+signal  PatAddr1 : STD_LOGIC_VECTOR (12 downto 0) := "0" & x"000";
+signal  PatAddr2 : STD_LOGIC_VECTOR (12 downto 0) := "0" & x"000";
+signal  PatAddr  : STD_LOGIC_VECTOR (12 downto 0) := "0" & x"000";
+signal  PatRead  : STD_LOGIC := '0';
+signal  PatData  : STD_LOGIC_VECTOR (15 downto 0) := x"0000";
 
 -- sprites
 type sprites_t is array (0 to 255) of STD_LOGIC_VECTOR (7 downto 0);
 signal  sprites : sprites_t := (others => x"00");
+signal sprindex : integer := 0;
+signal sprdata  : STD_LOGIC_VECTOR (7 downto 0) := x"00";
 
 type sprcache_t is array (0 to 7) of STD_LOGIC_VECTOR (31 downto 0);
 signal  sprcache : sprcache_t := (others => x"00000000");
@@ -77,15 +81,17 @@ attribute ram_style of sprites : signal is "block";
 
 begin
 
+PatAddr <= PatAddr1 when phase = 2 else PatAddr2;
+
 VRAM0Addr <= PatAddr(11 downto 4) & PatAddr(2 downto 0);
 VRAM1Addr <= PatAddr(11 downto 4) & PatAddr(2 downto 0);
 VRAM2Addr <= PatAddr(11 downto 4) & PatAddr(2 downto 0);
 VRAM3Addr <= PatAddr(11 downto 4) & PatAddr(2 downto 0);
 
-VRAM0Read <= PatRead and (NOT PatAddr(12));
-VRAM1Read <= PatRead and (NOT PatAddr(12));
-VRAM2Read <= PatRead and (    PatAddr(12));
-VRAM3Read <= PatRead and (    PatAddr(12));
+VRAM0Read <= (NOT PatAddr(12));
+VRAM1Read <= (NOT PatAddr(12));
+VRAM2Read <= (    PatAddr(12));
+VRAM3Read <= (    PatAddr(12));
 
 PatData( 7 downto 0) <= VRAM0Data or VRAM2Data;
 PatData(15 downto 8) <= VRAM1Data or VRAM3Data;
@@ -112,6 +118,7 @@ variable  spr4x   : integer := 0;
 variable  spr5x   : integer := 0;
 variable  spr6x   : integer := 0;
 variable  spr7x   : integer := 0;
+variable  offset  : integer := 0;
 variable  sprindx : integer := 0;
 
 variable  V       : STD_LOGIC := '0';               -- vert. nametable
@@ -124,31 +131,120 @@ variable  FH      : STD_LOGIC_VECTOR ( 2 downto 0); -- hori. pixel index
 begin
 
     if (CLK = '1' and CLK'event ) then
+        -- sprite processing
+        if (SE = '0' or phase = 0 or phase = 4) then
+            -- make use of hblank time by loading
+            if (n < 64 and m < 8) then
+                if (sstate = 0) then
+                    -- current sprite in range?
+                    spr_y := conv_integer(unsigned(sprdata))+1;
+                    if (PPU_CTRL(5) = '0') then
+                        max_y := spr_y + 8;
+                    else
+                        max_y := spr_y + 16;
+                    end if;
+                    if (cur_y >= spr_y and cur_y < max_y) then
+                        -- in range
+                        row := cur_y-spr_y;
+                        sstate := 1;
+                        sprindex <= sprindex + 2;
+                    else
+                        -- skip
+                        n := n + 1;
+                        sprindex <= sprindex + 4;
+                    end if;
+                elsif (sstate = 1) then
+                    -- store sprite attributes
+                    sprcache(m)(15 downto 8) <= sprdata;
+                    if (sprdata(7) = '1') then
+                        if (PPU_CTRL(5) = '0') then
+                            row := 7 - row;
+                        else
+                            row := 15 - row;
+                        end if;
+                    end if;
+                    sprindex <= sprindex + 1;
+                    sstate := 2;
+                elsif (sstate = 2) then
+                    -- store sprite X
+                    if (m = 0) then
+                        spr0x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 1) then
+                        spr1x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 2) then
+                        spr2x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 3) then
+                        spr3x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 4) then
+                        spr4x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 5) then
+                        spr5x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 6) then
+                        spr6x:=conv_integer(unsigned(sprdata));
+                    elsif (m = 7) then
+                        spr7x:=conv_integer(unsigned(sprdata));
+                    end if;
+                    sprcache(m)(7 downto 0) <= sprdata;
+                    sprindex <= sprindex - 2;
+                    sstate := 3;
+                elsif (sstate = 3) then
+                    --load color bit 0
+                    if (PPU_CTRL(5) = '0') then
+                        PatAddr2 <= PPU_CTRL(3) &
+                                    sprdata &
+                                    "0" &
+                                    conv_std_logic_vector(row,3);
+                    elsif (row < 8) then
+                        PatAddr2 <= sprdata(0) &
+                                    sprdata(7 downto 1) & "0" &
+                                    "0" &
+                                    conv_std_logic_vector(row,3);
+                    else
+                        PatAddr2 <= sprdata(0) &
+                                    sprdata(7 downto 1) & "1" &
+                                    "0" &
+                                    conv_std_logic_vector(row-8,3);
+                    end if;
+                    PatRead <= '1';
+                    sprindex <= sprindex + 1;
+                    sstate := 4;
+                elsif (sstate = 4) then
+                    sstate := 5;
+                elsif (sstate = 5) then
+                    -- read color bit 0
+                    if (sprdata(6) = '0') then
+                        sprcache(m)(16) <= PatData(7);
+                        sprcache(m)(17) <= PatData(6);
+                        sprcache(m)(18) <= PatData(5);
+                        sprcache(m)(19) <= PatData(4);
+                        sprcache(m)(20) <= PatData(3);
+                        sprcache(m)(21) <= PatData(2);
+                        sprcache(m)(22) <= PatData(1);
+                        sprcache(m)(23) <= PatData(0);
+                        sprcache(m)(24) <= PatData(15);
+                        sprcache(m)(25) <= PatData(14);
+                        sprcache(m)(26) <= PatData(13);
+                        sprcache(m)(27) <= PatData(12);
+                        sprcache(m)(28) <= PatData(11);
+                        sprcache(m)(29) <= PatData(10);
+                        sprcache(m)(30) <= PatData(9);
+                        sprcache(m)(31) <= PatData(8);
+                    else
+                        sprcache(m)(31 downto 16) <= PatData;
+                    end if;
+                    -- next sprite
+                    m := m + 1;
+                    n := n + 1;
+                    sprindex <= sprindex + 2;
+                    sstate := 0;
+                end if;
+            end if;
+        end if;
+        -- rendering
         if (SE = '0') then
             -- reset state machine counters
             phase   <= 0;
             counter <= 0;
-            -- reset sprite cache
-            n       := 0;
-            m       := 0;
-            sstate  := 0;
-            cur_y   := conv_integer(unsigned(Y(9 downto 1)));
-            sprcache(0)(7 downto 0) <= x"FF";
-            sprcache(1)(7 downto 0) <= x"FF";
-            sprcache(2)(7 downto 0) <= x"FF";
-            sprcache(3)(7 downto 0) <= x"FF";
-            sprcache(4)(7 downto 0) <= x"FF";
-            sprcache(5)(7 downto 0) <= x"FF";
-            sprcache(6)(7 downto 0) <= x"FF";
-            sprcache(7)(7 downto 0) <= x"FF";
-            spr0x   := 255;
-            spr1x   := 255;
-            spr2x   := 255;
-            spr3x   := 255;
-            spr4x   := 255;
-            spr5x   := 255;
-            spr6x   := 255;
-            spr7x   := 255;
             -- reset color
             if (phase /= 0) then
                 color <= "111111";
@@ -161,108 +257,6 @@ begin
                 -- is drawn in the middle of screen.
                 color   <= "111111";
                 if (counter < 64) then
-                    -- make use of this time by loading
-                    -- current 8 sprites to sprite cache
---                 if (n < 64 and m < 8) then
---                     if (sstate = 0) then
---                         -- current sprite in range?
---                         spr_y := conv_integer(unsigned(sprites(n*4)))+1;
---                         if (PPU_CTRL(5) = '0') then
---                             max_y := spr_y + 8;
---                         else
---                             max_y := spr_y + 16;
---                         end if;
---                         if (cur_y >= spr_y and cur_y < max_y) then
---                             -- in range
---                             sstate := 1;
---                         else
---                             -- skip
---                             n := n + 1;
---                         end if;
---                     elsif (sstate = 1) then
---                         -- store sprite attributes
---                         sprcache(m)(15 downto 8) <= sprites(n*4+2);
---                         sstate := 2;
---                     elsif (sstate = 2) then
---                         -- store sprite X
---                         if (m = 0) then
---                             spr0x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 1) then
---                             spr1x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 2) then
---                             spr2x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 3) then
---                             spr3x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 4) then
---                             spr4x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 5) then
---                             spr5x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 6) then
---                             spr6x:=conv_integer(unsigned(sprites(n*4+3)));
---                         elsif (m = 7) then
---                             spr7x:=conv_integer(unsigned(sprites(n*4+3)));
---                         end if;
---                         sstate := 3;
---                     elsif (sstate = 3) then
---                         -- calculate row
---                         row := cur_y-spr_y;
---                         -- load color bit 0
--- --                             if (PPU_CTRL(5) = '0') then
--- --                                 PatAddr <= PPU_CTRL(3) &
--- --                                            sprites(n*4+1) &
--- --                                            "0" &
--- --                                            conv_std_logic_vector(row,3);
---                         if (row < 8) then
---                             PatAddr <= PPU_CTRL(3) &
---                                         sprites(n*4+1)(7 downto 1) & "0" &
---                                         "0" &
---                                         conv_std_logic_vector(row,3);
---                         else
---                             PatAddr <= PPU_CTRL(3) &
---                                         sprites(n*4+1)(7 downto 1) & "1" &
---                                         "0" &
---                                         conv_std_logic_vector(row-8,3);
---                         end if;
---                         PatRead <= '1';
---                         sstate := 4;
---                     elsif (sstate = 4) then
---                         -- read color bit 0
---                         if (sprites(n*4+2)(6) = '0') then
---                             sprcache(m)(16) <= PatData(7);
---                             sprcache(m)(17) <= PatData(6);
---                             sprcache(m)(18) <= PatData(5);
---                             sprcache(m)(19) <= PatData(4);
---                             sprcache(m)(20) <= PatData(3);
---                             sprcache(m)(21) <= PatData(2);
---                             sprcache(m)(22) <= PatData(1);
---                             sprcache(m)(23) <= PatData(0);
---                         else
---                             sprcache(m)(23 downto 16) <= PatData;
---                         end if;
---                         -- load color bit 1
---                         PatAddr(3) <= '1';
---                         sstate := 5;
---                     elsif (sstate = 5) then
---                         -- read color bit 1
---                         if (sprites(n*4+2)(6) = '0') then
---                             sprcache(m)(24) <= PatData(7);
---                             sprcache(m)(25) <= PatData(6);
---                             sprcache(m)(26) <= PatData(5);
---                             sprcache(m)(27) <= PatData(4);
---                             sprcache(m)(28) <= PatData(3);
---                             sprcache(m)(29) <= PatData(2);
---                             sprcache(m)(30) <= PatData(1);
---                             sprcache(m)(31) <= PatData(0);
---                         else
---                             sprcache(m)(31 downto 24) <= PatData;
---                         end if;
---                         PatRead <= '0';
---                         -- next sprite
---                         m := m + 1;
---                         n := n + 1;
---                         sstate := 0;
---                     end if;
---                 end if;
                     counter <= counter + 1;
                 else
                     counter <= 0;
@@ -303,7 +297,7 @@ begin
                 end if;
             elsif (phase = 1) then
                 -- load lowest 2 bits of color
-                PatAddr <= PPU_CTRL(4) & VRAM4Data(7 downto 0) & "0" & FV;
+                PatAddr1 <= PPU_CTRL(4) & VRAM4Data(7 downto 0) & "0" & FV;
                 -- load associated attribute
                 VRAM4Addr <= H & "1111" & VT(4 downto 2) & HT(4 downto 2);
                 -- early calculation for shifts
@@ -327,54 +321,47 @@ begin
                         H  := NOT H;
                     end if;
                 end if;
-
-
-                -- (b) find matching sprite, if any
---             cur_x := counter;
---             sprindx := 8;
---             if (sprindx=8 and cur_x >= spr0x and cur_x < (spr0x+8)) then
---                 sprindx := 0;
---             end if;
---             if (sprindx=8 and cur_x >= spr1x and cur_x < (spr1x+8)) then
---                 sprindx := 1;
---             end if;
---             if (sprindx=8 and cur_x >= spr2x and cur_x < (spr2x+8)) then
---                 sprindx := 2;
---             end if;
---             if (sprindx=8 and cur_x >= spr3x and cur_x < (spr3x+8)) then
---                 sprindx := 3;
---             end if;
---             if (sprindx=8 and cur_x >= spr4x and cur_x < (spr4x+8)) then
---                 sprindx := 4;
---             end if;
---             if (sprindx=8 and cur_x >= spr5x and cur_x < (spr5x+8)) then
---                 sprindx := 5;
---             end if;
---             if (sprindx=8 and cur_x >= spr6x and cur_x < (spr6x+8)) then
---                 sprindx := 6;
---             end if;
---             if (sprindx=8 and cur_x >= spr7x and cur_x < (spr7x+8)) then
---                 sprindx := 7;
---             end if;
---             if (sprindx < 8) then
---                 scolor(0) := sprcache(sprindx)(16+(cur_x mod 8));
---                 scolor(1) := sprcache(sprindx)(24+(cur_x mod 8));
---                 scolor(2) := sprcache(sprindx)(8);
---                 scolor(3) := sprcache(sprindx)(9);
---             else
---                 scolor := "0000";
---             end if;
-
+                -- find matching sprite, if any
+                if (counter >= spr0x and counter < (spr0x+8)) then
+                    sprindx := 0;
+                elsif (counter >= spr1x and counter < (spr1x+8)) then
+                    sprindx := 1;
+                elsif (counter >= spr2x and counter < (spr2x+8)) then
+                    sprindx := 2;
+                elsif (counter >= spr3x and counter < (spr3x+8)) then
+                    sprindx := 3;
+                elsif (counter >= spr4x and counter < (spr4x+8)) then
+                    sprindx := 4;
+                elsif (counter >= spr5x and counter < (spr5x+8)) then
+                    sprindx := 5;
+                elsif (counter >= spr6x and counter < (spr6x+8)) then
+                    sprindx := 6;
+                elsif (counter >= spr7x and counter < (spr7x+8)) then
+                    sprindx := 7;
+                else
+                    sprindx := 8;
+                end if;
                 -- go to next step
                 phase <= 2;
             elsif (phase = 2) then
-                -- read color
+                -- read tile color
                 tcolor(0) := PatData( 7-conv_integer(unsigned(bshift)));
                 tcolor(1) := PatData(15-conv_integer(unsigned(bshift)));
                 tcolor(2) := VRAM4Data(conv_integer(unsigned(ashift))+0);
                 tcolor(3) := VRAM4Data(conv_integer(unsigned(ashift))+1);
+                -- continue sprite evaluation
+                if (sprindx < 8) then
+                    offset  := counter -
+                        conv_integer(unsigned(sprcache(sprindx)(7 downto 0)));
+                    scolor(0) := sprcache(sprindx)(16+offset);
+                    scolor(1) := sprcache(sprindx)(24+offset);
+                    scolor(2) := sprcache(sprindx)(8);
+                    scolor(3) := sprcache(sprindx)(9);
+                else
+                    scolor := "0000";
+                end if;
                 -- output color
-                if (scolor(0) /= '0' or scolor(1) /= '0') then
+                if (scolor(0) = '1' or scolor(1) = '1') then
                     -- sprite
                     color <= SprPal(conv_integer(unsigned(scolor)));
                 elsif (tcolor(1) = '0' and tcolor(0) = '0') then
@@ -390,18 +377,24 @@ begin
                     counter <= counter + 1;
                     phase   <= 1;
                 else
-                    phase   <= 5;
+                    phase   <= 3;
                 end if;
             elsif (phase = 3) then
                 phase <= 4;
-            elsif (phase = 4) then
-                phase <= 5;
-            elsif (phase = 5) then
-                phase <= 6;
-            elsif (phase = 6) then
-                phase <= 7;
-            elsif (phase = 7) then
-                phase <= 8;
+                -- reset sprite cache
+                n       := 0;
+                m       := 0;
+                sstate  := 0;
+                cur_y   := conv_integer(unsigned(Y(9 downto 1)));
+                spr0x   := 255;
+                spr1x   := 255;
+                spr2x   := 255;
+                spr3x   := 255;
+                spr4x   := 255;
+                spr5x   := 255;
+                spr6x   := 255;
+                spr7x   := 255;
+                sprindex <= 0;
             else
                 VRAM4Read <= '0';
                 PatRead   <= '0';
@@ -422,6 +415,7 @@ begin
             -- read
             SprDataOut <= sprites(conv_integer(unsigned(SprAddr)));
         end if;
+        sprdata    <= sprites(sprindex);
         if (lastSprWR /= SprWR and SprWR='1') then
             -- write
             sprites(conv_integer(unsigned(SprAddr))) <= SprDataIn;

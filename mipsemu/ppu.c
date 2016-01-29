@@ -246,6 +246,7 @@ unsigned char ppu_reg_read(int reg) {
             fprintf(stderr, "Illegal read!\n");
             return 0;
         case 4: /* sprite memory data */
+            printf("sprite read: $%04X $%02X\n", SMA, sprites[SMA]);
             return sprites[SMA++];
         case 5: /* screen scroll offsets */
             fprintf(stderr, "Illegal read!\n");
@@ -283,6 +284,7 @@ void ppu_reg_write(unsigned short reg, unsigned char data) {
             SMA = data;
             break;
         case 4: /* sprite memory data */
+            //printf("sprite write: $%04X $%02X\n", SMA, data);
             sprites[SMA++] = data;
             break;
         case 5: /* screen scroll offsets */
@@ -617,6 +619,7 @@ static void refresh() {
     }
 
     /* draw sprites */
+    printf("sprite size: %d\n", SS);
     for (i = 63; i >= 0; i--) {
         AR  = sprites[i*4+2] & 3; /* attribute */
         if (SS == 0) {
