@@ -61,6 +61,11 @@ component graphics is
            VRAM3DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
            VRAM4DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
            VRAMDataOut : out STD_LOGIC_VECTOR ( 8 downto 0);
+           SprRD       : out STD_LOGIC;
+           SprWR       : out STD_LOGIC;
+           SprAddr     : out STD_LOGIC_VECTOR ( 7 downto 0);
+           SprDataIn   : in  STD_LOGIC_VECTOR ( 7 downto 0);
+           SprDataOut  : out STD_LOGIC_VECTOR ( 7 downto 0);
            PalRD       : out STD_LOGIC;
            PalWR       : out STD_LOGIC;
            PalAddr     : out STD_LOGIC_VECTOR ( 4 downto 0);
@@ -118,6 +123,11 @@ component sequencer is
           VRAM4Read  : out STD_LOGIC := '0';
           VRAM4Addr  : out STD_LOGIC_VECTOR (10 downto 0);
           VRAM4Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
+          SprRD      : in  STD_LOGIC;
+          SprWR      : in  STD_LOGIC;
+          SprAddr    : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          SprDataIn  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          SprDataOut : out STD_LOGIC_VECTOR ( 7 downto 0);
           PalRD      : in  STD_LOGIC;
           PalWR      : in  STD_LOGIC;
           PalAddr    : in  STD_LOGIC_VECTOR ( 4 downto 0);
@@ -210,6 +220,12 @@ signal VRAM4ReadEnable : STD_LOGIC;
 signal VRAM4ReadAddr   : STD_LOGIC_VECTOR (10 downto 0);
 signal VRAM4ReadData   : STD_LOGIC_VECTOR ( 8 downto 0);
 
+signal SprRD           : STD_LOGIC;
+signal SprWR           : STD_LOGIC;
+signal SprAddr         : STD_LOGIC_VECTOR ( 7 downto 0);
+signal SprDataIn       : STD_LOGIC_VECTOR ( 7 downto 0);
+signal SprDataOut      : STD_LOGIC_VECTOR ( 7 downto 0);
+
 signal PalRD           : STD_LOGIC;
 signal PalWR           : STD_LOGIC;
 signal PalAddr         : STD_LOGIC_VECTOR ( 4 downto 0);
@@ -229,6 +245,7 @@ u1: graphics  port map (CLK, CLK_12MHz, CS, RW, A, Din, Dout,
                         VRAMAddrFromGU,
                         VRAM0DataToGU, VRAM1DataToGU, VRAM2DataToGU,
                         VRAM3DataToGU, VRAM4DataToGU, VRAMDataFromGU,
+                        SprRD, SprWR, SprAddr, SprDataOut, SprDataIn,
                         PalRD, PalWR, PalAddr, PalDataOut, PalDataIn,
                         ROW_BASE, CURSOR_ROW, CURSOR_COL,
                         PPU_CTRL, PPU_HSCR, PPU_VSCR, MODE);
@@ -261,6 +278,7 @@ u7: sequencer port map (CLK_56MHz, CLK_28MHz, SE,
                         VRAM2ReadEnable, VRAM2ReadAddr, VRAM2ReadData,
                         VRAM3ReadEnable, VRAM3ReadAddr, VRAM3ReadData,
                         VRAM4ReadEnable, VRAM4ReadAddr, VRAM4ReadData,
+                        SprRD, SprWR, SprAddr, SprDataIn, SprDataOut,
                         PalRD, PalWR, PalAddr, PalDataIn, PalDataOut,
                         COLOR);
 u8: dac       port map (DE, MODE, COLOR, R, G, B);

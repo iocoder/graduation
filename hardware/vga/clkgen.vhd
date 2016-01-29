@@ -61,6 +61,8 @@ attribute clock_signal : string;
 attribute clock_signal of oCLK_50MHz : signal is "yes";
 attribute clock_signal of oCLK_25MHz : signal is "yes";
 attribute clock_signal of oCLK_12MHz : signal is "yes";
+attribute clock_signal of oCLK_56MHz : signal is "yes";
+attribute clock_signal of oCLK_28MHz : signal is "yes";
 
 signal reset      : integer   := 2;
 

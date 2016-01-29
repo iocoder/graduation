@@ -31,6 +31,11 @@ entity graphics is
            VRAM3DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
            VRAM4DataIn : in  STD_LOGIC_VECTOR ( 8 downto 0);
            VRAMDataOut : out STD_LOGIC_VECTOR ( 8 downto 0);
+           SprRD       : out STD_LOGIC;
+           SprWR       : out STD_LOGIC;
+           SprAddr     : out STD_LOGIC_VECTOR ( 7 downto 0);
+           SprDataIn   : in  STD_LOGIC_VECTOR ( 7 downto 0);
+           SprDataOut  : out STD_LOGIC_VECTOR ( 7 downto 0);
            PalRD       : out STD_LOGIC;
            PalWR       : out STD_LOGIC;
            PalAddr     : out STD_LOGIC_VECTOR ( 4 downto 0);
@@ -62,6 +67,7 @@ signal PPU_CTRL_REG   : STD_LOGIC_VECTOR (15 downto 0) := x"0000";
 signal PPU_HSCR_REG   : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal PPU_VSCR_REG   : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal PPU_ADDR_REG   : STD_LOGIC_VECTOR (15 downto 0) := x"0000";
+signal PPU_SMA_REG    : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal PPU_HIT_REG    : STD_LOGIC := '0';
 signal PPU_VBLANK_REG : STD_LOGIC := '0';
 signal PPU_FF         : STD_LOGIC := '0';
@@ -73,46 +79,38 @@ process (CLK12)
     procedure ppu_mem_access(write : in STD_LOGIC;
                              data  : in STD_LOGIC_VECTOR(7 downto 0)) is
     begin
-        case PPU_ADDR_REG(13 downto 11) is
-            when "000" =>
-                -- ram0
-                VRAM0Read   <= NOT write;
-                VRAM0Write  <= write;
-                VRAMAddr    <= PPU_ADDR_REG(10 downto 0);
+        case PPU_ADDR_REG(13 downto 12) is
+            when "00" =>
+                -- ram0 and ram1
+                if (PPU_ADDR_REG(3) = '0') then
+                    VRAM0Read   <= NOT write;
+                    VRAM0Write  <= write;
+                else
+                    VRAM1Read   <= NOT write;
+                    VRAM1Write  <= write;
+                end if;
+                VRAMAddr    <= PPU_ADDR_REG(11 downto 4) &
+                               PPU_ADDR_REG( 2 downto 0);
                 VRAMDataOut <= "0" & data;
-            when "001" =>
-                -- ram1
-                VRAM1Read   <= NOT write;
-                VRAM1Write  <= write;
-                VRAMAddr    <= PPU_ADDR_REG(10 downto 0);
+            when "01" =>
+                -- ram2 and ram3
+                if (PPU_ADDR_REG(3) = '0') then
+                    VRAM2Read   <= NOT write;
+                    VRAM2Write  <= write;
+                else
+                    VRAM3Read   <= NOT write;
+                    VRAM3Write  <= write;
+                end if;
+                VRAMAddr    <= PPU_ADDR_REG(11 downto 4) &
+                               PPU_ADDR_REG( 2 downto 0);
                 VRAMDataOut <= "0" & data;
-            when "010" =>
-                -- ram2
-                VRAM2Read   <= NOT write;
-                VRAM2Write  <= write;
-                VRAMAddr    <= PPU_ADDR_REG(10 downto 0);
-                VRAMDataOut <= "0" & data;
-            when "011" =>
-                -- ram3
-                VRAM3Read   <= NOT write;
-                VRAM3Write  <= write;
-                VRAMAddr    <= PPU_ADDR_REG(10 downto 0);
-                VRAMDataOut <= "0" & data;
-            when "100" =>
+            when "10" =>
                 -- ram4 (namtabs)
                 VRAM4Read   <= NOT write;
                 VRAM4Write  <= write;
                 VRAMAddr    <= PPU_ADDR_REG(10 downto 0);
                 VRAMDataOut <= "0" & data;
-            when "101" =>
-                -- ram4 (namtabs)
-                VRAM4Read   <= NOT write;
-                VRAM4Write  <= write;
-                VRAMAddr    <= PPU_ADDR_REG(10 downto 0);
-                VRAMDataOut <= "0" & data;
-            when "110" =>
-                -- empty
-            when "111" =>
+            when "11" =>
                 -- palette
                 if (PPU_ADDR_REG(13 downto 8) = "111111") then
                     if (PPU_ADDR_REG(3 downto 0) = "0000") then
@@ -155,9 +153,15 @@ begin
                     when "010" =>
                         -- status
                     when "011" =>
-                        -- TODO: Sprite Memory Address
+                        -- Sprite Memory Address
+                        PPU_SMA_REG <= Din(7 downto 0);
                     when "100" =>
-                        -- TODO: Sprite Memory Data
+                        -- Sprite Memory Data
+                        SprWR       <= '1';
+                        SprAddr     <= PPU_SMA_REG;
+                        SprDataOut  <= Din(7 downto 0);
+                        PPU_SMA_REG <= conv_std_logic_vector(
+                            conv_integer(PPU_SMA_REG)+1,8);
                     when "101" =>
                         -- scroll data
                         if (PPU_FF = '0') then
@@ -246,9 +250,13 @@ begin
             VRAM2Write <= '0';
             VRAM3Write <= '0';
             VRAM4Write <= '0';
+            SprRD      <= '0';
+            SprWR      <= '0';
             PalRD      <= '0';
             PalWR      <= '0';
             Dout       <= x"0000";
+            SprAddr    <= x"00";
+            SprDataOut <= x"00";
             PalAddr    <= "00000";
             PalDataOut <= x"00";
             if (VBLANK /= LASTVBLANK) then

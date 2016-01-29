@@ -32,6 +32,11 @@ entity sequencer is
           VRAM4Read  : out STD_LOGIC := '0';
           VRAM4Addr  : out STD_LOGIC_VECTOR (10 downto 0);
           VRAM4Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
+          SprRD      : in  STD_LOGIC;
+          SprWR      : in  STD_LOGIC;
+          SprAddr    : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          SprDataIn  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          SprDataOut : out STD_LOGIC_VECTOR ( 7 downto 0);
           PalRD      : in  STD_LOGIC;
           PalWR      : in  STD_LOGIC;
           PalAddr    : in  STD_LOGIC_VECTOR ( 4 downto 0);
@@ -93,6 +98,11 @@ component ppuseq is
           VRAM4Read  : out STD_LOGIC := '0';
           VRAM4Addr  : out STD_LOGIC_VECTOR (10 downto 0);
           VRAM4Data  : in  STD_LOGIC_VECTOR ( 8 downto 0);
+          SprRD      : in  STD_LOGIC;
+          SprWR      : in  STD_LOGIC;
+          SprAddr    : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          SprDataIn  : in  STD_LOGIC_VECTOR ( 7 downto 0);
+          SprDataOut : out STD_LOGIC_VECTOR ( 7 downto 0);
           PalRD      : in  STD_LOGIC;
           PalWR      : in  STD_LOGIC;
           PalAddr    : in  STD_LOGIC_VECTOR ( 4 downto 0);
@@ -130,7 +140,7 @@ U1: vgaseq port map (CLK28, SE, ROW_BASE, CURSOR_ROW, CURSOR_COL, X, Y, B9,
                      VGA_VRAM3Read, VGA_VRAM3Addr, VRAM3Data,
                      VGA_Color);
 
-U2: ppuseq port map (CLK56, SE, ROW_BASE, CURSOR_ROW, CURSOR_COL,
+U2: ppuseq port map (CLK28, SE, ROW_BASE, CURSOR_ROW, CURSOR_COL,
                      PPU_CTRL, PPU_HSCR, PPU_VSCR,
                      X, Y, B9,
                      PPU_VRAM0Read, PPU_VRAM0Addr, VRAM0Data,
@@ -138,6 +148,7 @@ U2: ppuseq port map (CLK56, SE, ROW_BASE, CURSOR_ROW, CURSOR_COL,
                      PPU_VRAM2Read, PPU_VRAM2Addr, VRAM2Data,
                      PPU_VRAM3Read, PPU_VRAM3Addr, VRAM3Data,
                      VRAM4Read, VRAM4Addr, VRAM4Data,
+                     SprRD, SprWR, SprAddr, SprDataIn, SprDataOut,
                      PalRD, PalWR, PalAddr, PalDataIn, PalDataOut,
                      PPU_Color);
 
