@@ -25,8 +25,25 @@
  *
  */
 
+#include "../../../firmware/bios.h"
+
+bios_t bios __attribute__((section(".bss")));
+
+void bios_init() {
+    int i;
+    char *ptr;
+    /* get ptr to BIOS structure */
+    __asm__("or %0, $0, $gp":"=r"(ptr));
+    /* copy into bios variable */
+    for (i = 0; i < sizeof(bios_t); i++)
+        ((char *) &bios)[i] = ptr[i];
+}
+
 int main() {
     /* This is the main() function of Quafios kernel :D */
-    init();
+    bios_init();
+    bios.vga.print_fmt("Hello from Quafios kernel!\n");
+    while(1);
+    /*init();*/
     return 0;
 }

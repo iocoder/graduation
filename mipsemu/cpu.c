@@ -165,6 +165,7 @@ int mem_instr;
 int mem_pc4;
 int mem_memop;
 int mem_ctrlsig[CTRL_COUNT];
+int mem_tmp;
 int mem_addr;
 int mem_data_in;
 int mem_data_out;
@@ -723,6 +724,7 @@ void cpu_debug() {
 int cpu_clk() {
     /* store clk controls */
     int ifclk = id_ifclk, pcclk = id_pcclk, handle_exception = 0;
+    int oldreg = 0;
 
     if (halted == 1) {
         cpu_debug_short();
@@ -830,6 +832,7 @@ int cpu_clk() {
         mem_ctrlsig[MEM_READ]   = 0;
         mem_ctrlsig[MEM_WRITE]  = 0;
         mem_ctrlsig[BRANCH]     = 0;
+        mem_tmp     = 0;
         mem_addr    = 0;
         mem_data_in = 0;
         mem_rk      = 0;
@@ -846,6 +849,7 @@ int cpu_clk() {
         mem_ctrlsig[MEM_READ] = ex_ctrlsig[MEM_READ];
         mem_ctrlsig[MEM_WRITE] = ex_ctrlsig[MEM_WRITE];
         mem_ctrlsig[BRANCH] = ex_ctrlsig[BRANCH];
+        mem_tmp = ex_muxop;
         mem_addr = ex_alu_output;
         mem_data_in = ex_muxop;
         mem_rk = ex_rk;
@@ -886,10 +890,29 @@ int cpu_clk() {
                 mem_data_out = (int) ((short)tlb_read(1, mem_addr,1));
                 break;
             case MEMOP_LEFT:
-                mem_data_out = (unsigned int)
-                                ((unsigned char)tlb_read(1, mem_addr,0));
-                printf("LWL not implemented!!!\n");
-                //exit(0);
+                switch(mem_addr&3) {
+                    case 0:
+                        mem_data_out=(tlb_read(1, mem_addr-0,0)<<24)|
+                                     (mem_tmp&0x00FFFFFF);
+                        break;
+                    case 1:
+                        mem_data_out=(tlb_read(1, mem_addr-0,0)<<24)|
+                                     (tlb_read(1, mem_addr-1,0)<<16)|
+                                     (mem_tmp&0x0000FFFF);
+                        break;
+                    case 2:
+                        mem_data_out=(tlb_read(1, mem_addr-0,0)<<24)|
+                                     (tlb_read(1, mem_addr-1,0)<<16)|
+                                     (tlb_read(1, mem_addr-2,0)<< 8)|
+                                     (mem_tmp&0x000000FF);
+                        break;
+                    case 3:
+                        mem_data_out=(tlb_read(1, mem_addr-0,0)<<24)|
+                                     (tlb_read(1, mem_addr-1,0)<<16)|
+                                     (tlb_read(1, mem_addr-2,0)<< 8)|
+                                     (tlb_read(1, mem_addr-3,0)<< 0);
+                        break;
+                }
                 break;
             case MEMOP_WORD:
                 mem_data_out = tlb_read(1, mem_addr,2);
@@ -903,10 +926,29 @@ int cpu_clk() {
                                 ((unsigned short)tlb_read(1, mem_addr,1));
                 break;
             case MEMOP_RIGHT:
-                mem_data_out = (unsigned int)
-                                ((unsigned char)tlb_read(1, mem_addr,0));
-                printf("LWR not implemented!!!\n");
-                //exit(0);
+                switch(mem_addr&3) {
+                    case 0:
+                        mem_data_out=(tlb_read(1, mem_addr+3,0)<<24)|
+                                     (tlb_read(1, mem_addr+2,0)<<16)|
+                                     (tlb_read(1, mem_addr+1,0)<< 8)|
+                                     (tlb_read(1, mem_addr+0,0)<< 0);
+                        break;
+                    case 1:
+                        mem_data_out=(mem_tmp & 0xFF000000)|
+                                     (tlb_read(1, mem_addr+2,0)<<16)|
+                                     (tlb_read(1, mem_addr+1,0)<< 8)|
+                                     (tlb_read(1, mem_addr+0,0)<< 0);
+                        break;
+                    case 2:
+                        mem_data_out=(mem_tmp & 0xFFFF0000)|
+                                     (tlb_read(1, mem_addr+1,0)<< 8)|
+                                     (tlb_read(1, mem_addr+0,0)<< 0);
+                        break;
+                    case 3:
+                        mem_data_out=(mem_tmp & 0xFFFFFF00)|
+                                     (tlb_read(1, mem_addr+0,0)<< 0);
+                        break;
+                }
                 break;
             default:
                 /* exception */
@@ -1577,6 +1619,7 @@ void cpu_init() {
     mem_ctrlsig[MEM_READ] = 0;
     mem_ctrlsig[MEM_WRITE] = 0;
     mem_ctrlsig[BRANCH] = 0;
+    mem_tmp = 0;
     mem_addr = 0;
     mem_data_in = 0;
     mem_data_out = 0;

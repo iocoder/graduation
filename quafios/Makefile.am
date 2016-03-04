@@ -1,4 +1,4 @@
-SUBDIRS = boot nes tools
+SUBDIRS = boot kernel nes tools
 
 export ROOT_DIR=$(prefix)
 export BOOT_DIR=$(prefix)/boot
@@ -20,6 +20,7 @@ export QCC=mipsel-linux-gnu-gcc
 export QAS=mipsel-linux-gnu-as
 export QLD=mipsel-linux-gnu-ld
 export QOC=mipsel-linux-gnu-objcopy
+export QOD=mipsel-linux-gnu-objdump
 
 export QCFLAGS = -mno-abicalls -mips1 \
 	  -fno-zero-initialized-in-bss -fno-stack-protector -fno-exceptions \

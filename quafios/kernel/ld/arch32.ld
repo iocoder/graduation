@@ -2,7 +2,7 @@ ENTRY(main)
 
 SECTIONS {
 
-	. = 0x00100000;
+	. = 0x80010000;
 
 	kernel_physical_start = .;
 

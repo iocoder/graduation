@@ -165,6 +165,16 @@ void loadnes() {
     __asm__("jr %0"::"r"(0x80010000));
 }
 
+void loadquaf() {
+    cls();
+    if (loadfile(0, 63, "/boot/kernel.bin", 0x80010000)) {
+        printf("Quafios kernel not found! halting...");
+        while(1);
+    }
+    __asm__("jr %0"::"r"(0x80010000));
+}
+
+
 void show_menu() {
     int32_t i;
     uint8_t dl;
@@ -214,6 +224,7 @@ void show_menu() {
                     case 0:
                         /*enable_graphics = 0;*/
                         /*return;*/
+                        loadquaf();
                     case 1:
                         loadnes();
                     case 2:

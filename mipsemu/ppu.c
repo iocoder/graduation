@@ -619,7 +619,7 @@ static void refresh() {
     }
 
     /* draw sprites */
-    printf("sprite size: %d\n", SS);
+    /*printf("sprite size: %d\n", SS);*/
     for (i = 63; i >= 0; i--) {
         AR  = sprites[i*4+2] & 3; /* attribute */
         if (SS == 0) {
@@ -752,10 +752,10 @@ void ppu_init() {
         g = g*8/256;
         b = b*4/256;
         color = ((r&7)<<5)|((g&7)<<2)|(b&3);
-        printf("\"");
+        /*printf("\"");
         for (j = 0; j < 8; j++)
             printf("%d", (color>>(7-j))&1);
-        printf("\",\n");
+        printf("\",\n");*/
     }
 
 
