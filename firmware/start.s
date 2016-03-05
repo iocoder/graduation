@@ -111,7 +111,19 @@ start:
 .org 0x180
     .set noat
     .set noreorder
+    nop
+    nop
+    nop
+    nop
+    lui   $k0, %hi(isr_loc)
+    lw    $k0, %lo(isr_loc)($k0)
+    jr    $k0
+    nop
 
+.org 0x200
+
+.global isr_routine
+isr_routine:
     addi  $sp, -4*32
 
     sw    $0,  4* 0($sp)

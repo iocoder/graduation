@@ -88,6 +88,14 @@ void legacy_video_attr(char attr) {
     ptr->vga.print_fmt("%a", attr);
 }
 
+void legacy_set_isr_loc(void *loc) {
+    bios_t *ptr;
+    /* get ptr to BIOS structure */
+    __asm__("or %0, $0, $gp":"=r"(ptr));
+    /* call function */
+    ptr->isr.set_isr_loc(loc);
+}
+
 /* ================================================================= */
 /*                           Interface                               */
 /* ================================================================= */

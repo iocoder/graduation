@@ -63,4 +63,9 @@ extern uint32_t kernel_physical_end;
 #define KERNEL_MEMORY_PAGES     (KERNEL_MEMORY_SIZE/PAGE_SIZE)
 #define KERNEL_MEMORY_PTABLES   (KERNEL_MEMORY_PAGES/PAGE_TABLE_ENTRY_COUNT)
 
+/* buddy algorithm parameters */
+
+#define L       5   /* 2^L is the smallest size block (32 bytes) */
+#define U       25  /* 2^U is the upper size block (32MB)        */
+
 #endif

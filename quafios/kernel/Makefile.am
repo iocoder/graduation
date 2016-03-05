@@ -1,5 +1,7 @@
 CSD=$(shell realpath $(top_srcdir)/$(subdir))
-OBJ=$(shell cd $(CSD) && find ./ -name "*.c" 2>/dev/null | sed 's/\.c/\.o/g')
+COBJ=$(shell cd $(CSD) && find ./ -name "*.c" 2>/dev/null | sed 's/\.c/\.o/g')
+SOBJ=$(shell cd $(CSD) && find ./ -name "*.s" 2>/dev/null | sed 's/\.s/\.o/g')
+OBJ=$(COBJ) $(SOBJ)
 CFILES         = $(shell find $(CSD)/         -name "*.c" 2>/dev/null)
 ALLHFILES      = $(shell find $(CSD)/         -name "*.h" 2>/dev/null)
 HFILES         = $(shell find $(CSD)/include/ -name "*.h" 2>/dev/null)
@@ -16,6 +18,9 @@ DEPS          = $(ALLHFILES) Makefile
 SDIRS         = $(shell cd $(CSD) && find . -type d 2>/dev/null)
 
 %.o:%.c $(DEPS)
+	$(QCC) $(QCFLAGS) -Xassembler -I$(CSD) -D QUAFIOS_KERNEL -c -o $@ $<
+
+%.o:%.s $(DEPS)
 	$(QCC) $(QCFLAGS) -Xassembler -I$(CSD) -D QUAFIOS_KERNEL -c -o $@ $<
 
 $(OBJECT_NAME).bin: $(OBJECT_NAME).elf $(OBJ) $(LDSCRIPT)

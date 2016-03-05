@@ -202,8 +202,6 @@ void pmem_init() {
         uint64_t end  = bootinfo->res[i].end;
         uint64_t frame;
 
-        printk("base: %x, end: %x\n", (int) base, (int) end);
-
         /* align to page boundaries...
          * example: 0x1234: 0x3456 ---> 0x1000:0x4000 (4KB page).
          */
@@ -241,6 +239,5 @@ void pmem_init() {
         }
     }
     ppalloc();
-    printk("done! %d %d %x\n", ram_size, pmem_usable_pages, ppalloc());
 
 }

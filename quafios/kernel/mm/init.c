@@ -77,7 +77,7 @@ void mm_init() {
     pmem_init();
 
     /* Initialize kernel memory: */
-    /*kmem_init();*/
+    kmem_init();
 
     /* register in sysfs */
     /*sysfs_reg("mem", mm_stats);*/

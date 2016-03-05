@@ -29,11 +29,48 @@
 #ifdef ARCH_MIPS
 
 #include <arch/type.h>
+#include <sys/error.h>
+#include <sys/mm.h>
+#include <sys/scheduler.h>
 
 #include <mips/asm.h>
+#include <mips/page.h>
+
+typedef struct regiontbl {
+    /* a table that stores information about specific mapping */
+    file_mem_t *region[PAGE_TABLE_ENTRY_COUNT];
+} __attribute__((packed)) regiontbl_t;
+
+typedef struct {
+    uint32_t* page_dir;       /* page directory.                        */
+    uint32_t* page_dir_ext;   /* a copy of page directory.              */
+    regiontbl_t **region_dir; /* region information directory table.    */
+} arch_umem_t;                /* architecture dependant umem structure. */
+
+uint32_t general_pagedir[PAGE_DIR_ENTRY_COUNT]
+                __attribute__((aligned(PAGE_SIZE)));
+uint32_t general_pagedir_ext[PAGE_DIR_ENTRY_COUNT]
+                __attribute__ ((aligned(PAGE_SIZE)));
+uint32_t kmem_pagetab[KERNEL_MEMORY_PAGES]
+                __attribute__ ((aligned(PAGE_SIZE)));
+regiontbl_t *general_regiondir[PAGE_DIR_ENTRY_COUNT]
+                __attribute__ ((aligned(PAGE_SIZE)));
+uint32_t *cr3; /* just like cr3 of x86 */
+int32_t page_initialized = 0;
+
+void file_close() {
+
+}
+
+uint32_t get_badvaddr() {
+    uint32_t reg;
+    __asm__("mfc0 %0, $8;":"=r"(reg):"r"(0xFFFFFFFF));
+    return reg;
+}
+
 
 /****************************************************************************/
-/*                  MIPS paging system initialization                       */
+/*                        TLB access routines                               */
 /****************************************************************************/
 
 void set_tlb(uint32_t index, uint32_t virt, uint32_t phys, uint32_t v) {
@@ -41,6 +78,10 @@ void set_tlb(uint32_t index, uint32_t virt, uint32_t phys, uint32_t v) {
     mtc0((v<<9)|(phys<<12), ENTRY_LO);
     mtc0((virt<<12), ENTRY_HI);
     tlbwi();
+}
+
+void fill_tlb(uint32_t virt, uint32_t phys, uint32_t v) {
+    set_tlb(virt&63, virt, phys, v);
 }
 
 void get_tlb(uint32_t index, uint32_t *virt, uint32_t *phys, uint32_t *v) {
@@ -54,122 +95,40 @@ void get_tlb(uint32_t index, uint32_t *virt, uint32_t *phys, uint32_t *v) {
     *virt = high>>12;
 }
 
-void page_init() {
-    uint32_t virt, phys, v;
-    set_tlb(0, 0, 0x1E000, 1);
-    *((uint16_t *) 0) = 'A';
-    *((uint16_t *) 4) = 'B';
-    *((uint16_t *) 8) = 'C';
-    *((uint16_t *) 12) = 'D';
-
+void flush_tlb() {
+    int i;
+    for (i = 0; i < 64; i++)
+        set_tlb(i, 0, 0, 0);
 }
 
-#if 0
-
-#include <arch/type.h>
-#include <sys/error.h>
-#include <sys/mm.h>
-#include <sys/scheduler.h>
-
-#include <i386/asm.h>
-#include <i386/protect.h>
-#include <i386/page.h>
-
-/*
- * Architecture-dependant code for virtual memory operations.
- */
-
-uint32_t general_pagedir[PAGE_DIR_ENTRY_COUNT]
-                __attribute__((aligned(PAGE_SIZE)));
-
-uint32_t general_pagedir_ext[PAGE_DIR_ENTRY_COUNT]
-                __attribute__ ((aligned(PAGE_SIZE)));
-
-uint32_t ktext_pagetab[KTEXT_MEMORY_PAGES]
-                __attribute__ ((aligned(PAGE_SIZE)));
-
-uint32_t kmem_pagetab[KERNEL_MEMORY_PAGES]
-                __attribute__ ((aligned(PAGE_SIZE)));
-
-
-typedef struct regiontbl {
-    /* a table that stores information about specific mapping */
-    file_mem_t *region[PAGE_TABLE_ENTRY_COUNT];
-} __attribute__((packed)) regiontbl_t;
-
-typedef struct {
-    uint32_t* page_dir;       /* page directory.                        */
-    uint32_t  page_dir_phys;  /* physical address of page_dir;          */
-    uint32_t* page_dir_ext;   /* a copy of page directory.              */
-    regiontbl_t **region_dir; /* region information directory table.    */
-} arch_umem_t;                /* architecture dependant umem structure. */
-
-int32_t page_initialized = 0;
-
 /****************************************************************************/
-/*                  i386 paging system initialization                       */
+/*                  MIPS paging system initialization                       */
 /****************************************************************************/
 
 void page_init() {
-
-    int32_t i, p = 0;
-
-    /* Initialize general page directory & page tables:  */
-    /* ================================================= */
-    /* 1: KTEXT AREA:  */
-    /* --------------- */
-    /* initialize the KTEXT AREA page tables. */
-    for (i = 0; i < KTEXT_MEMORY_PAGES; i++)
-        ktext_pagetab[i] = (i*PAGE_SIZE) | PAGE_ENTRY_KERNEL_MODE;
-
-    /* map those tables into the page directory: */
-    for (i = 0; i < KTEXT_MEMORY_PTABLES; i++) {
-        general_pagedir[p] = ((uint32_t)
-            &ktext_pagetab[i*PAGE_TABLE_ENTRY_COUNT]) |
-            PAGE_ENTRY_KERNEL_MODE;
-
-        general_pagedir_ext[p++] = (((uint32_t)
-            &ktext_pagetab[i*PAGE_TABLE_ENTRY_COUNT]));
+    int i;
+    /* no pages are currently allocated */
+    for (i = 0; i < PAGE_DIR_ENTRY_COUNT; i++) {
+        general_pagedir[i] = 0;
+        general_pagedir_ext[i] = 0;
+        general_regiondir[i] = NULL;
     }
-
-    /* 2: UMEM AREA:  */
-    /* -------------- */
-    /* map user memory area into the page directory: */
-    for (i = 0; i < USER_MEMORY_PTABLES; i++) {
-        general_pagedir[p] = 0;
-        general_pagedir_ext[p++] = 0;
-    }
-
-    /* 3: KMEM AREA:  */
-    /* -------------- */
     /* initialize the KMEM AREA page tables. */
     for (i = 0; i < KERNEL_MEMORY_PAGES; i++)
         kmem_pagetab[i] = 0;
-
     /* map kernel memory area into the page directory: */
     for (i = 0; i < KERNEL_MEMORY_PTABLES; i++) {
-        general_pagedir[p] = ((uint32_t)
+        int p = KERNEL_MEMORY_BASE/(PAGE_SIZE*PAGE_TABLE_ENTRY_COUNT);
+        general_pagedir[i+p] = ((uint32_t)
             &kmem_pagetab[i*PAGE_TABLE_ENTRY_COUNT]) |
-            PAGE_ENTRY_KERNEL_MODE;
-
-        general_pagedir_ext[p++] = ((uint32_t)
-            &kmem_pagetab[i*PAGE_TABLE_ENTRY_COUNT]);
+                PAGE_ENTRY_KERNEL_MODE;
     }
-
-    /* Enable Paging:  */
-    /* =============== */
-    /* Setup CR3: */
-    set_cr3(general_pagedir);
-
-    /* Write-back and invalidate the cache: */
-    __asm__ ("wbinvd");
-
-    /* Enable Paging and Disable Caching: */
-    set_cr0(CR0_GENERIC);
-
+    /* set cr3 to general_pagedir */
+    cr3 = general_pagedir;
+    /* flush tlb */
+    flush_tlb();
     /* done */
     page_initialized = 1;
-
 }
 
 /****************************************************************************/
@@ -179,28 +138,23 @@ void page_init() {
 arch_umem_t get_arch_umem_t(umem_t *umem) {
     /* get the virtual address of umem's page_dir: */
     arch_umem_t ret;
-
     if (umem != NULL) {
         arch_umem_t *arch_umem = (arch_umem_t *) umem->arch_reg;
         ret.page_dir      = arch_umem->page_dir;
-        ret.page_dir_phys = arch_umem->page_dir_phys;
         ret.page_dir_ext  = arch_umem->page_dir_ext;
         ret.region_dir    = arch_umem->region_dir;
     } else if (curproc != NULL) {
         arch_umem_t *arch_umem = (arch_umem_t *) curproc->umem.arch_reg;
         ret.page_dir      = arch_umem->page_dir;
-        ret.page_dir_phys = arch_umem->page_dir_phys;
         ret.page_dir_ext  = arch_umem->page_dir_ext;
         ret.region_dir    = arch_umem->region_dir;
     } else {
         /* umem = NULL & curproc = NULL */
         /* process management is not initialized yet... */
         ret.page_dir      = general_pagedir;
-        ret.page_dir_phys = (uint32_t) general_pagedir;
         ret.page_dir_ext  = general_pagedir_ext;
-        ret.region_dir    = NULL;
+        ret.region_dir    = general_regiondir;
     }
-
     return ret;
 }
 
@@ -210,7 +164,7 @@ uint32_t getPageEntry(umem_t *umem, uint32_t vaddr) {
     pde = (vaddr >> 22) & 0x3FF; /* page dir entry */
     if (!(arch_umem.page_dir[pde] & PAGE_ENTRY_P))
         return 0;
-    pagetbl = (uint32_t*)(arch_umem.page_dir_ext[pde]&PAGE_BASE_MASK);
+    pagetbl = (uint32_t*)(arch_umem.page_dir[pde]&PAGE_BASE_MASK);
     pe = (vaddr >> 12) & 0x3FF; /* page entry; */
     return pagetbl[pe];
 }
@@ -232,6 +186,8 @@ uint32_t arch_vmdir_isMapped(umem_t *umem, uint32_t vaddr) {
 uint32_t arch_vmpage_getAddr(umem_t *umem, uint32_t vaddr) {
     return getPageEntry(umem, vaddr) & PAGE_BASE_MASK;
 }
+
+#if 0
 
 void arch_vmpage_copy(umem_t *msrc, uint32_t src,
                       umem_t *mdest, uint32_t dest,
@@ -299,6 +255,7 @@ void arch_vmpage_copy(umem_t *msrc, uint32_t src,
     return;
 
 }
+#endif
 
 uint32_t arch_vmpage_map(umem_t *umem, uint32_t vaddr, uint32_t user) {
 
@@ -327,9 +284,10 @@ uint32_t arch_vmpage_map(umem_t *umem, uint32_t vaddr, uint32_t user) {
          */
         pagetbl[0] = 0; /* this is very tricky ;) */
 
-        arch_umem.page_dir[pde] = (getPageEntry(NULL, (uint32_t) pagetbl) &
-                                   PAGE_BASE_MASK) | PAGE_ENTRY_USER_MODE;
-        arch_umem.page_dir_ext[pde] = ((uint32_t) pagetbl)|PAGE_EXT_REMOVABLE;
+        arch_umem.page_dir[pde] = (((uint32_t) pagetbl) &
+                                   PAGE_BASE_MASK) |
+                                   PAGE_ENTRY_USER_MODE |
+                                   PAGE_EXT_REMOVABLE;
 
         /* also allocate a region table corresponding to this page table */
         if (!(arch_umem.region_dir[pde] = kmalloc(sizeof(regiontbl_t))))
@@ -339,7 +297,7 @@ uint32_t arch_vmpage_map(umem_t *umem, uint32_t vaddr, uint32_t user) {
         for (i = 0; i < PAGE_TABLE_ENTRY_COUNT; i++)
             arch_umem.region_dir[pde]->region[i] = (file_mem_t*)(pagetbl[i]=0);
     } else {
-        pagetbl = (uint32_t *)(arch_umem.page_dir_ext[pde]&PAGE_BASE_MASK);
+        pagetbl = (uint32_t *)(arch_umem.page_dir[pde]&PAGE_BASE_MASK);
     }
 
     pe = (vaddr >> 12) & 0x3FF; /* page entry; */
@@ -347,12 +305,11 @@ uint32_t arch_vmpage_map(umem_t *umem, uint32_t vaddr, uint32_t user) {
     pagetbl[pe] = PAGE_ENTRY_AF | PAGE_ENTRY_RW;
     if (user) pagetbl[pe] |= PAGE_ENTRY_US;
 
-    if (arch_umem.page_dir_ext[pde] & PAGE_EXT_REMOVABLE)
+    if (arch_umem.page_dir[pde] & PAGE_EXT_REMOVABLE)
         arch_umem.page_dir_ext[pde]++;
 
     /* update CPU caches. */
-    if (get_cr3() == arch_umem.page_dir_phys)
-        set_cr3(get_cr3());
+    /*flush_tlb();*/
 
     return ESUCCESS;
 }
@@ -371,7 +328,7 @@ uint32_t arch_vmpage_unmap(umem_t *umem, int32_t vaddr) {
     arch_umem = get_arch_umem_t(umem);
 
     pde = (vaddr >> 22) & 0x3FF; /* page dir entry */
-    pagetbl = (uint32_t *)(arch_umem.page_dir_ext[pde]&PAGE_BASE_MASK);
+    pagetbl = (uint32_t *)(arch_umem.page_dir[pde]&PAGE_BASE_MASK);
     pe = (vaddr >> 12) & 0x3FF; /* page entry; */
 
     if (arch_umem.region_dir[pde] && arch_umem.region_dir[pde]->region[pe]) {
@@ -394,12 +351,12 @@ uint32_t arch_vmpage_unmap(umem_t *umem, int32_t vaddr) {
 
     pagetbl[pe] = 0;
 
-    if (arch_umem.page_dir_ext[pde] & PAGE_EXT_REMOVABLE)
+    if (arch_umem.page_dir[pde] & PAGE_EXT_REMOVABLE)
         arch_umem.page_dir_ext[pde]--;
 
-    if ((arch_umem.page_dir_ext[pde]&PAGE_FLAG_MASK)==PAGE_EXT_REMOVABLE) {
+    if ((arch_umem.page_dir[pde]&PAGE_FLAG_MASK)==PAGE_EXT_REMOVABLE) {
         /* page table is empty */
-        kfree(arch_umem.page_dir_ext[pde] & PAGE_BASE_MASK);
+        kfree(arch_umem.page_dir[pde] & PAGE_BASE_MASK);
         arch_umem.page_dir_ext[pde] = 0;
         arch_umem.page_dir[pde] = 0;
         /* also deallocate the associated region table */
@@ -408,12 +365,13 @@ uint32_t arch_vmpage_unmap(umem_t *umem, int32_t vaddr) {
     }
 
     /* update CPU caches. */
-    if (get_cr3() == arch_umem.page_dir_phys)
-        set_cr3(get_cr3());
+    /*flush_tlb();*/
 
     return ESUCCESS;
 
 }
+
+#if 0
 
 void arch_set_page(umem_t *umem, uint32_t vaddr, uint32_t paddr) {
 
@@ -466,6 +424,8 @@ void arch_vmpage_attach_file(umem_t *umem,
 
 }
 
+#endif
+
 /****************************************************************************/
 /*                        Virtual Memory Organization                       */
 /****************************************************************************/
@@ -510,10 +470,6 @@ uint32_t arch_vminit(umem_t *umem) {
         arch_umem->region_dir[i] = 0;
     }
 
-    /* now we can safely get the physical address of page_dir: */
-    arch_umem->page_dir_phys =
-        arch_vmpage_getAddr(NULL, (uint32_t) arch_umem->page_dir);
-
     /* return */
     umem->arch_reg = (void *) arch_umem;
     return ESUCCESS;
@@ -521,7 +477,8 @@ uint32_t arch_vminit(umem_t *umem) {
 
 void arch_vmswitch(umem_t *umem) {
     arch_umem_t arch_umem = get_arch_umem_t(umem);
-    set_cr3(arch_umem.page_dir_phys);
+    cr3 = arch_umem.page_dir;
+    flush_tlb();
 }
 
 void arch_vmdestroy(umem_t *umem) {
@@ -537,80 +494,70 @@ void arch_vmdestroy(umem_t *umem) {
 /*                            Page Fault Handler                            */
 /****************************************************************************/
 
-int32_t page_fault(uint32_t err) {
-
+void tlb_miss() {
     /* variable declarations:  */
     /* ----------------------- */
     arch_umem_t arch_umem;
-    uint32_t pde, *pagetbl, pe, paddr, read = 0;
+    uint32_t pde, *pagetbl, pe, paddr, vaddr, read = 0;
     file_mem_t *region = NULL;
-
-    /* error source must be page not present:  */
-    /* --------------------------------------- */
-    if (err & PAGE_ENTRY_P)
-        return -1;
 
     /* get umem structures of current process:  */
     /* ---------------------------------------- */
     arch_umem = get_arch_umem_t(NULL);
 
-    /* get page entry of the address stored in cr2:  */
-    /* --------------------------------------------- */
-    pde = (get_cr2() >> 22) & 0x3FF; /* page dir entry */
-    if (!(arch_umem.page_dir[pde] & PAGE_ENTRY_P))
-        return -1;
-    pagetbl = (uint32_t *) (arch_umem.page_dir_ext[pde]&PAGE_BASE_MASK);
-    pe = (get_cr2() >> 12) & 0x3FF; /* page entry; */
-
-    /* validate the page fault:  */
-    /* ------------------------- */
-    if ((pagetbl[pe] & PAGE_ENTRY_P) || !(pagetbl[pe] & PAGE_ENTRY_AF))
-        return -1;
-
-    /* get info about the mapping */
-    if (arch_umem.region_dir[pde] /* not a kernel page? */) {
-        region = arch_umem.region_dir[pde]->region[pe];
+    /* get page entry of the address stored in badvaddr:  */
+    /* -------------------------------------------------- */
+    vaddr = get_badvaddr();
+    pde = (vaddr >> 22) & 0x3FF; /* page dir entry */
+    if (!(arch_umem.page_dir[pde] & PAGE_ENTRY_P)) {
+        panic(NULL, "Page fault!\n");
     }
+    pagetbl = (uint32_t *) (arch_umem.page_dir[pde]&PAGE_BASE_MASK);
+    pe = (vaddr >> 12) & 0x3FF; /* page entry; */
+    if (!(pagetbl[pe] & PAGE_ENTRY_P) && !(pagetbl[pe] & PAGE_ENTRY_AF)) {
+        panic(NULL, "Page fault!\n");
+    }
+
+    /*printk("vaddr: %x %x %x\n", vaddr, pagetbl, pagetbl[pe]);*/
 
     /* allocate memory:  */
     /* ----------------- */
-    if (region == NULL) {
-        paddr = ppalloc();
-    } else {
-        /* a mapped file */
-        if (!region->paddr) {
-            region->paddr = ppalloc();
-            /* consider reading */
-            read = 1;
+    if (pagetbl[pe] & PAGE_ENTRY_AF) {
+        if (arch_umem.region_dir[pde])
+            region = arch_umem.region_dir[pde]->region[pe];
+        if (region == NULL) {
+            /* normal page */
+            paddr = ppalloc();
+        } else {
+            /* a mapped file */
+            if (!region->paddr) {
+                region->paddr = ppalloc();
+                /* consider reading */
+                read = 1;
+            }
+            paddr = region->paddr;
         }
-        paddr = region->paddr;
+        pagetbl[pe] |= paddr;
+        pagetbl[pe] |= PAGE_ENTRY_P;
+        pagetbl[pe] &= ~PAGE_ENTRY_AF;
+    } else {
+        paddr = pagetbl[pe];
     }
 
-    /* update entry:  */
-    /* -------------- */
-    pagetbl[pe] |= paddr;
-    pagetbl[pe] |= PAGE_ENTRY_P;
-    pagetbl[pe] &= ~PAGE_ENTRY_AF;
-
-    /* update cache:  */
-    /* -------------- */
-    set_cr3(get_cr3());
+    /* update TLB:  */
+    /* ------------ */
+    fill_tlb(vaddr>>12, paddr>>12, 1);
 
     /* read from disk:  */
     /* ---------------- */
     if (read) {
-        fsd_t *fsdriver = region->file->mp->sb->fsdriver;
-        void * buf = (void *)(get_cr2() & PAGE_BASE_MASK);
+        /*fsd_t *fsdriver = region->file->mp->sb->fsdriver;
+        void * buf = (void *)(vaddr & PAGE_BASE_MASK);
         fsdriver->seek(region->file, region->pos);
-        fsdriver->read(region->file, buf, PAGE_SIZE);
+        fsdriver->read(region->file, buf, PAGE_SIZE);*/
     }
 
-    /* return:  */
-    /* -------- */
-    return 0;
 }
-
-#endif
 
 #else
 

@@ -7,6 +7,8 @@
 void (*isr[8])(int *regs);
 
 unsigned char x;
+unsigned int isr_loc;
+extern int isr_routine;
 
 void print_status() {
     int reg;
@@ -75,8 +77,14 @@ void handle_interrupt(int *regs) {
     pic_enable();
 }
 
+void set_isr_loc(void *loc) {
+    isr_loc = (unsigned int) loc;
+}
+
 void isr_init() {
     int i;
+    /* set ISR location */
+    set_isr_loc(&isr_routine);
     /* initialize ISRs with NULL */
     for (i = 0; i < 8; i++)
         isr[i] = 0;

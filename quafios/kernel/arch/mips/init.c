@@ -30,6 +30,9 @@
 
 void arch_init() {
 
+    /* initialize isr */
+    isr_init();
+
     /* start paging */
     page_init();
 

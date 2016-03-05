@@ -38,6 +38,7 @@ void bios_init() {
 
     /* isr routines */
     bios.isr.ptrs         = isr;
+    bios.isr.set_isr_loc  = set_isr_loc;
 
     /* load gp register with ptr to bios structure */
     __asm__("or $gp, $0, %0"::"r"(&bios));

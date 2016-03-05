@@ -28,6 +28,8 @@
 
 void init()  {
 
+    char *str;
+
     /* Print splash screen: */
     splash();
 
@@ -36,6 +38,10 @@ void init()  {
 
     /* Initialize Memory Management System: */
     mm_init();
+    printk("initialized!\n");
+    /*str = (char *) kmalloc(50);
+    strcpy(str, "hey you!\n");
+    printk(str);*/
     idle();
 
     /* Device Manager: */

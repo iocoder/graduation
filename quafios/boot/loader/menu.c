@@ -156,6 +156,10 @@ void print_menu_option(int32_t line, char *str, int32_t selected) {
     printf("%c ", 179);
 }
 
+void cli() {
+    __asm__("mtc0 %0, $12"::"r"(0xABCDDCBE));
+}
+
 void loadnes() {
     cls();
     if (loadfile(0, 63, "/boot/nes.bin", 0x80010000)) {
@@ -171,9 +175,9 @@ void loadquaf() {
         printf("Quafios kernel not found! halting...");
         while(1);
     }
+    cli();
     __asm__("jr %0"::"r"(0x80010000));
 }
-
 
 void show_menu() {
     int32_t i;

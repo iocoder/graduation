@@ -35,6 +35,7 @@ typedef struct {
 
 typedef struct {
     /*14*/ void (**ptrs)(int *regs);
+    /*15*/ void (*set_isr_loc)(void *loc);
 } bios_isr_t;
 
 typedef struct {
