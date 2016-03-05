@@ -30,7 +30,8 @@ export QCFLAGS = -mno-abicalls -mips1 \
 	  -Iinclude \
 	  -I$(TSD)/kernel/include \
 	  -I$(TSD)/qlibc/include \
-	  -I$(TSD)/gui/include
+	  -I$(TSD)/gui/include \
+	  -D ARCH_MIPS -D SUBARCH_MIPS
 
 export QLFLAGS = -L$(TBD)/qlibc/lib -L$(TBD)/gui/lib
 

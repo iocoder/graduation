@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> i386: kernel stack.                              | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,16 @@
  *
  */
 
-int main() {
+#ifdef ARCH_I386
 
-    /* initialize bios structure */
-    bios_init();
+#include <arch/type.h>
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+#include <i386/stack.h>
 
-    /* show menu */
-    show_menu();
+uint8_t kernel_stack[KERNEL_STACK_SIZE] __attribute__ ((aligned(16)));
 
-    /* done */
-    return 0;
+#else
 
-}
+typedef int dummy;
+
+#endif

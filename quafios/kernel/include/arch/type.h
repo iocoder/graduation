@@ -26,4 +26,10 @@
  *
  */
 
+#ifdef ARCH_I386
 #include <i386/type.h>
+#endif
+
+#ifdef ARCH_MIPS
+#include <mips/type.h>
+#endif

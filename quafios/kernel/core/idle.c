@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> idle() procedure.                                | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,6 @@
  *
  */
 
-int main() {
-
-    /* initialize bios structure */
-    bios_init();
-
-    /* initialize bootinfo structure */
-    bootinfo_init();
-
-    /* show menu */
-    show_menu();
-
-    /* done */
-    return 0;
-
+void idle() {
+    while(1);
 }

@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> i386 initialization.                             | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,27 @@
  *
  */
 
-int main() {
+#ifdef ARCH_I386
 
-    /* initialize bios structure */
-    bios_init();
+void arch_init() {
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+    /* Start paging: */
+    page_init();
 
-    /* show menu */
-    show_menu();
+    /* Initialize Data Structures: */
+    gdt_init();        /* General Descriptor Table */
+    idt_init();        /* Interrupt Descriptor Table */
+    ts_init();         /* Task Segment Structure. */
 
-    /* done */
-    return 0;
+    /* Initialize Interrupt Service Routine: */
+    exception_init();  /* Exception handler. */
+    irq_init();        /* IRQ handler. */
+    syscall_init();    /* System call handler. */
 
 }
+
+#else
+
+typedef int dummy;
+
+#endif

@@ -6,6 +6,8 @@
 
 void (*isr[8])(int *regs);
 
+unsigned char x;
+
 void print_status() {
     int reg;
     __asm__("mfc0 %0, $12":"=r"(reg):"r"(0xFFFFFFFF));
@@ -24,7 +26,23 @@ void print_epc() {
     print_fmt("EPC: %x\n", reg);
 }
 
+void print_badvaddr() {
+    int reg;
+    __asm__("mfc0 %0, $8;":"=r"(reg):"r"(0xFFFFFFFF));
+    print_fmt("BadVaddr: %x\n", reg);
+}
+
 void handle_interrupt(int *regs) {
+    int cause;
+    __asm__("mfc0 %0, $13":"=r"(cause):"r"(0xFFFFFFFF));
+    if (cause == 4) {
+        print_fmt("EPIC exception!\n");
+        print_epc();
+        print_cause();
+        print_status();
+        print_badvaddr();
+        while(1);
+    }
     switch (pic_read()) {
         case 0:
             pit_irq();
@@ -49,8 +67,10 @@ void handle_interrupt(int *regs) {
     }
     if (isr[pic_read()&7])
         isr[pic_read()&7](regs);
-    //print_epc();
-    //print_cause();
+    *((unsigned short *) 0xBE000000) = x++;
+    /*print_epc();
+    print_cause();
+    print_status();*/
     //print_fmt("int source: %x\n", pic_read());
     pic_enable();
 }

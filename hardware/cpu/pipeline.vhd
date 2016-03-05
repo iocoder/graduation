@@ -34,6 +34,7 @@ architecture Behavioral of pipeline is
 
 -- TYPES
 type     regfile_t  is array (0 to 31) of STD_LOGIC_VECTOR (31 downto 0);
+type     tlb_t      is array (0 to 63) of STD_LOGIC_VECTOR (40 downto 0);
 
 -- CONTROL SIGNALS
 constant REG_DEST       : integer := 0;
@@ -147,6 +148,8 @@ signal   id_is_gtz      : STD_LOGIC := '0';
 signal   id_is_mfc0     : STD_LOGIC := '0';
 signal   id_is_mtc0     : STD_LOGIC := '0';
 signal   id_is_rfe      : STD_LOGIC := '0';
+signal   id_is_tlbr     : STD_LOGIC := '0';
+signal   id_is_tlbwi    : STD_LOGIC := '0';
 signal   id_is_cop0     : STD_LOGIC := '0';
 signal   id_pc_src      : STD_LOGIC_VECTOR ( 7 downto 0) := x"00";
 signal   id_if_flush    : STD_LOGIC := '0';
@@ -212,6 +215,8 @@ signal   mem_data_in    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_data_out   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_tmp        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_tmp2       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   mem_pagemiss   : STD_LOGIC := '0';
+signal   mem_cached     : STD_LOGIC := '0';
 signal   mem_rk         : STD_LOGIC_VECTOR ( 4 downto 0) := "00000";
 signal   mem_is_mfc0    : STD_LOGIC := '0';
 signal   mem_is_mtc0    : STD_LOGIC := '0';
@@ -229,6 +234,20 @@ signal   wb_is_mfc0     : STD_LOGIC := '0';
 signal   wb_is_mtc0     : STD_LOGIC := '0';
 signal   wb_exception   : STD_LOGIC := '0';
 
+-- TLB
+signal   instr_vaddr    : STD_LOGIC_VECTOR (31 downto 0);
+signal   instr_paddr    : STD_LOGIC_VECTOR (31 downto 0);
+signal   instr_miss     : boolean := false;
+signal   data_vaddr     : STD_LOGIC_VECTOR (31 downto 0);
+signal   data_paddr     : STD_LOGIC_VECTOR (31 downto 0);
+signal   data_miss      : boolean := false;
+signal   tlb_read_en    : boolean := false;
+signal   tlb_write_en   : boolean := false;
+signal   tlb_entrylo    : STD_LOGIC_VECTOR (31 downto 0);
+signal   tlb_entryhi    : STD_LOGIC_VECTOR (31 downto 0);
+signal   tlb            : tlb_t  := (others => "0" & x"0000000000");
+attribute ram_style of tlb : signal is "block";
+
 -- coprocessor registers:
 constant IEc            : integer := 0;
 constant KUc            : integer := 1;
@@ -239,6 +258,11 @@ constant KUo            : integer := 5;
 
 constant IR             : STD_LOGIC_VECTOR (4 downto 0) := "00000";
 
+signal   Index          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 0
+signal   Random         : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 1
+signal   EntryLo        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 2
+signal   BadVaddr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 8
+signal   EntryHi        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 10
 signal   SR             : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 12
 signal   CAUSE          : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 13
 signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 14
@@ -246,11 +270,15 @@ signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 14
 signal   CAUSE_tmp      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   EPC_tmp        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
+signal   if_badvaddr    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   mem_badvaddr   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+
 signal   got_rising     : std_logic := '0';
 signal   got_falling    : std_logic := '0';
 
 signal   int_busy       : boolean := false;
 signal   iSTALL         : STD_LOGIC;
+
 
 begin
 
@@ -262,6 +290,59 @@ begin
 --                                    has moved to phase 1
 
 iSTALL <= '1' when STALL='1' or ex_busy = 1 or int_busy or mem_busy else '0';
+
+--------------------------------------------------------------------------------
+--                                TLB                                         --
+--------------------------------------------------------------------------------
+
+process(CLK50)
+
+variable data_entry  : std_logic_vector(40 downto 0);
+variable read_entry  : std_logic_vector(40 downto 0);
+variable write_entry : std_logic_vector(40 downto 0);
+
+begin
+
+    if (CLK50 = '0' and CLK50'event) then
+        if (id_is_tlbwi='1' and (ex_instr  = x"00000000" or
+                                 mem_instr = x"00000000" or
+                                 wb_instr  = x"00000000")) then
+            write_entry(19 downto  0) := EntryLo(31 downto 12);
+            write_entry(39 downto 20) := EntryHi(31 downto 12);
+            write_entry(40) := EntryLo(9);
+            tlb(conv_integer(Index)) <= write_entry;
+        end if;
+        if (id_is_tlbr='1') then
+            read_entry := tlb(conv_integer(Index));
+            tlb_entrylo(31 downto 12) <= read_entry(19 downto  0);
+            tlb_entryhi(31 downto 12) <= read_entry(39 downto 20);
+            tlb_entrylo(9) <= read_entry(40);
+        end if;
+        -- instrution access
+        -- data access
+        data_entry := tlb(conv_integer(data_vaddr(17 downto 12)));
+        if (data_vaddr(31) = '0' or data_vaddr(30) = '1') then
+            -- 0x00000000-0x7FFFFFFF
+            -- 0xC0000000-0xFFFFFFFF
+            if (data_entry(39 downto 20) = data_vaddr(31 downto 12) and
+                data_entry(40) = '1') then
+                data_miss <=false;
+                data_paddr<=data_entry(19 downto 0)&data_vaddr(11 downto 0);
+            else
+                data_miss <=true;
+            end if;
+        elsif (data_vaddr(29) = '0') then
+            -- 0x80000000-0x9FFFFFFF
+            data_paddr <= "000" & data_vaddr(28 downto 0);
+            data_miss  <= false;
+        else
+            -- 0xA0000000-0xBFFFFFFF
+            data_paddr <= "000" & data_vaddr(28 downto 0);
+            data_miss  <= false;
+        end if;
+    end if;
+
+end process;
 
 --------------------------------------------------------------------------------
 --                              EXCEPTIONS                                    --
@@ -280,7 +361,10 @@ begin
             -- if exception conditions are satisfied, next cycle is
             -- an exception fetch, and all stages before and including the
             -- exception-source stage shall be flushed.
-            if (int_busy) then
+            if (mem_exception='1') then
+                CAUSE    <= x"00000004"; -- TLB miss
+                EPC      <= alu_add(mem_pc4,x"FFFFFFFC");
+            elsif (int_busy) then
                 int_busy <= false;
                 -- store EPC and CAUSE
                 if (id_is_jr='1' or id_is_jalr='1' or
@@ -328,21 +412,25 @@ begin
 
         handle_exception := false;
 
-        if (if_exception='1' and
+        if (if_exphndl= '0' and
+            if_exception='1' and
             id_instr=x"00000000" and
             ex_instr=x"00000000" and
             mem_instr=x"00000000") then
             -- IF STAGE EXCEPTION
             handle_exception := true;
-        elsif (id_exception='1' and
+        elsif (if_exphndl= '0' and
+               id_exception='1' and
                ex_instr=x"00000000" and
                mem_instr=x"00000000") then
             -- ID EXCEPTION
             handle_exception := true;
-        elsif (ex_exception='1' and mem_instr=x"00000000") then
+        elsif (if_exphndl= '0' and
+               ex_exception='1' and
+               mem_instr=x"00000000") then
             -- EX EXCEPTION
             handle_exception := true;
-        elsif (mem_exception='1') then
+        elsif (if_exphndl= '0' and mem_exception='1') then
             -- MEM EXCEPTION
             handle_exception := true;
         end if;
@@ -365,7 +453,7 @@ begin
                     if_pc <= id_jraddr;
                 end if;
             end if;
-            if_exphndl   <= '0';
+            if_exphndl <= '0';
         end if;
     end if;
 end process;
@@ -397,7 +485,9 @@ begin
         if (id_exception='1') then
             -- don't move
             id_next_instr := id_instr;
-        elsif (if_exception='1') then
+        elsif (if_exception='1' or
+               ex_exception='1' or
+               mem_exception = '1') then
             -- flush ID
             id_instr      <= x"00000000";
             id_next_instr := x"00000000";
@@ -443,6 +533,10 @@ impure function read_cop0_reg(indx : in STD_LOGIC_VECTOR (4  downto 0))
     variable retval    : STD_LOGIC_VECTOR(31 downto 0);
     begin
         case indx is
+            when "00000" => retval := x"0000"&"00"&Index(5 downto 0)&x"00";
+            when "00010" => retval := EntryLo;
+            when "01000" => retval := BadVaddr;
+            when "01010" => retval := EntryHi;
             when "01100" => retval := SR;
             when "01101" => retval := CAUSE;
             when "01110" => retval := EPC;
@@ -455,6 +549,9 @@ procedure write_cop0_reg(indx : in STD_LOGIC_VECTOR (4  downto 0);
                          val  : in STD_LOGIC_VECTOR (31 downto 0)) is
     begin
         case indx is
+            when "00000" => Index(5 downto 0) <= val(13 downto 8);
+            when "00010" => EntryLo <= val;
+            when "01010" => EntryHi <= val;
             when "01100" => SR <= val;
             when others  =>
         end case;
@@ -479,19 +576,38 @@ begin
     end if;
 
     if (CLK = '0' and CLK'event) then
-        if (if_exphndl='1' and if_exception='1') then
+        if (if_exphndl='1' and got_falling /= got_rising) then
             -- disable interrupts
+            tlb_read_en <= false;
             SR(5 downto 0) <= SR(3 downto 0) & "00";
+            -- set badvaddr
+            if (mem_exception='1') then
+                BadVaddr <= mem_badvaddr;
+            end if;
         elsif (id_is_rfe='1') then
+            tlb_read_en <= false;
             SR(3 downto 0) <= SR(5 downto 2);
         elsif (wb_is_mtc0='1') then
             -- write to coprocessor registers
+            tlb_read_en <= false;
             write_cop0_reg(wb_rk, wb_value_of_rk);
+        elsif (id_is_tlbr='1') then
+            -- read TLB entry
+            EntryLo <= tlb_entrylo;
+            EntryHi <= tlb_entryhi;
+            tlb_read_en <= true;
         else
+            tlb_read_en <= false;
             -- read from coprocessor registers
             id_cop0_regrd <= read_cop0_reg(id_rd);
         end if;
 
+        if (id_is_tlbwi='1') then
+            -- write TLB entry
+            tlb_write_en <= true;
+        else
+            tlb_write_en <= false;
+        end if;
     end if;
 
 end process;
@@ -538,6 +654,10 @@ id_is_mfc0  <= '1' when is_cop0(id_opcode) and id_rs = "00000" else '0';
 id_is_mtc0  <= '1' when is_cop0(id_opcode) and id_rs = "00100" else '0';
 id_is_rfe   <= '1' when is_cop0(id_opcode) and id_rs = "10000"
                                            and id_funct = "010000" else '0';
+id_is_tlbr  <= '1' when is_cop0(id_opcode) and id_rs = "10000"
+                                           and id_funct = "000001" else '0';
+id_is_tlbwi <= '1' when is_cop0(id_opcode) and id_rs = "10000"
+                                           and id_funct = "000010" else '0';
 id_is_cop0  <= '1' when is_cop0(id_opcode) else '0';
 
 -- register file outputs
@@ -680,7 +800,7 @@ id_stall <= '1' when
      (ex_ctrlsig(REG_WRITE) ='1' and ex_rk /="00000" and ex_rk =id_rt) or
      (mem_ctrlsig(REG_WRITE)='1' and mem_rk/="00000" and mem_rk=id_rt))) or
     -- mfc0/mtc0 need to introduce 3 bubbles in the pipeline
-    ((id_is_mfc0='1' or id_is_mtc0='1' or id_is_rfe='1') and
+    ((id_is_cop0 = '1') and
      (ex_instr /= x"00000000" or mem_instr /= x"00000000" or
       wb_instr /= x"00000000"))
     -- any other case shouldn't need a stall
@@ -717,7 +837,7 @@ begin
     if (CLK = '1' and CLK'event and iSTALL = '0') then
         if (ex_exception='1') then
             -- don't move
-        elsif (id_exception='1' or id_ifclk = '0') then
+        elsif (id_exception='1' or mem_exception='1' or id_ifclk = '0') then
             -- introduce a bubble in EX
             ex_instr     <= x"00000000";
             ex_pc4       <= x"00000000";
@@ -888,21 +1008,28 @@ begin
     end if;
 end process;
 
+-- precalculation for physical address
+data_vaddr <= ex_alu_output;
+
 --------------------------------------------------------------------------------
 --                               MEM STAGE                                    --
 --------------------------------------------------------------------------------
 
 -- register transfer
 process(CLK)
+
 begin
     if ( CLK = '1' and CLK'event ) then
         if (iSTALL = '0') then
             if (mem_exception='1') then
-                -- don't move
-            elsif (ex_exception='1') then
+                if (if_exphndl = '1') then
+                    mem_exception <= '0';
+                end if;
+            elsif (ex_exception='1' or
+                   ((ex_ctrlsig(MEM_READ)='1' OR
+                    ex_ctrlsig(MEM_WRITE)='1') and data_miss)) then
                 -- introduce a bubble in MEM
                 mem_instr     <= x"00000000";
-                mem_pc4       <= x"00000000";
                 mem_memop     <= x"00";
                 mem_ctrlsig   <= x"00";
                 mem_addr      <= x"00000000";
@@ -910,6 +1037,18 @@ begin
                 mem_rk        <= "00000";
                 mem_is_mfc0   <= '0';
                 mem_is_mtc0   <= '0';
+                if (((ex_ctrlsig(MEM_READ)='1' OR
+                    ex_ctrlsig(MEM_WRITE)='1') and data_miss)) then
+                    -- TLB data miss, throw exception
+                    mem_pagemiss <= '1';
+                    mem_exception <= '1';
+                    mem_badvaddr <= ex_alu_output;
+                    mem_pc4      <= ex_pc4;
+                else
+                    mem_pagemiss <= '0';
+                    mem_exception <= '0';
+                    mem_pc4      <= x"00000000";
+                end if;
             else
                 -- normal operation
                 mem_instr     <= ex_instr;
@@ -919,10 +1058,13 @@ begin
                 mem_rk        <= ex_rk;
                 mem_is_mfc0   <= ex_is_mfc0;
                 mem_is_mtc0   <= ex_is_mtc0;
+                mem_pagemiss  <= '0';
+                mem_exception <= '0';
                 if (ex_ctrlsig(MEM_READ)='1' OR
                     ex_ctrlsig(MEM_WRITE)='1') then
                     if (ex_memop = MEMOP_LEFT) then
                         -- first cycle
+                        mem_pagemiss <= '0';
                         mem_busy    <= true;
                         mem_addr    <= ex_alu_output(31 downto 2) & "00";
                         mem_phase   <= conv_integer(ex_alu_output(1 downto 0));
@@ -938,6 +1080,8 @@ begin
                             mem_data_in <= x"000000" & ex_muxop2( 7 downto  0);
                         end if;
                     elsif (ex_memop = MEMOP_RIGHT) then
+                        -- first cycle
+                        mem_pagemiss <= '0';
                         mem_busy    <= true;
                         mem_addr    <= ex_alu_output(31 downto 2) & "11";
                         mem_phase   <= conv_integer(ex_alu_output(1 downto 0));
@@ -954,14 +1098,15 @@ begin
                         end if;
                     else
                         -- normal load/store instruction
+                        mem_pagemiss <= '0';
                         mem_busy    <= false;
-                        mem_addr    <= ex_alu_output;
                         mem_data_in <= ex_muxop2;
+                        mem_addr    <= data_paddr;
                     end if;
                 else
                     mem_busy    <= false;
-                    mem_addr    <= ex_alu_output;
                     mem_data_in <= ex_muxop2;
+                    mem_addr    <= ex_alu_output;
                 end if;
             end if;
         elsif (STALL='0') then

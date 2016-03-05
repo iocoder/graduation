@@ -11,6 +11,11 @@ SECTIONS {
 	.data   : {*(.data           )}
 	.bss    : {*(.bss COMMON     )}
 
+	. = (. + 0xFFF) & 0xFFFFF000;
+
 	kernel_physical_end = . ;
+
+        /* physical memory map is allocated here */
+        pmmap = . ;
 
 }

@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> Splash Screen.                                   | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,32 @@
  *
  */
 
-int main() {
+#include <arch/type.h>
 
-    /* initialize bios structure */
-    bios_init();
+void splash() {
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+    uint32_t i;
 
-    /* show menu */
-    show_menu();
+    printk("\n");
 
-    /* done */
-    return 0;
+    printk("%a", 0x0B);
+
+    for (i = 0; i < 80; i++)
+            printk("=");
+    printk("                                 Quafios 2.0.1\n");
+    for (i = 0; i < 80; i++)
+            printk("=");
+
+    printk("\n");
+
+    printk("%a", 0x0A);
+    printk("Quafios Copyright (C) 2015 Mostafa Abd El-Aziz.\n");
+    printk("This program comes with ABSOLUTELY NO WARRANTY; ");
+    printk("for details\ntype `view /home/DISCLAIMER'.\n");
+    printk("This is free software, ");
+    printk("and you are welcome to redistribute it under certain\n");
+    printk("conditions; type `view /home/COPYING' ");
+    printk("for details.\n");
+    printk("%a", 0x0F);
 
 }

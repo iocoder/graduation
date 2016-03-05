@@ -29,45 +29,11 @@
 #ifndef MEMMAN_H
 #define MEMMAN_H
 
-#include <lib/linkedlist.h>
 #include <arch/type.h>
+#include <arch/mem.h>
+#include <lib/linkedlist.h>
 
 #define NULL            0
-
-/* IF 32 BIT: */
-#define MEMORY_LIMIT        __extension__ 0x100000000ULL    /* 4GB. */
-#define MEMORY_PAGES        ((uint32_t)(MEMORY_LIMIT/PAGE_SIZE))
-
-extern uint32_t kernel_physical_start;
-extern uint32_t kernel_physical_end;
-
-#define KERNEL_PHYSICAL_START   ((uint32_t) &kernel_physical_start)
-
-#define KERNEL_PHYSICAL_END     ((uint32_t) &kernel_physical_end)
-
-#define KERNEL_SIZE             (KERNEL_PHYSICAL_END-KERNEL_PHYSICAL_START)
-
-#define KTEXT_MEMORY_BASE       0x00000000
-#define KTEXT_MEMORY_END        0x08000000
-#define KTEXT_MEMORY_SIZE       (KTEXT_MEMORY_END-KTEXT_MEMORY_BASE)
-#define KTEXT_MEMORY_PAGES      (KTEXT_MEMORY_SIZE/PAGE_SIZE)
-#define KTEXT_MEMORY_PTABLES    (KTEXT_MEMORY_PAGES/PAGE_TABLE_ENTRY_COUNT)
-
-#define USER_MEMORY_BASE        KTEXT_MEMORY_END
-#define USER_MEMORY_END         0xC0000000
-#define USER_MEMORY_SIZE        (USER_MEMORY_END-USER_MEMORY_BASE)
-#define USER_MEMORY_PAGES       (USER_MEMORY_SIZE/PAGE_SIZE)
-#define USER_MEMORY_PTABLES     (USER_MEMORY_PAGES/PAGE_TABLE_ENTRY_COUNT)
-
-#define KERNEL_MEMORY_BASE      USER_MEMORY_END
-#define KERNEL_MEMORY_END       MEMORY_LIMIT
-#define KERNEL_MEMORY_SIZE      ((uint32_t)(\
-                                    KERNEL_MEMORY_END-KERNEL_MEMORY_BASE))
-#define KERNEL_MEMORY_PAGES     (KERNEL_MEMORY_SIZE/PAGE_SIZE)
-#define KERNEL_MEMORY_PTABLES   (KERNEL_MEMORY_PAGES/PAGE_TABLE_ENTRY_COUNT)
-
-/* User Memory:  */
-/* ============= */
 
 typedef struct ummap_entry_str {
     struct ummap_entry_str *next;

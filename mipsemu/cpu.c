@@ -866,15 +866,51 @@ int cpu_clk() {
                 tlb_write(1, mem_addr, mem_data_in, 1);
                 break;
             case MEMOP_LEFT:
-                printf("SWL not implemented!!!\n");
-                exit(0);
+                switch(mem_addr&3) {
+                    case 0:
+                        tlb_write(1, mem_addr-0, (mem_data_in>>24)&0xFF, 0);
+                        break;
+                    case 1:
+                        tlb_write(1, mem_addr-0, (mem_data_in>>24)&0xFF, 0);
+                        tlb_write(1, mem_addr-1, (mem_data_in>>16)&0xFF, 0);
+                        break;
+                    case 2:
+                        tlb_write(1, mem_addr-0, (mem_data_in>>24)&0xFF, 0);
+                        tlb_write(1, mem_addr-1, (mem_data_in>>16)&0xFF, 0);
+                        tlb_write(1, mem_addr-2, (mem_data_in>> 8)&0xFF, 0);
+                        break;
+                    case 3:
+                        tlb_write(1, mem_addr-0, (mem_data_in>>24)&0xFF, 0);
+                        tlb_write(1, mem_addr-1, (mem_data_in>>16)&0xFF, 0);
+                        tlb_write(1, mem_addr-2, (mem_data_in>> 8)&0xFF, 0);
+                        tlb_write(1, mem_addr-3, (mem_data_in>> 0)&0xFF, 0);
+                        break;
+                }
                 break;
             case MEMOP_WORD:
                 tlb_write(1, mem_addr, mem_data_in, 2);
                 break;
             case MEMOP_RIGHT:
-                printf("SWR not implemented!!!\n");
-                exit(0);
+                switch(mem_addr&3) {
+                    case 0:
+                        tlb_write(1, mem_addr+0, (mem_data_in>> 0)&0xFF, 0);
+                        tlb_write(1, mem_addr+1, (mem_data_in>> 8)&0xFF, 0);
+                        tlb_write(1, mem_addr+2, (mem_data_in>>16)&0xFF, 0);
+                        tlb_write(1, mem_addr+3, (mem_data_in>>24)&0xFF, 0);
+                        break;
+                    case 1:
+                        tlb_write(1, mem_addr+0, (mem_data_in>> 0)&0xFF, 0);
+                        tlb_write(1, mem_addr+1, (mem_data_in>> 8)&0xFF, 0);
+                        tlb_write(1, mem_addr+2, (mem_data_in>>16)&0xFF, 0);
+                        break;
+                    case 2:
+                        tlb_write(1, mem_addr+0, (mem_data_in>> 0)&0xFF, 0);
+                        tlb_write(1, mem_addr+1, (mem_data_in>> 8)&0xFF, 0);
+                        break;
+                    case 3:
+                        tlb_write(1, mem_addr+0, (mem_data_in>> 0)&0xFF, 0);
+                        break;
+                }
                 break;
             default:
                 /* exception */

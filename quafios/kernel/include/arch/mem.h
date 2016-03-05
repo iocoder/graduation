@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> Arch: Memory header.                             | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,10 @@
  *
  */
 
-int main() {
+#ifdef ARCH_I386
+#include <i386/mem.h>
+#endif
 
-    /* initialize bios structure */
-    bios_init();
-
-    /* initialize bootinfo structure */
-    bootinfo_init();
-
-    /* show menu */
-    show_menu();
-
-    /* done */
-    return 0;
-
-}
+#ifdef ARCH_MIPS
+#include <mips/mem.h>
+#endif

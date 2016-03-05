@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> MIPS: process operations.                        | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,47 @@
  *
  */
 
-int main() {
+#ifdef ARCH_MIPS
 
-    /* initialize bios structure */
-    bios_init();
+#include <arch/type.h>
+#include <sys/proc.h>
+#include <sys/scheduler.h>
+#include <sys/error.h>
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
-
-    /* show menu */
-    show_menu();
-
-    /* done */
-    return 0;
+void umode_jmp(int32_t vaddr, int32_t sp) {
 
 }
+
+void copy_context(proc_t *child) {
+
+}
+
+void arch_proc_switch(proc_t *oldproc, proc_t *newproc) {
+
+}
+
+void arch_yield() {
+
+}
+
+int32_t arch_get_int_status() {
+
+}
+
+void arch_set_int_status(int32_t status) {
+
+}
+
+void arch_disable_interrupts() {
+
+}
+
+void arch_enable_interrupts() {
+
+}
+
+#else
+
+typedef int dummy;
+
+#endif

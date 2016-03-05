@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> MIPS: type header.                               | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,20 @@
  *
  */
 
-int main() {
+#ifndef TYPE_H
+#define TYPE_H
 
-    /* initialize bios structure */
-    bios_init();
+typedef                        char          int8_t;
+typedef                        short         int16_t;
+typedef                        int           int32_t;
+__extension__ typedef          long long int int64_t;
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+typedef               unsigned char          uint8_t;
+typedef               unsigned short         uint16_t;
+typedef               unsigned int           uint32_t;
+__extension__ typedef unsigned long long int uint64_t;
 
-    /* show menu */
-    show_menu();
+typedef uint32_t size_t;
+typedef int32_t  ssize_t;
 
-    /* done */
-    return 0;
-
-}
+#endif

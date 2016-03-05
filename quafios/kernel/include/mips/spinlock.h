@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> MIPS: spinlock header                            | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,15 @@
  *
  */
 
-int main() {
+#ifndef SPINLOCK_H
+#define SPINLOCK_H
 
-    /* initialize bios structure */
-    bios_init();
+#include <mips/type.h>
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+typedef int32_t spinlock_t;
 
-    /* show menu */
-    show_menu();
+void spinlock_init(spinlock_t *spinlock);
+void spinlock_acquire(spinlock_t *spinlock);
+void spinlock_release(spinlock_t *spinlock);
 
-    /* done */
-    return 0;
-
-}
+#endif

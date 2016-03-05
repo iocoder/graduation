@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  -> bootinfo structure.                              | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,40 @@
  *
  */
 
-int main() {
+#include <arch/type.h>
+#include <sys/bootinfo.h>
 
-    /* initialize bios structure */
-    bios_init();
+bootinfo_t *bootinfo = (bootinfo_t *) 0x8000C000;
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+void bootinfo_init() {
 
-    /* show menu */
-    show_menu();
+    uint32_t cont = 0;
 
-    /* done */
-    return 0;
+    /* read memory layout: */
+    bootinfo->mem_ents = 1;
+    bootinfo->mem_ent[0].base         = 0;
+    bootinfo->mem_ent[0].end          = 16*1024*1024;
+
+    /* determine RAM regions that should be reserved: */
+    bootinfo->res[BI_BOOTLOADER].base = 0x08000;
+    bootinfo->res[BI_BOOTLOADER].end  = 0x0C000;
+
+    bootinfo->res[BI_BOOTINFO].base   = 0x0C000;
+    bootinfo->res[BI_BOOTINFO].end    = 0x10000;
+
+    bootinfo->res[BI_KERNEL].base     = 0x10000;
+    bootinfo->res[BI_KERNEL].end      = 0x10000; /* temp value */
+
+    bootinfo->res[BI_RAMDISK].base    = 0x00000;
+    bootinfo->res[BI_RAMDISK].end     = 0x00000; /* temp value */
+
+    bootinfo->res[BI_ARCH0].base      = 0x00000;
+    bootinfo->res[BI_ARCH0].end       = 0x08000; /* BIOS */
+
+    bootinfo->res[BI_ARCH1].base      = 0x00000;
+    bootinfo->res[BI_ARCH1].end       = 0x00000;
+
+    bootinfo->res[BI_ARCH2].base      = 0x00000;
+    bootinfo->res[BI_ARCH2].end       = 0x00000;
 
 }

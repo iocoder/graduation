@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> MIPS: assembly header                            | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,24 @@
  *
  */
 
-int main() {
+#ifndef ASM_H
+#define ASM_H
 
-    /* initialize bios structure */
-    bios_init();
+#include <arch/type.h>
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+/* coprocessor registers */
+#define INDEX     "0"
+#define ENTRY_LO  "2"
+#define ENTRY_HI  "10"
+#define SR        "12"
+#define CAUSE     "13"
+#define EPC       "14"
 
-    /* show menu */
-    show_menu();
+/* coprocessor instructions */
+#define mtc0(rs, nn) __asm__("mtc0 %0, $" nn::"r"(rs));
+#define mfc0(rs, nn) __asm__("mfc0 %0, $" nn:"=r"(rs));
+#define rfe()        __asm__("rfe");
+#define tlbr()       __asm__("tlbr");
+#define tlbwi()      __asm__("tlbwi");
 
-    /* done */
-    return 0;
-
-}
+#endif

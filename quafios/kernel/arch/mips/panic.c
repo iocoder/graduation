@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> MIPS: panic() procedure.                         | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,23 @@
  *
  */
 
-int main() {
+#ifdef ARCH_MIPS
 
-    /* initialize bios structure */
-    bios_init();
+#include <arch/type.h>
+#include <sys/scheduler.h>
+#include <sys/printk.h>
+#include <tty/vtty.h>
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+typedef struct {
+    int hey;
+} Regs;
 
-    /* show menu */
-    show_menu();
-
-    /* done */
-    return 0;
+void panic(Regs *regs, const char *fmt, ...) {
 
 }
+
+#else
+
+typedef int dummy;
+
+#endif

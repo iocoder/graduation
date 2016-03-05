@@ -69,6 +69,7 @@
 
 #define BASE_GENESIS_MACHINE            0x02
 #define  SUB_GENESIS_MACHINE_IBMPC      0x00
+#define  SUB_GENESIS_MACHINE_MIPS       0x01
 
 /* ============================================================== */
 /*                    Virtual Memory Bus Codes                    */

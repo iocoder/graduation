@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios MIPS Boot-Loader.                           | |
- *        | |  -> main() procedure.                                | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> Device Management Unit .                         | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,17 @@
  *
  */
 
-int main() {
+#include <arch/type.h>
+#include <sys/device.h>
 
-    /* initialize bios structure */
-    bios_init();
+uint32_t dev_read(device_t *dev, uint64_t off, uint32_t size, char *buff) {
 
-    /* initialize bootinfo structure */
-    bootinfo_init();
+}
 
-    /* show menu */
-    show_menu();
+uint32_t dev_write(device_t *dev, uint64_t off, uint32_t size, char *buff) {
 
-    /* done */
-    return 0;
+}
+
+uint32_t dev_ioctl(device_t *dev, uint32_t cmd, void *data) {
 
 }
