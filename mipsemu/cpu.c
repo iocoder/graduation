@@ -1611,7 +1611,7 @@ int cpu_clk() {
     /* coprocessor handling (on the falling edge) */
     if (if_exphndl) {
         /* disable interrupts */
-        SR <<= 2;
+        SR = (SR & 0xFFFFFFC0)|((SR<<2)&0x3F);
     } else if (id_is_rfe && !ex_instr && !mem_instr && !wb_instr) {
         /* return from exception */
         SR = (SR & 0xFFFFFFF0)|((((unsigned int)SR)>>2)&0xF);
