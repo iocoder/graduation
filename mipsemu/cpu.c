@@ -76,6 +76,9 @@
 #define TAG_LOW         12
 #define TAG_HIGH        31
 
+/* TLB parameters */
+#define TLB_ENTRIES     64
+
 /* halt */
 int halted;
 
@@ -120,6 +123,8 @@ int id_is_gtz;
 int id_is_mfc0;
 int id_is_mtc0;
 int id_is_rfe;
+int id_is_tlbr;
+int id_is_tlbwi;
 int id_is_cop0;
 int id_pc_src;
 int id_if_flush;
@@ -166,6 +171,7 @@ int mem_pc4;
 int mem_memop;
 int mem_ctrlsig[CTRL_COUNT];
 int mem_tmp;
+int mem_badvaddr;
 int mem_addr;
 int mem_data_in;
 int mem_data_out;
@@ -188,10 +194,21 @@ int wb_is_mtc0;
 int wb_exception;
 
 /* coprocessor */
+int Index;
+int EntryLo;
+int BadVaddr;
+int EntryHi;
 int SR;
 int CAUSE;
 int EPC;
 int irq;
+
+/* TLB */
+struct {
+    unsigned int virt;
+    unsigned int phy;
+    unsigned int valid;
+} tlb[TLB_ENTRIES] = {0};
 
 /* caches */
 unsigned int icache_v   [CACHE_LINES] = {0};
@@ -358,25 +375,67 @@ void cache_write(int which, unsigned int addr, unsigned int data, int size) {
     }
 }
 
+/* TLB miss? */
+int tlb_miss(unsigned int virt) {
+    int indx;
+    if (!((virt&0xC0000000) == 0x80000000)) {
+        virt >>= 12;
+        indx = virt & (TLB_ENTRIES-1);
+        return !tlb[indx].valid || tlb[indx].virt != virt;
+    }
+    return 0;
+}
+
 /* TLB read */
 unsigned int tlb_read(int which, unsigned int addr, int size) {
+    int indx, virt;
     if ((addr&0xC0000000) == 0x80000000) {
         addr &= 0x1FFFFFFF;
+    } else {
+        virt = addr >> 12;
+        indx = virt & (TLB_ENTRIES-1);
+        addr = (tlb[indx].phy<<12)|(addr&0xFFF);
     }
     return cache_read(which, addr, size);
 }
 
 /* TLB write */
 void tlb_write(int which, unsigned int addr, unsigned int data, int size) {
+    int indx, virt;
     if ((addr&0xC0000000) == 0x80000000) {
         addr &= 0x1FFFFFFF;
+    } else {
+        virt = addr >> 12;
+        indx = virt & (TLB_ENTRIES-1);
+        addr = (tlb[indx].phy<<12)|(addr&0xFFF);
     }
     cache_write(which, addr, data, size);
+}
+
+/* access TLB for read */
+void read_tlb_entry() {
+    EntryLo = (tlb[Index].phy <<12) | (tlb[Index].valid<<9);
+    EntryHi = (tlb[Index].virt<<12);
+}
+
+/* overwrite TLB entry */
+void write_tlb_entry() {
+    tlb[Index].phy   = (EntryLo>>12)&0xFFFFF;
+    tlb[Index].virt  = (EntryHi>>12)&0xFFFFF;
+    tlb[Index].valid = (EntryLo>> 9)&1;
 }
 
 /* read coprocessor 0 register */
 int read_cop0_reg(int indx) {
     switch (indx) {
+        case 0:
+            return Index<<8;
+        case 2:
+            return EntryLo;
+        case 8:
+            return BadVaddr;
+        case 10:
+            return EntryHi;
         case 12:
             return SR;
         case 13:
@@ -391,6 +450,15 @@ int read_cop0_reg(int indx) {
 /* write coprocessor 0 register */
 void write_cop0_reg(int indx, int val) {
     switch (indx) {
+        case 0:
+            Index = (val>>8)&(TLB_ENTRIES-1);
+            break;
+        case 2:
+            EntryLo = val;
+            break;
+        case 10:
+            EntryHi = val;
+            break;
         case 12:
             SR = val;
             break;
@@ -820,10 +888,23 @@ int cpu_clk() {
     /* process MEM stage */
     if (mem_exception) {
         /* don't move */
-    } else if (ex_exception) {
+        if (if_exphndl) {
+            mem_exception = 0;
+        }
+    } else if (ex_exception ||
+               ((ex_ctrlsig[MEM_READ]||ex_ctrlsig[MEM_WRITE])&&
+                tlb_miss(ex_alu_output))) {
         /* introduce a bubble in MEM */
         mem_instr   = 0;
-        mem_pc4     = 0;
+        if ((ex_ctrlsig[MEM_READ]||ex_ctrlsig[MEM_WRITE])&&
+                tlb_miss(ex_alu_output)) {
+            mem_exception = 1;
+            mem_badvaddr  = ex_alu_output;
+            mem_pc4       = ex_pc4;
+            BadVaddr      = mem_badvaddr;
+        } else {
+            mem_pc4     = 0;
+        }
         mem_memop   = 0;
         mem_ctrlsig[REG_DEST]   = 0;
         mem_ctrlsig[ALU_SRC]    = 0;
@@ -995,7 +1076,7 @@ int cpu_clk() {
     /* process EX stage */
     if (ex_exception) {
         /* don't move */
-    } else if (id_exception || !ifclk) {
+    } else if (id_exception || mem_exception || !ifclk) {
         /* introudce bubble */
         ex_instr = 0;
         ex_pc4 = 0;
@@ -1163,19 +1244,19 @@ int cpu_clk() {
             ex_alu_output = ((unsigned int) ex_alu1)<((unsigned int) ex_alu2);
             break;
         case ALUOP_SLL:
-            ex_alu_output = ex_alu2 << ex_shamt;
+            ex_alu_output = ((unsigned int) ex_alu2) << ex_shamt;
             break;
         case ALUOP_SRL:
-            ex_alu_output = ex_alu2 >> ex_shamt;
+            ex_alu_output = ((unsigned int) ex_alu2) >> ex_shamt;
             break;
         case ALUOP_SRA:
             ex_alu_output = (((signed int) ex_alu2) / (1<<ex_shamt));
             break;
         case ALUOP_SLLV:
-            ex_alu_output = ex_alu2 << (ex_alu1&31);
+            ex_alu_output = ((unsigned int) ex_alu2) << (ex_alu1&31);
             break;
         case ALUOP_SRLV:
-            ex_alu_output = ex_alu2 >> (ex_alu1&31);
+            ex_alu_output = ((unsigned int) ex_alu2) >> (ex_alu1&31);
             break;
         case ALUOP_SRAV:
             ex_alu_output = (((signed int) ex_alu2) / (1<<(ex_alu1&31)));
@@ -1189,7 +1270,7 @@ int cpu_clk() {
     /* ID */
     if (id_exception) {
         /* don't move */
-    } else if (if_exception) {
+    } else if (if_exception || ex_exception || mem_exception) {
         /* flush ID */
         id_instr = 0;
         id_pc    = if_pc4-4;
@@ -1237,6 +1318,8 @@ int cpu_clk() {
     id_is_mfc0 = is_cop0(id_opcode) & (id_rs ==  0);
     id_is_mtc0 = is_cop0(id_opcode) & (id_rs ==  4);
     id_is_rfe  = is_cop0(id_opcode) & (id_rs == 16) & (id_funct == 16);
+    id_is_tlbr = is_cop0(id_opcode) & (id_rs == 16) & (id_funct == 1);
+    id_is_tlbwi = is_cop0(id_opcode) & (id_rs == 16) & (id_funct == 2);
     id_is_cop0 = is_cop0(id_opcode);
     if (is_alureg(id_opcode)) {
         id_ctrlsig_in[REG_DEST]   = 1;
@@ -1452,8 +1535,7 @@ int cpu_clk() {
           (mem_ctrlsig[REG_WRITE] && mem_rk &&
           (mem_rk == id_rs || (id_opcode != 1 && mem_rk == id_rt)))))
         ||
-        ((id_is_mfc0 || id_is_mtc0 || id_is_rfe) &&
-         (ex_instr || mem_instr || wb_instr))) {
+        ((id_is_cop0) && (ex_instr || mem_instr || wb_instr))) {
         /* hazard, stall the pipeline */
         id_stall = 1;
         id_ifclk = 0;
@@ -1527,16 +1609,23 @@ int cpu_clk() {
     if_instr = tlb_read(0, if_pc, 2);
 
     /* coprocessor handling (on the falling edge) */
-    if (if_exphndl && if_exception) {
+    if (if_exphndl) {
         /* disable interrupts */
         SR <<= 2;
-    } else if (id_is_rfe) {
+    } else if (id_is_rfe && !ex_instr && !mem_instr && !wb_instr) {
         /* return from exception */
-        SR = (SR & 0xFFFFFFF0)|((SR>>2)&0xF);
+        SR = (SR & 0xFFFFFFF0)|((((unsigned int)SR)>>2)&0xF);
     } else if (wb_is_mtc0) {
         write_cop0_reg(wb_rk, wb_value_of_rk);
+    } else if (id_is_tlbr) {
+        /* read TLB entry */
+        read_tlb_entry();
     } else {
         id_cop0_regrd = read_cop0_reg(id_rd);
+    }
+    /* write TLB entry */
+    if (id_is_tlbwi && !ex_instr && !mem_instr && !wb_instr) {
+        write_tlb_entry();
     }
 
     /* handle exceptions (falling edge) */
@@ -1544,7 +1633,10 @@ int cpu_clk() {
      * an exception fetch, and all stages before and including the
      * exception-source stage shall be flushed.
      */
-    if (if_exphndl) {
+    if (mem_exception) {
+        CAUSE = 0x00000004; /* TLB miss */
+        EPC   = mem_pc4-4;
+    } if (if_exphndl) {
         /* exception served */
         if_exception = 0;
         irq = 0;
@@ -1599,6 +1691,8 @@ void cpu_init() {
     id_is_mfc0 = 0;
     id_is_mtc0 = 0;
     id_is_rfe = 0;
+    id_is_tlbr = 0;
+    id_is_tlbwi = 0;
     id_is_cop0 = 0;
     id_pc_src = 0;
     id_if_flush = 0;
@@ -1656,6 +1750,7 @@ void cpu_init() {
     mem_ctrlsig[MEM_WRITE] = 0;
     mem_ctrlsig[BRANCH] = 0;
     mem_tmp = 0;
+    mem_badvaddr = 0;
     mem_addr = 0;
     mem_data_in = 0;
     mem_data_out = 0;

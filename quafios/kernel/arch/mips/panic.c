@@ -38,8 +38,12 @@ typedef struct {
 } Regs;
 
 void panic(Regs *regs, const char *fmt, ...) {
-    printk(NULL, "KERNEL PANIC! %s\n", fmt);
-    while(1);
+    printk("KERNEL PANIC! %s\n", fmt);
+    print_cause();
+    print_status();
+    print_epc();
+    print_badvaddr();
+    idle();
 }
 
 #else
