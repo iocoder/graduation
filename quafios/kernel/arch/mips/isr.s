@@ -144,4 +144,3 @@ return:
     mfc0  $k0, $14
     jr    $k0
     rfe
-

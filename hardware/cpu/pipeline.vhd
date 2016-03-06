@@ -241,8 +241,6 @@ signal   instr_miss     : boolean := false;
 signal   data_vaddr     : STD_LOGIC_VECTOR (31 downto 0);
 signal   data_paddr     : STD_LOGIC_VECTOR (31 downto 0);
 signal   data_miss      : boolean := false;
-signal   tlb_read_en    : boolean := false;
-signal   tlb_write_en   : boolean := false;
 signal   tlb_entrylo    : STD_LOGIC_VECTOR (31 downto 0);
 signal   tlb_entryhi    : STD_LOGIC_VECTOR (31 downto 0);
 signal   tlb            : tlb_t  := (others => "0" & x"0000000000");
@@ -578,35 +576,27 @@ begin
     if (CLK = '0' and CLK'event) then
         if (if_exphndl='1' and got_falling /= got_rising) then
             -- disable interrupts
-            tlb_read_en <= false;
             SR(5 downto 0) <= SR(3 downto 0) & "00";
             -- set badvaddr
             if (mem_exception='1') then
                 BadVaddr <= mem_badvaddr;
             end if;
-        elsif (id_is_rfe='1') then
-            tlb_read_en <= false;
+        elsif (id_is_rfe='1' and
+               ex_instr=x"00000000" and
+               mem_instr=x"00000000" and
+               wb_instr=x"00000000" and
+               got_rising /= got_falling) then
             SR(3 downto 0) <= SR(5 downto 2);
         elsif (wb_is_mtc0='1') then
             -- write to coprocessor registers
-            tlb_read_en <= false;
             write_cop0_reg(wb_rk, wb_value_of_rk);
         elsif (id_is_tlbr='1') then
             -- read TLB entry
             EntryLo <= tlb_entrylo;
             EntryHi <= tlb_entryhi;
-            tlb_read_en <= true;
         else
-            tlb_read_en <= false;
             -- read from coprocessor registers
             id_cop0_regrd <= read_cop0_reg(id_rd);
-        end if;
-
-        if (id_is_tlbwi='1') then
-            -- write TLB entry
-            tlb_write_en <= true;
-        else
-            tlb_write_en <= false;
         end if;
     end if;
 

@@ -35,7 +35,7 @@ unsigned char chr;
 void print_status() {
     int reg;
     __asm__("mfc0 %0, $12":"=r"(reg):"r"(0xFFFFFFFF));
-    printk("reg: %x\n", reg);
+    printk("STATUS: %x\n", reg);
 }
 
 void print_cause() {
