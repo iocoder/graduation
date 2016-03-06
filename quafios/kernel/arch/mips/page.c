@@ -309,8 +309,9 @@ uint32_t arch_vmpage_map(umem_t *umem, uint32_t vaddr, uint32_t user) {
         arch_umem.page_dir_ext[pde]++;
 
     /* update CPU caches. */
-    /*flush_tlb();*/
+    fill_tlb(vaddr>>12, 0, 0);
 
+    /* done */
     return ESUCCESS;
 }
 
@@ -365,13 +366,12 @@ uint32_t arch_vmpage_unmap(umem_t *umem, int32_t vaddr) {
     }
 
     /* update CPU caches. */
-    /*flush_tlb();*/
+    fill_tlb(vaddr>>12, 0, 0);
 
+    /* done */
     return ESUCCESS;
 
 }
-
-#if 0
 
 void arch_set_page(umem_t *umem, uint32_t vaddr, uint32_t paddr) {
 
@@ -386,15 +386,15 @@ void arch_set_page(umem_t *umem, uint32_t vaddr, uint32_t paddr) {
     pde = (vaddr >> 22) & 0x3FF; /* page dir entry */
     if (!(arch_umem.page_dir[pde] & PAGE_ENTRY_P))
         return; /* failed */
-    pagetbl = (uint32_t *) (arch_umem.page_dir_ext[pde]&PAGE_BASE_MASK);
+    pagetbl = (uint32_t *) (arch_umem.page_dir[pde]&PAGE_BASE_MASK);
     pe = (vaddr >> 12) & 0x3FF; /* page entry; */
 
     /* set page entry: */
     pagetbl[pe] = (pagetbl[pe] & PAGE_FLAG_MASK) | paddr;
     pagetbl[pe] |= PAGE_ENTRY_P;
 
-    /* update cache: */
-    set_cr3(get_cr3());
+    /* update CPU caches. */
+    fill_tlb(vaddr>>12, 0, 0);
 
 }
 
@@ -413,7 +413,7 @@ void arch_vmpage_attach_file(umem_t *umem,
     pde = (vaddr >> 22) & 0x3FF; /* page dir entry */
     if (!(arch_umem.page_dir[pde] & PAGE_ENTRY_P))
         return; /* failed */
-    pagetbl = (uint32_t *) (arch_umem.page_dir_ext[pde]&PAGE_BASE_MASK);
+    pagetbl = (uint32_t *) (arch_umem.page_dir[pde]&PAGE_BASE_MASK);
     regiontbl = arch_umem.region_dir[pde];
 
     /* get page entry */
@@ -423,8 +423,6 @@ void arch_vmpage_attach_file(umem_t *umem,
     regiontbl->region[pe] = region;
 
 }
-
-#endif
 
 /****************************************************************************/
 /*                        Virtual Memory Organization                       */

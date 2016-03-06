@@ -62,4 +62,7 @@ void bootinfo_init() {
     bootinfo->res[BI_ARCH2].base      = 0x00000;
     bootinfo->res[BI_ARCH2].end       = 0x00000;
 
+    /* live? */
+    bootinfo->live = 0;
+
 }

@@ -51,8 +51,6 @@ uint32_t cur_physical_page = NULL;
 
 /* physical memory access routines */
 
-#if 0
-
 uint32_t to_phys(uint32_t addr) {
     uint32_t physpage;
     /* touch page */
@@ -120,8 +118,6 @@ void pmem_writel(void *p_addr, uint32_t val) {
     pmem_writeb(((uint8_t *)p_addr)+2, (val>>16) & 0xFF);
     pmem_writeb(((uint8_t *)p_addr)+3, (val>>24) & 0xFF);
 }
-
-#endif
 
 /* allocation and deallocation */
 

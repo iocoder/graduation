@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios Kernel 2.0.1.                               | |
- *        | |  -> Memory manager initialization.                   | |
+ *        | |  -> Partition table routines                         | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -27,17 +27,38 @@
  */
 
 #include <arch/type.h>
+#include <lib/linkedlist.h>
+#include <sys/error.h>
+#include <sys/printk.h>
 #include <sys/mm.h>
+#include <sys/class.h>
+#include <sys/resource.h>
+#include <sys/device.h>
+#include <storage/disk.h>
 
-void mm_init() {
+int32_t partprobe(disk_t *disk) {
 
-    /* Initialize physical memory: */
-    pmem_init();
+    int32_t devid = disk->dev->devid;
+    bus_t *diskbus;
+    device_t *subdev;
+    class_t cls;
+    reslist_t reslist = {0, NULL};
+    device_t *dev = (device_t *) devid_to_dev(devid);
 
-    /* Initialize kernel memory: */
-    kmem_init();
+    /* not a device? */
+    if (!devid)
+        return -EINVAL;
 
-    /* register memory status report in sysfs */
-    mmst_init();
+    /* make generic disk bus */
+    dev_mkbus(&diskbus, BUS_DISK, dev);
+
+    /* add partitions */
+    if (has_mbr(dev)) {
+        disk->partitioned = 1;
+        mbr_scan(dev);
+    }
+
+    /* done */
+    return ESUCCESS;
 
 }

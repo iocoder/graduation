@@ -26,8 +26,6 @@
  *
  */
 
-#ifdef SUBARCH_IBMPC
-
 #include <arch/type.h>
 #include <lib/linkedlist.h>
 #include <sys/error.h>
@@ -71,6 +69,8 @@ driver_t ibmpc_driver = {
 /* ================================================================= */
 /*                       Legacy Video Routines                       */
 /* ================================================================= */
+
+#ifdef SUBARCH_IBMPC
 
 /* Generic VGA characteristics of IBM PC: */
 #define VGA_MEMORY_BASE         0xB8000 /* all IBM PCs support this */
@@ -462,6 +462,8 @@ void legacy_video_init() {
 
 }
 
+#endif
+
 /* ================================================================= */
 /*                           Interface                               */
 /* ================================================================= */
@@ -658,9 +660,3 @@ uint32_t ibmpc_ioctl(device_t *dev, uint32_t cmd, void *data) {
 uint32_t ibmpc_irq(device_t *dev, uint32_t irqn) {
     return ESUCCESS;
 }
-
-#else
-
-typedef int dummy;
-
-#endif

@@ -32,6 +32,22 @@
 
 unsigned char chr;
 
+void irq_reserve() {
+
+}
+
+void irq_to_vector() {
+
+}
+
+void irq_setup() {
+
+}
+
+void enable_irq_system() {
+
+}
+
 void print_status() {
     int reg;
     __asm__("mfc0 %0, $12":"=r"(reg):"r"(0xFFFFFFFF));

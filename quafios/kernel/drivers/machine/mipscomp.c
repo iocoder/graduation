@@ -26,8 +26,6 @@
  *
  */
 
-#ifdef SUBARCH_MIPS
-
 #include <arch/type.h>
 #include <lib/linkedlist.h>
 #include <sys/error.h>
@@ -53,10 +51,10 @@ static class_t classes[] = {
 };
 
 /* driver_t structure that identifies this driver: */
-driver_t mips_driver = {
+driver_t mipscomp_driver = {
     /* cls_count: */ sizeof(classes)/sizeof(class_t),
     /* cls:       */ classes,
-    /* alias:     */ "mips",
+    /* alias:     */ "mipscomp",
     /* probe:     */ mips_probe,
     /* read:      */ mips_read,
     /* write:     */ mips_write,
@@ -68,39 +66,81 @@ driver_t mips_driver = {
 /*                          Console I/O                              */
 /* ================================================================= */
 
+#ifdef SUBARCH_MIPS
+
 #include "../../../../firmware/bios.h"
 
 bootinfo_t *bootinfo = (bootinfo_t *) 0x8000C000;
 
+uint32_t legacy_lfb_enabled = 0;
+uint8_t* legacy_vga_fbuf;
+bios_t *bios_ptr = NULL;
+
+void legacy_reboot() {
+}
+
+int32_t legacy_get_cursor(char *x, char *y) {
+    return ESUCCESS;
+}
+
+int32_t legacy_set_attr_at_off(char x, char y, char attr) {
+    return ESUCCESS;
+}
+
+int32_t legacy_set_char_at_off(char x, char y, char c) {
+    return ESUCCESS;
+}
+
+int32_t legacy_set_cursor(char x, char y) {
+    return ESUCCESS;
+}
+
+void legacy_redraw() {
+
+}
+
 void legacy_video_putc(char chr) {
-    bios_t *ptr;
     /* get ptr to BIOS structure */
-    __asm__("or %0, $0, $gp":"=r"(ptr));
+    if (!bios_ptr) {
+        __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+    }
     /* call function */
-    ptr->vga.print_fmt("%c", chr);
+    bios_ptr->vga.print_fmt("%c", chr);
 }
 
 void legacy_video_attr(char attr) {
-    bios_t *ptr;
     /* get ptr to BIOS structure */
-    __asm__("or %0, $0, $gp":"=r"(ptr));
+    if (!bios_ptr) {
+        __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+    }
     /* call function */
-    ptr->vga.print_fmt("%a", attr);
+    bios_ptr->vga.print_fmt("%a", attr);
+}
+
+void legacy_video_clear() {
+
 }
 
 void legacy_set_isr_loc(void *loc) {
-    bios_t *ptr;
     /* get ptr to BIOS structure */
-    __asm__("or %0, $0, $gp":"=r"(ptr));
+    if (!bios_ptr) {
+        __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+    }
     /* call function */
-    ptr->isr.set_isr_loc(loc);
+    bios_ptr->isr.set_isr_loc(loc);
 }
+
+#endif
 
 /* ================================================================= */
 /*                           Interface                               */
 /* ================================================================= */
 
 uint32_t mips_probe(device_t* dev, void* config) {
+
+    /* inform the user of our progress: */
+    printk("Quafios is running on Mostafa's graduation project.\n");
+
     return ESUCCESS;
 }
 
@@ -119,9 +159,3 @@ uint32_t mips_ioctl(device_t *dev, uint32_t cmd, void *data) {
 uint32_t mips_irq(device_t *dev, uint32_t irqn) {
     return ESUCCESS;
 }
-
-#else
-
-typedef int dummy;
-
-#endif

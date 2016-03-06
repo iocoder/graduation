@@ -60,6 +60,7 @@ extern driver_t ramdisk_driver;
 extern driver_t ps2_keyboard;
 extern driver_t ps2_mouse;
 extern driver_t ibmpc_driver;
+extern driver_t mipscomp_driver;
 extern driver_t isa_driver;
 extern driver_t pci_driver;
 extern driver_t i8253_driver;

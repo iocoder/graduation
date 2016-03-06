@@ -12,8 +12,7 @@ OBJECT_NAME   = kernel
 OBJECT_PREFIX = $(BOOT_DIR)
 LDSCRIPT      = $(CSD)/ld/arch32.ld
 KERNEL_LFLAGS = $(QLFLAGS) -Wl,-T$(LDSCRIPT) -Wl,--build-id=none
-LIBS          =
-# add -lgcc to LIBS
+LIBS          = -lgcc
 DEPS          = $(ALLHFILES) Makefile
 SDIRS         = $(shell cd $(CSD) && find . -type d 2>/dev/null)
 

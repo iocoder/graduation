@@ -91,10 +91,6 @@ semaphore_t ksem;
 /*                           Bitmap Operations                              */
 /* ======================================================================== */
 
-void vtty_ioctl(device_t *dev, int cmd, void *args) {
-
-}
-
 void set_bit(uint32_t i, uint32_t bitno) {
     uint32_t base = (submaps[i].start+bitno)/8;
     uint32_t off  = (submaps[i].start+bitno)%8;

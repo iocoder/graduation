@@ -29,7 +29,7 @@ nes.bin: $(OBJ) $(LINKER_SCRIPT)
 	$(QOC) -O binary nes.elf $@
 
 install-exec-local:
-	$(INSTALL) -D nes.bin $(OBJECT_PREFIX)/nes.bin
+#	$(INSTALL) -D nes.bin $(OBJECT_PREFIX)/nes.bin
 #	$(INSTALL) -D $(CSD)/contra.nes $(OBJECT_PREFIX)/../nes/contra.nes
 
 uninstall-local:

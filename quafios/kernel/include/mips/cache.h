@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios Kernel 2.0.1.                               | |
- *        | |  -> Memory manager initialization.                   | |
+ *        | |  -> MIPS: cache header                               | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,18 +26,9 @@
  *
  */
 
-#include <arch/type.h>
-#include <sys/mm.h>
+#ifndef CACHE_H
+#define CACHE_H
 
-void mm_init() {
+#define writeback() (0) /* TO BE IMPLEMENTED */
 
-    /* Initialize physical memory: */
-    pmem_init();
-
-    /* Initialize kernel memory: */
-    kmem_init();
-
-    /* register memory status report in sysfs */
-    mmst_init();
-
-}
+#endif

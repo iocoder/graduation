@@ -35,6 +35,6 @@ vhdsim/     VHDL code simulation with nvc (VHPI)
 Notes:
 ------
 -> You need gcc and SDL to compile the emulator (mipsemu).
--> You need to cross compile binutils and gcc to compile the firmware
-   * For binutils, you may use "cross-mipsel-linux-gnu-binutils".
-   * For gcc, you may use "cross-mipsel-linux-gnu-gcc".
+-> You need to cross compile binutils, gcc, and libgcc to compile the firmware
+   * Note: before you compile libgcc, please add 'HOST_LIBGCC2_CFLAGS=-mxgot'
+     to 'libgcc/config/mips/t-mips' file in gcc source code.
