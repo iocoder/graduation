@@ -93,8 +93,8 @@ isr:
     j     cause_one
     nop
 cause_zero:
-    /* interrupt */
-    jal   irq
+    /* interrupt request */
+    jal   irq_entry
     nop
     j     return
     nop

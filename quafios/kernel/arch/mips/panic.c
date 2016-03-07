@@ -37,6 +37,32 @@ typedef struct {
     int hey;
 } Regs;
 
+
+void print_status() {
+    int reg;
+    __asm__("mfc0 %0, $12":"=r"(reg):"r"(0xFFFFFFFF));
+    printk("STATUS: %x\n", reg);
+}
+
+void print_cause() {
+    int reg;
+    __asm__("mfc0 %0, $13":"=r"(reg):"r"(0xFFFFFFFF));
+    printk("CAUSE: %x\n", reg);
+}
+
+void print_epc() {
+    int reg;
+    __asm__("mfc0 %0, $14;":"=r"(reg):"r"(0xFFFFFFFF));
+    printk("EPC: %x\n", reg);
+}
+
+void print_badvaddr() {
+    int reg;
+    __asm__("mfc0 %0, $8;":"=r"(reg):"r"(0xFFFFFFFF));
+    printk("BadVaddr: %x\n", reg);
+}
+
+
 void panic(Regs *regs, const char *fmt, ...) {
     printk("KERNEL PANIC! %s\n", fmt);
     print_cause();

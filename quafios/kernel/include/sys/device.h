@@ -78,6 +78,7 @@ extern driver_t usbhub_driver;
 extern driver_t usbmass_driver;
 extern driver_t scsidisk_driver;
 extern driver_t partition_driver;
+extern driver_t gppic_driver;
 extern driver_t *drivers[];
 #define DRIVER_COUNT    (sizeof(drivers)/sizeof(driver_t*))
 
@@ -119,5 +120,6 @@ extern linkedlist devices;
 /* ------------ */
 uint32_t dev_read(device_t *,  uint64_t, uint32_t, char *);
 uint32_t dev_write(device_t *, uint64_t, uint32_t, char *);
+uint32_t dev_ioctl(device_t* dev, uint32_t cmd, void *data);
 
 #endif

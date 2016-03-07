@@ -29,55 +29,125 @@
 #ifdef ARCH_MIPS
 
 #include <arch/type.h>
+#include <arch/irq.h>
+#include <sys/error.h>
+#include <sys/mm.h>
+#include <sys/device.h>
+#include <sys/scheduler.h>
+#include <sys/semaphore.h>
+
+#define IRQ_COUNT 0x10
+
+typedef struct {
+    uint32_t    usable;      /* can be used?              */
+    device_t   *pic_device;  /* Reservation Queue.        */
+    linkedlist  requeue;     /* reservation queue (FCFS). */
+} irq_t;
+
+irq_t irq[IRQ_COUNT] = {0};
 
 unsigned char chr;
 
-void irq_reserve() {
+semaphore_t irqsema;
+
+int32_t irq_setup(uint32_t n, device_t *pic_device) {
+
+    if (n >= IRQ_COUNT)
+        return ENOENT;
+
+    /* setup an IRQ entry: */
+    sema_down(&irqsema);
+    irq[n].pic_device = pic_device;
+    irq[n].usable     = 1;
+    sema_up(&irqsema);
+
+    /* return: */
+    return ESUCCESS;
 
 }
 
-void irq_to_vector() {
+uint32_t irq_reserve(uint32_t n, irq_reserve_t *reserve) {
+
+    int32_t status;
+
+    if (n >= IRQ_COUNT || !irq[n].usable)
+        return ENOENT;
+
+    /* enter critical region */
+    status = arch_get_int_status();
+    arch_disable_interrupts();
+
+    /* add the request to the tail of the queue: */
+    linkedlist_addlast(&(irq[n].requeue), reserve);
+
+    /* exit critical region */
+    arch_set_int_status(status);
+
+    /* done. */
+    return ESUCCESS;
 
 }
 
-void irq_setup() {
+void irq_handler(uint32_t n) {
 
+    int32_t status;
+
+    if (n >= IRQ_COUNT || !irq[n].usable)
+        return; /* nothing to do here. */
+
+    /* enter critical region */
+    status = arch_get_int_status();
+    arch_disable_interrupts();
+
+    if (irq[n].requeue.count) {
+        /* The IRQ is to be served (apply FIRST COME FIRST SERVED). */
+        irq_reserve_t *req     = (irq_reserve_t *) irq[n].requeue.first;
+        device_t      *dev     = req->dev;
+        uint32_t       expires = req->expires;
+        void          *data    = req->data;
+        if (expires) {
+            /* delete the request from the queue */
+            linkedlist_aremove(&(irq[n].requeue), (linknode *) req);
+        }
+        /* now serve it! */
+        dev_irq(dev, n, data);
+    }
+
+    /* exit critical region */
+    arch_set_int_status(status);
+
+    /* Send End of Interrupt Command: */
+    dev_ioctl(irq[n].pic_device, 0, NULL);
+
+    /* call scheduler? */
+    if (n == scheduler_irq) {
+        ticks++;
+        scheduler();
+    }
+
+}
+
+int32_t irq_to_vector(uint32_t n) {
+    return n;
 }
 
 void enable_irq_system() {
-
+    arch_enable_interrupts();
 }
 
-void print_status() {
-    int reg;
-    __asm__("mfc0 %0, $12":"=r"(reg):"r"(0xFFFFFFFF));
-    printk("STATUS: %x\n", reg);
-}
+void irq_entry() {
 
-void print_cause() {
-    int reg;
-    __asm__("mfc0 %0, $13":"=r"(reg):"r"(0xFFFFFFFF));
-    printk("CAUSE: %x\n", reg);
-}
+    int n = 0;
 
-void print_epc() {
-    int reg;
-    __asm__("mfc0 %0, $14;":"=r"(reg):"r"(0xFFFFFFFF));
-    printk("EPC: %x\n", reg);
-}
-
-void print_badvaddr() {
-    int reg;
-    __asm__("mfc0 %0, $8;":"=r"(reg):"r"(0xFFFFFFFF));
-    printk("BadVaddr: %x\n", reg);
-}
-
-void irq() {
+    /* for debugging */
     *((unsigned short *) 0xBE000000) = chr++;
-    printk("interrupt!\n");
-    print_epc();
-    print_status();
-    print_cause();
+
+    /* ask for interrupt number */
+    dev_ioctl(irq[0].pic_device, 1, &n);
+
+    /* handle interrupt */
+    irq_handler(n);
+
 }
 
 #else

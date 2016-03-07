@@ -33,6 +33,8 @@
 #include <sys/scheduler.h>
 #include <sys/error.h>
 
+#include <mips/asm.h>
+
 void umode_jmp(int32_t vaddr, int32_t sp) {
 
 }
@@ -50,19 +52,19 @@ void arch_yield() {
 }
 
 int32_t arch_get_int_status() {
-
+    return get_status() & 1;
 }
 
 void arch_set_int_status(int32_t status) {
-
+    set_status((get_status() & 0xFFFFFFFE)|(status&1));
 }
 
 void arch_disable_interrupts() {
-
+    arch_set_int_status(0);
 }
 
 void arch_enable_interrupts() {
-
+    arch_set_int_status(1);
 }
 
 #else

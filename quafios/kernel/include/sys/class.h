@@ -48,6 +48,7 @@
 #define BUS_CARDBUS                     0x0A
 #define BUS_USB                         0x0B
 #define BUS_DISK                        0x0C
+#define BUS_GP                          0x0D
 #define BUS_UNDEFINED                   0xFF
 
 /* ============================================================== */
@@ -242,6 +243,13 @@
 #define   IF_USB_HUB_HISPEED_SINGLE_TT  0x01
 #define   IF_USB_HUB_HISPEED_MULTI_TT   0x02
 #define   IF_USB_HUB_ROOTHUB            0xFF
+
+/* ============================================================== */
+/*                         GP Bus Codes                           */
+/* ============================================================== */
+
+#define BASE_GP_PIC                     0x01
+#define  SUB_GP_PIC                     0x00
 
 /* ============================================================== */
 /*                        DISK Bus Codes                          */

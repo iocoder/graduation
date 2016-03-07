@@ -10,11 +10,11 @@ static int buf_read = 0;
 static unsigned char last_read = 0;
 
 int next_read() {
-    return (buf_read+1)%sizeof(KBD_BUF_SIZE);
+    return (buf_read+1)%KBD_BUF_SIZE;
 }
 
 int next_write() {
-    return (buf_write+1)%sizeof(KBD_BUF_SIZE);
+    return (buf_write+1)%KBD_BUF_SIZE;
 }
 
 unsigned char get_from_buf() {

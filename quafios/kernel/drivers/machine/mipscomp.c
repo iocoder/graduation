@@ -138,9 +138,35 @@ void legacy_set_isr_loc(void *loc) {
 
 uint32_t mips_probe(device_t* dev, void* config) {
 
-    /* inform the user of our progress: */
-    printk("Quafios is running on Mostafa's graduation project.\n");
+    bus_t *hostbus;
+    device_t *t;
+    class_t cls;
+    reslist_t reslist = {0, NULL};
+    resource_t *resv;
 
+    /* inform the user of our progress: */
+    printk("Quafios is running on %aMostafa's graduation project%a.\n",
+           0x0E, 0x0F);
+
+    /* Create bus: */
+    dev_mkbus(&hostbus, BUS_GP, dev);
+
+    /* add PIC */
+    cls.bus    = BUS_GP;
+    cls.base   = BASE_GP_PIC;
+    cls.sub    = SUB_GP_PIC;
+    cls.progif = IF_ANY;
+    resv = (resource_t *) kmalloc(sizeof(resource_t)*1);
+    if (resv == NULL)
+        return ENOMEM;
+    resv[0].type = RESOURCE_TYPE_MEM;
+    resv[0].data.mem.base = 0xBE802000;
+    resv[0].data.mem.size = 1;
+    reslist.count = 1;
+    reslist.list  = resv;
+    dev_add(&t, hostbus, cls, reslist, NULL);
+
+    /* done */
     return ESUCCESS;
 }
 

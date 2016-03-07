@@ -2,7 +2,11 @@
 
 int curproc = 0;
 uint64_t ticks = 0;
-int scheduler_irq;
+int scheduler_irq = 0;
+
+void scheduler() {
+
+}
 
 void send() {
 

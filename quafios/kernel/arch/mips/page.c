@@ -58,17 +58,6 @@ regiontbl_t *general_regiondir[PAGE_DIR_ENTRY_COUNT]
 uint32_t *cr3; /* just like cr3 of x86 */
 int32_t page_initialized = 0;
 
-void file_close() {
-
-}
-
-uint32_t get_badvaddr() {
-    uint32_t reg;
-    __asm__("mfc0 %0, $8;":"=r"(reg):"r"(0xFFFFFFFF));
-    return reg;
-}
-
-
 /****************************************************************************/
 /*                        TLB access routines                               */
 /****************************************************************************/
@@ -549,10 +538,10 @@ void tlb_miss() {
     /* read from disk:  */
     /* ---------------- */
     if (read) {
-        /*fsd_t *fsdriver = region->file->mp->sb->fsdriver;
+        fsd_t *fsdriver = region->file->mp->sb->fsdriver;
         void * buf = (void *)(vaddr & PAGE_BASE_MASK);
         fsdriver->seek(region->file, region->pos);
-        fsdriver->read(region->file, buf, PAGE_SIZE);*/
+        fsdriver->read(region->file, buf, PAGE_SIZE);
     }
 
 }
