@@ -30,8 +30,6 @@
 
 .global isr, isr_init
 
-.section .text.isr
-
 .section .text.isr_init
 
 isr_init:
@@ -43,6 +41,8 @@ isr_init:
     lw    $ra, 16($sp)
     addiu $sp, $sp, 20
     jr    $ra
+
+.section .text.isr
 
 isr:
 .set noat
@@ -84,6 +84,7 @@ isr:
     sw    $31, 4*31($sp)
     /* store pointer to regs */
     move  $a0, $sp
+    addi  $sp, -4*32
     /* examine cause */
     mfc0  $t0, $13
     srl   $t0, $t0, 2
@@ -106,6 +107,7 @@ cause_one:
     nop
 return:
     /* pop registers */
+    addi  $sp, 4*32
     lw    $0,  4* 0($sp)
     lw    $1,  4* 1($sp)
     lw    $2,  4* 2($sp)

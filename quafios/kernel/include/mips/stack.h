@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios Kernel 2.0.1.                               | |
- *        | |  -> MIPS: process operations.                        | |
+ *        | |  -> MIPS: stack header.                              | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,55 +26,28 @@
  *
  */
 
-#ifdef ARCH_MIPS
+#ifndef STACK_H
+#define STACK_H
 
+#include <i386/protect.h>
 #include <arch/type.h>
-#include <sys/proc.h>
-#include <sys/scheduler.h>
-#include <sys/error.h>
 
-#include <mips/asm.h>
+/* Registers & Stacks:  */
+/* -------------------- */
+#define store_reg()     printk("stack.h: store_reg() stub!\n")
+#define restore_reg()   printk("stack.h: restore_reg() stub!\n")
 
-void umode_jmp(int32_t vaddr, int32_t sp) {
+typedef struct {
+    int x;
+} Regs;
 
-}
+#define get_regs()      printk("stack.h: get_regs() stub!")
 
-void copy_context(proc_t *child) {
+/* Stack: */
+#define USER_STACK_SIZE         0x1000000 /* 16MB       */
+#define KERNEL_STACK_SIZE       8*1024    /* 8KB Stack. */
+extern uint8_t kernel_stack[];
 
-}
-
-void arch_proc_switch(proc_t *oldproc, proc_t *newproc) {
-
-}
-
-void arch_yield() {
-
-}
-
-int32_t arch_get_int_status() {
-    return get_status() & 1;
-}
-
-void arch_set_int_status(int32_t status) {
-    set_status((get_status() & 0xFFFFFFFE)|(status&1));
-}
-
-void arch_disable_interrupts() {
-    arch_set_int_status(0);
-}
-
-void arch_enable_interrupts() {
-    arch_set_int_status(1);
-}
-
-void print_sp() {
-    uint32_t reg;
-    __asm__("move %0, $sp":"=r"(reg));
-    printk("sp: %x\n", reg);
-}
-
-#else
-
-typedef int dummy;
+#define stack_switch()  printk("stack.h: stack_switch() stub!")
 
 #endif

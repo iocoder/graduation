@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios Kernel 2.0.1.                               | |
- *        | |  -> MIPS: process operations.                        | |
+ *        | |  -> Filesystem: I/O Control.                         | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,55 +26,38 @@
  *
  */
 
-#ifdef ARCH_MIPS
-
 #include <arch/type.h>
-#include <sys/proc.h>
+#include <sys/fs.h>
 #include <sys/scheduler.h>
-#include <sys/error.h>
 
-#include <mips/asm.h>
+/***************************************************************************/
+/*                             file_ioctl()                                */
+/***************************************************************************/
 
-void umode_jmp(int32_t vaddr, int32_t sp) {
+int32_t file_ioctl(file_t *file, uint32_t cmd, void *data) {
 
-}
+    switch(file->inode->mode & FT_MASK) {
+        case FT_REGULAR:
+        case FT_DIR:
+        return file->inode->sb->fsdriver->ioctl(file, cmd, data);
 
-void copy_context(proc_t *child) {
-
-}
-
-void arch_proc_switch(proc_t *oldproc, proc_t *newproc) {
-
-}
-
-void arch_yield() {
+        case FT_SPECIAL:
+        return dev_ioctl(file->inode->dev, cmd, data);
+    }
 
 }
 
-int32_t arch_get_int_status() {
-    return get_status() & 1;
+/***************************************************************************/
+/*                                ioctl()                                  */
+/***************************************************************************/
+
+int32_t ioctl(int32_t fd, uint32_t cmd, void *data) {
+
+    /* fd must be a valid open descriptor: */
+    if (fd < 0 || fd >= FD_MAX || curproc->file[fd] == NULL)
+        return -EBADF;
+
+    /* do the ioctl: */
+    return -file_ioctl(curproc->file[fd], cmd, data);
+
 }
-
-void arch_set_int_status(int32_t status) {
-    set_status((get_status() & 0xFFFFFFFE)|(status&1));
-}
-
-void arch_disable_interrupts() {
-    arch_set_int_status(0);
-}
-
-void arch_enable_interrupts() {
-    arch_set_int_status(1);
-}
-
-void print_sp() {
-    uint32_t reg;
-    __asm__("move %0, $sp":"=r"(reg));
-    printk("sp: %x\n", reg);
-}
-
-#else
-
-typedef int dummy;
-
-#endif

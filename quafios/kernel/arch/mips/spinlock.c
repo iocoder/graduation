@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios Kernel 2.0.1.                               | |
- *        | |  -> MIPS: process operations.                        | |
+ *        | |  -> MIPS: spinlocks.                                 | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -29,48 +29,24 @@
 #ifdef ARCH_MIPS
 
 #include <arch/type.h>
-#include <sys/proc.h>
+#include <arch/spinlock.h>
+#include <sys/mm.h>
 #include <sys/scheduler.h>
-#include <sys/error.h>
 
-#include <mips/asm.h>
-
-void umode_jmp(int32_t vaddr, int32_t sp) {
-
+void spinlock_init(spinlock_t *spinlock) {
+    /* initialize spinlock to 0 (currently not acquired) */
+    *spinlock = 0;
 }
 
-void copy_context(proc_t *child) {
-
+void spinlock_acquire(spinlock_t *spinlock) {
+    /* stub */
 }
 
-void arch_proc_switch(proc_t *oldproc, proc_t *newproc) {
-
-}
-
-void arch_yield() {
-
-}
-
-int32_t arch_get_int_status() {
-    return get_status() & 1;
-}
-
-void arch_set_int_status(int32_t status) {
-    set_status((get_status() & 0xFFFFFFFE)|(status&1));
-}
-
-void arch_disable_interrupts() {
-    arch_set_int_status(0);
-}
-
-void arch_enable_interrupts() {
-    arch_set_int_status(1);
-}
-
-void print_sp() {
-    uint32_t reg;
-    __asm__("move %0, $sp":"=r"(reg));
-    printk("sp: %x\n", reg);
+void spinlock_release(spinlock_t *spinlock) {
+    /* set spinlock to zero to let other processes
+     * be able to hold it by spinlock_acquire().
+     */
+    *spinlock = 0;
 }
 
 #else

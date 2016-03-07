@@ -86,9 +86,7 @@ device_t *devid_to_dev(uint32_t devid) {
     /* get the device_t structure that corresponds to "devid". */
     device_t *ptr = (device_t *) devices.first;
     while((ptr != NULL) && (ptr->devid != devid)) {
-        printk("ptr before: %x\n", ptr);
         ptr = (device_t *) ptr->next;
-        printk("ptr after: %x\n", ptr);
     }
     return ptr;
 }

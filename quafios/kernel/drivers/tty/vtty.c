@@ -187,7 +187,7 @@ uint32_t vtty_read(device_t *dev, uint64_t off, uint32_t size, char *buff) {
 
 uint32_t vtty_write(device_t *dev, uint64_t off, uint32_t size, char *buff) {
     int i = 0;
-    while(i < size)
+    while (i < size)
         print_char(buff[i++]);
     return size;
 }

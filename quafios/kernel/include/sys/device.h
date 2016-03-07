@@ -50,7 +50,7 @@ struct driver_str {
     uint32_t (*write)(device_t *dev, uint64_t off, uint32_t size, char *buff);
     uint32_t (*ioctl)(device_t *dev, uint32_t cmd, void *data);
     uint32_t (*irq  )(device_t *dev, uint32_t irqn);
-};
+} __attribute__((packed));
 
 /* Supported Drivers:  */
 /* ------------------- */
@@ -90,7 +90,7 @@ typedef struct {
     void*        next;      /* next bus in the linkedlist. */
     uint32_t     type;      /* bus class type.             */
     struct device_str *ctl; /* Controller Device.          */
-} bus_t;
+} __attribute__((packed)) bus_t;
 
 /* Bus Linked List:  */
 /* ----------------- */
@@ -110,7 +110,7 @@ struct device_str {
     reslist_t           resources;  /* Resources list.                       */
     struct super_block* sb;         /* filesystem super block.               */
     uint32_t            drvreg;     /* driver related value.                 */
-};
+} __attribute__((packed));
 
 /* Device Driver List:  */
 /* -------------------- */
@@ -120,6 +120,8 @@ extern linkedlist devices;
 
 /* Prototypes:  */
 /* ------------ */
+uint32_t dev_add(device_t **ret, bus_t* bus, class_t cls,
+                 reslist_t resources, void* config);
 uint32_t dev_read(device_t *,  uint64_t, uint32_t, char *);
 uint32_t dev_write(device_t *, uint64_t, uint32_t, char *);
 uint32_t dev_ioctl(device_t* dev, uint32_t cmd, void *data);

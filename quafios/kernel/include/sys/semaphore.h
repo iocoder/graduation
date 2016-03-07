@@ -45,4 +45,3 @@ void sema_down(semaphore_t *sema);
 void sema_up(semaphore_t *sema);
 
 #endif
-

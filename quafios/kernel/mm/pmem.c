@@ -35,6 +35,7 @@
 
 uint32_t pmem_usable_pages = 0;
 uint32_t ram_size = 0;
+uint32_t ram_usage = 0;
 
 /* memory map (up to 4MB) */
 extern uint32_t pmmap[MEMORY_PAGES];
@@ -142,6 +143,9 @@ void *ppalloc() {
     /* exit critical region */
     arch_set_int_status(status);
 
+    /* report increase in usage */
+    ram_usage += PAGE_SIZE;
+
     /* return allocated frame */
     return (void *)((((uint32_t) entry) - ((uint32_t) &pmmap))*
                     PAGE_SIZE/sizeof(uint32_t));
@@ -161,6 +165,9 @@ void ppfree(void *base) {
     /* release frame */
     entry=(linknode*)((uint32_t)&pmmap[((uint32_t)base)/PAGE_SIZE]);
     linkedlist_add(&pfreelist, entry);
+
+    /* report decrease in usage */
+    ram_usage -= PAGE_SIZE;
 
     /* exit critical region */
     arch_set_int_status(status);

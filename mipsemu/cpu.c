@@ -80,128 +80,128 @@
 #define TLB_ENTRIES     64
 
 /* halt */
-int halted;
+unsigned int halted;
 
 /* external signals */
-int nmi_pulse;
+unsigned int nmi_pulse;
 
 /* progress info */
-int cur_step;
+unsigned int cur_step;
 
 /* IF */
-int if_pc;
-int if_pc4;
-int if_instr;
-int if_exphndl;
-int if_exception;
+unsigned int if_pc;
+unsigned int if_pc4;
+unsigned int if_instr;
+unsigned int if_exphndl;
+unsigned int if_exception;
 
 /* ID */
-int id_instr;
-int id_opcode;
-int id_rs;
-int id_rt;
-int id_rd;
-int id_ropcode;
-int id_shamt;
-int id_funct;
-int id_is_jr;
-int id_is_jalr;
-int id_pc;
-int id_pc4;
-int id_imm32;
-int id_shl;
-int id_val_of_rs;
-int id_val_of_rt;
-int id_cop0_regrd;
-int id_braddr;
-int id_jmpaddr;
-int id_jraddr;
-int id_is_equal;
-int id_is_zero;
-int id_is_lez;
-int id_is_gtz;
-int id_is_mfc0;
-int id_is_mtc0;
-int id_is_rfe;
-int id_is_tlbr;
-int id_is_tlbwi;
-int id_is_cop0;
-int id_pc_src;
-int id_if_flush;
-int id_ctrlsig_in[CTRL_COUNT]; /* ctl unit output */
-int id_aluop;
-int id_memop;
-int id_ctrlsig[CTRL_COUNT]; /* ctl mux output */
-int id_stall; /* hazard outputs */
-int id_ifclk; /* hazard outputs */
-int id_pcclk; /* hazard outputs */
-int id_exception;
-int id_regfile[32];
+unsigned int id_instr;
+unsigned int id_opcode;
+unsigned int id_rs;
+unsigned int id_rt;
+unsigned int id_rd;
+unsigned int id_ropcode;
+unsigned int id_shamt;
+unsigned int id_funct;
+unsigned int id_is_jr;
+unsigned int id_is_jalr;
+unsigned int id_pc;
+unsigned int id_pc4;
+unsigned int id_imm32;
+unsigned int id_shl;
+unsigned int id_val_of_rs;
+unsigned int id_val_of_rt;
+unsigned int id_cop0_regrd;
+unsigned int id_braddr;
+unsigned int id_jmpaddr;
+unsigned int id_jraddr;
+unsigned int id_is_equal;
+unsigned int id_is_zero;
+unsigned int id_is_lez;
+unsigned int id_is_gtz;
+unsigned int id_is_mfc0;
+unsigned int id_is_mtc0;
+unsigned int id_is_rfe;
+unsigned int id_is_tlbr;
+unsigned int id_is_tlbwi;
+unsigned int id_is_cop0;
+unsigned int id_pc_src;
+unsigned int id_if_flush;
+unsigned int id_ctrlsig_in[CTRL_COUNT]; /* ctl unit output */
+unsigned int id_aluop;
+unsigned int id_memop;
+unsigned int id_ctrlsig[CTRL_COUNT]; /* ctl mux output */
+unsigned int id_stall; /* hazard outputs */
+unsigned int id_ifclk; /* hazard outputs */
+unsigned int id_pcclk; /* hazard outputs */
+unsigned int id_exception;
+unsigned int id_regfile[32];
 
 /* EX */
 long long ex_tmp;
-int ex_hi;
-int ex_lo;
-int ex_instr;
-int ex_rs;
-int ex_rt;
-int ex_rd;
-int ex_shamt;
-int ex_pc4;
-int ex_aluop;
-int ex_memop;
-int ex_ctrlsig[CTRL_COUNT];
-int ex_val_of_rs;
-int ex_val_of_rt;
-int ex_imm32;
-int ex_fu_mux1 = 0; /* forwarding unit selector for mux1 */
-int ex_fu_mux2 = 0; /* forwarding unit selector for mux2 */
-int ex_alu1; /* input 1 for ALU (output of first forwarding mux) */
-int ex_muxop; /* output of second forwarding mux */
-int ex_alu2; /* input 2 for ALU (muxop or imm?) */
-int ex_alu_output; /* output of ALU */
-int ex_rk; /* output of forth mux */
-int ex_is_mfc0;
-int ex_is_mtc0;
-int ex_exception;
+unsigned int ex_hi;
+unsigned int ex_lo;
+unsigned int ex_instr;
+unsigned int ex_rs;
+unsigned int ex_rt;
+unsigned int ex_rd;
+unsigned int ex_shamt;
+unsigned int ex_pc4;
+unsigned int ex_aluop;
+unsigned int ex_memop;
+unsigned int ex_ctrlsig[CTRL_COUNT];
+unsigned int ex_val_of_rs;
+unsigned int ex_val_of_rt;
+unsigned int ex_imm32;
+unsigned int ex_fu_mux1 = 0; /* forwarding unit selector for mux1 */
+unsigned int ex_fu_mux2 = 0; /* forwarding unit selector for mux2 */
+unsigned int ex_alu1; /* input 1 for ALU (output of first forwarding mux) */
+unsigned int ex_muxop; /* output of second forwarding mux */
+unsigned int ex_alu2; /* input 2 for ALU (muxop or imm?) */
+unsigned int ex_alu_output; /* output of ALU */
+unsigned int ex_rk; /* output of forth mux */
+unsigned int ex_is_mfc0;
+unsigned int ex_is_mtc0;
+unsigned int ex_exception;
 
 /* MEM */
-int mem_instr;
-int mem_pc4;
-int mem_memop;
-int mem_ctrlsig[CTRL_COUNT];
-int mem_tmp;
-int mem_badvaddr;
-int mem_addr;
-int mem_data_in;
-int mem_data_out;
-int mem_rk;
-int mem_is_mfc0;
-int mem_is_mtc0;
-int mem_exception;
-int mem_array[4096];
+unsigned int mem_instr;
+unsigned int mem_pc4;
+unsigned int mem_memop;
+unsigned int mem_ctrlsig[CTRL_COUNT];
+unsigned int mem_tmp;
+unsigned int mem_badvaddr;
+unsigned int mem_addr;
+unsigned int mem_data_in;
+unsigned int mem_data_out;
+unsigned int mem_rk;
+unsigned int mem_is_mfc0;
+unsigned int mem_is_mtc0;
+unsigned int mem_exception;
+unsigned int mem_array[4096];
 
 /* WB */
-int wb_instr;
-int wb_pc4;
-int wb_ctrlsig[CTRL_COUNT];
-int wb_mem_out;
-int wb_alu_out;
-int wb_value_of_rk;
-int wb_rk;
-int wb_is_mfc0;
-int wb_is_mtc0;
-int wb_exception;
+unsigned int wb_instr;
+unsigned int wb_pc4;
+unsigned int wb_ctrlsig[CTRL_COUNT];
+unsigned int wb_mem_out;
+unsigned int wb_alu_out;
+unsigned int wb_value_of_rk;
+unsigned int wb_rk;
+unsigned int wb_is_mfc0;
+unsigned int wb_is_mtc0;
+unsigned int wb_exception;
 
 /* coprocessor */
-int Index;
-int EntryLo;
-int BadVaddr;
-int EntryHi;
-int SR;
-int CAUSE;
-int EPC;
-int irq;
+unsigned int Index;
+unsigned int EntryLo;
+unsigned int BadVaddr;
+unsigned int EntryHi;
+unsigned int SR;
+unsigned int CAUSE;
+unsigned int EPC;
+unsigned int irq;
 
 /* TLB */
 struct {
@@ -402,6 +402,13 @@ unsigned int tlb_read(int which, unsigned int addr, int size) {
 /* TLB write */
 void tlb_write(int which, unsigned int addr, unsigned int data, int size) {
     int indx, virt;
+    if (addr == 0x80000674) {
+        printf("writing isr_loc! by %x\n", mem_pc4-4);
+    }
+    if (addr == 0x80049410) {
+        printf("writing system_console! by %x %x\n", mem_pc4-4, data);
+    }
+
     if ((addr&0xC0000000) == 0x80000000) {
         addr &= 0x1FFFFFFF;
     } else {
@@ -791,11 +798,16 @@ void cpu_debug() {
 /* clk */
 int cpu_clk() {
     /* store clk controls */
-    int ifclk = id_ifclk, pcclk = id_pcclk, handle_exception = 0;
+    int ifclk = id_ifclk, pcclk = id_pcclk, handle_exception = 0, exphandled=0;
     int oldreg = 0;
 
     if (halted == 1) {
         cpu_debug_short();
+        int i = 0;
+        for (i = 0; i < 64; i++) {
+            printf("tlb %d: %x %x %d\n", i, tlb[i].virt<<12,
+                   tlb[i].phy<<12, tlb[i].valid);
+        }
         halted++;
     }
 
@@ -844,7 +856,14 @@ int cpu_clk() {
             } else {
                 /* ? */
             }
+
+            if ((if_pc & 0xF0000000) == 0xC0000000) {
+                printf("problematic address: %x\n", id_pc);
+            }
+
         }
+        if (if_exphndl)
+            exphandled = 1;
         if_exphndl = 0;
     }
 
@@ -1313,8 +1332,8 @@ int cpu_clk() {
     id_jraddr  = id_val_of_rs;
     id_is_equal = (id_val_of_rs==id_val_of_rt);
     id_is_zero = (id_val_of_rs == 0);
-    id_is_lez = (id_val_of_rs <= 0);
-    id_is_gtz = (id_val_of_rs > 0);
+    id_is_lez = (((signed int)id_val_of_rs) <= 0);
+    id_is_gtz = (((signed int)id_val_of_rs) > 0);
     id_is_mfc0 = is_cop0(id_opcode) & (id_rs ==  0);
     id_is_mtc0 = is_cop0(id_opcode) & (id_rs ==  4);
     id_is_rfe  = is_cop0(id_opcode) & (id_rs == 16) & (id_funct == 16);
@@ -1605,16 +1624,24 @@ int cpu_clk() {
     }
 
     /* IF */
-    if_pc4 = if_pc + 4;
-    if_instr = tlb_read(0, if_pc, 2);
+    if (!id_exception && !ex_exception && !mem_exception) {
+        if_pc4 = if_pc + 4;
+        if_instr = tlb_read(0, if_pc, 2);
+    } else {
+        if_instr = 0;
+    }
 
     /* coprocessor handling (on the falling edge) */
-    if (if_exphndl) {
+    /*if (id_is_rfe)
+        printf("rfe: %x %x %x\n", ex_instr, mem_instr, wb_instr);*/
+    if (exphandled) {
         /* disable interrupts */
         SR = (SR & 0xFFFFFFC0)|((SR<<2)&0x3F);
+        /*printf("entry: set SR to %x\n", SR);*/
     } else if (id_is_rfe && !ex_instr && !mem_instr && !wb_instr) {
         /* return from exception */
         SR = (SR & 0xFFFFFFF0)|((((unsigned int)SR)>>2)&0xF);
+        /*printf("exit:  set SR to %x\n", SR);*/
     } else if (wb_is_mtc0) {
         write_cop0_reg(wb_rk, wb_value_of_rk);
     } else if (id_is_tlbr) {
@@ -1636,7 +1663,8 @@ int cpu_clk() {
     if (mem_exception) {
         CAUSE = 0x00000004; /* TLB miss */
         EPC   = mem_pc4-4;
-    } if (if_exphndl) {
+        printf("trap %x, badvaddr: %x\n", EPC, BadVaddr);
+    } else if (if_exphndl) {
         /* exception served */
         if_exception = 0;
         irq = 0;

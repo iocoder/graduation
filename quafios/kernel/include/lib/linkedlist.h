@@ -41,7 +41,7 @@ typedef struct linknode_str {
                     TYPE *first;        \
                     TYPE *last;         \
                     unsigned int count; \
-            }
+            } __attribute__((packed))
 
 
 #ifdef QUAFIOS_KERNEL

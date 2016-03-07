@@ -79,6 +79,11 @@ bios_t *bios_ptr = NULL;
 void legacy_reboot() {
 }
 
+void legacy_init() {
+    __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+    bios_ptr->vga.show_cursor();
+}
+
 int32_t legacy_get_cursor(char *x, char *y) {
     return ESUCCESS;
 }
@@ -102,7 +107,7 @@ void legacy_redraw() {
 void legacy_video_putc(char chr) {
     /* get ptr to BIOS structure */
     if (!bios_ptr) {
-        __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+        legacy_init();
     }
     /* call function */
     bios_ptr->vga.print_fmt("%c", chr);
@@ -111,7 +116,7 @@ void legacy_video_putc(char chr) {
 void legacy_video_attr(char attr) {
     /* get ptr to BIOS structure */
     if (!bios_ptr) {
-        __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+        legacy_init();
     }
     /* call function */
     bios_ptr->vga.print_fmt("%a", attr);
@@ -124,7 +129,7 @@ void legacy_video_clear() {
 void legacy_set_isr_loc(void *loc) {
     /* get ptr to BIOS structure */
     if (!bios_ptr) {
-        __asm__("or %0, $0, $gp":"=r"(bios_ptr));
+        legacy_init();
     }
     /* call function */
     bios_ptr->isr.set_isr_loc(loc);
@@ -171,7 +176,7 @@ uint32_t mips_probe(device_t* dev, void* config) {
     cls.base   = BASE_GP_PIT;
     cls.sub    = SUB_GP_PIT;
     cls.progif = IF_ANY;
-    resv = (resource_t *) kmalloc(sizeof(resource_t)*1);
+    resv = (resource_t *) kmalloc(sizeof(resource_t)*2);
     if (resv == NULL)
         return ENOMEM;
     resv[0].type = RESOURCE_TYPE_MEM;
@@ -179,7 +184,7 @@ uint32_t mips_probe(device_t* dev, void* config) {
     resv[0].data.mem.size = 1;
     resv[1].type = RESOURCE_TYPE_IRQ;
     resv[1].data.irq.number = 0;
-    reslist.count = 1;
+    reslist.count = 2;
     reslist.list  = resv;
     dev_add(&t, hostbus, cls, reslist, NULL);
 
@@ -188,7 +193,7 @@ uint32_t mips_probe(device_t* dev, void* config) {
     cls.base   = BASE_GP_KBD;
     cls.sub    = SUB_GP_KBD;
     cls.progif = IF_ANY;
-    resv = (resource_t *) kmalloc(sizeof(resource_t)*1);
+    resv = (resource_t *) kmalloc(sizeof(resource_t)*2);
     if (resv == NULL)
         return ENOMEM;
     resv[0].type = RESOURCE_TYPE_MEM;
@@ -196,7 +201,7 @@ uint32_t mips_probe(device_t* dev, void* config) {
     resv[0].data.mem.size = 1;
     resv[1].type = RESOURCE_TYPE_IRQ;
     resv[1].data.irq.number = 1;
-    reslist.count = 1;
+    reslist.count = 2;
     reslist.list  = resv;
     dev_add(&t, hostbus, cls, reslist, NULL);
 

@@ -48,7 +48,7 @@ irq_t irq[IRQ_COUNT] = {0};
 
 unsigned char chr;
 
-semaphore_t irqsema;
+semaphore_t irqsema = {1};
 
 int32_t irq_setup(uint32_t n, device_t *pic_device) {
 

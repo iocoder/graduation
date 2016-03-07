@@ -2,7 +2,7 @@
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
  *        | |  Quafios Kernel 2.0.1.                               | |
- *        | |  -> MIPS: process operations.                        | |
+ *        | |  -> Synchronization testing.                         | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,55 +26,54 @@
  *
  */
 
-#ifdef ARCH_MIPS
-
 #include <arch/type.h>
-#include <sys/proc.h>
+#include <sys/printk.h>
 #include <sys/scheduler.h>
-#include <sys/error.h>
+#include <sys/proc.h>
+#include <sys/mm.h>
+#include <sys/fs.h>
+#include <arch/stack.h>
+#include <arch/spinlock.h>
+#include <sys/semaphore.h>
 
-#include <mips/asm.h>
+int32_t in_synctest = 0;
 
-void umode_jmp(int32_t vaddr, int32_t sp) {
+int32_t busy = 0;
+spinlock_t spinlock;
+int32_t count = 1;
 
+semaphore_t sema;
+
+int32_t is_in_synctest() {
+    return in_synctest;
 }
 
-void copy_context(proc_t *child) {
-
+void synctest_main() {
+    int32_t i;
+    while(1) {
+        if (curproc->pid == 1) {
+            /*spinlock_acquire(&spinlock);*/
+            sema_down(&sema);
+            printk("%aA", 0x4F);
+            sema_up(&sema);
+            /*spinlock_release(&spinlock);*/
+        } else {
+            /*spinlock_acquire(&spinlock);*/
+            sema_down(&sema);
+            printk("%aB", 0x1F);
+            sema_up(&sema);
+            /*spinlock_release(&spinlock);*/
+        }
+    }
 }
 
-void arch_proc_switch(proc_t *oldproc, proc_t *newproc) {
-
+void synctest() {
+    in_synctest = 1;
+    spinlock_init(&spinlock);
+    sema_init(&sema, 1);
+    fork();
+    sema_down(&sema);
+    yield();
+    sema_up(&sema);
+    synctest_main();
 }
-
-void arch_yield() {
-
-}
-
-int32_t arch_get_int_status() {
-    return get_status() & 1;
-}
-
-void arch_set_int_status(int32_t status) {
-    set_status((get_status() & 0xFFFFFFFE)|(status&1));
-}
-
-void arch_disable_interrupts() {
-    arch_set_int_status(0);
-}
-
-void arch_enable_interrupts() {
-    arch_set_int_status(1);
-}
-
-void print_sp() {
-    uint32_t reg;
-    __asm__("move %0, $sp":"=r"(reg));
-    printk("sp: %x\n", reg);
-}
-
-#else
-
-typedef int dummy;
-
-#endif

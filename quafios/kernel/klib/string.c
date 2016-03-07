@@ -148,3 +148,7 @@ char *itoa(int value, char *str, int base) {
     return str;
 
 }
+
+void memcpy() {
+    printk("string.c: memcpy() stub!\n");
+}

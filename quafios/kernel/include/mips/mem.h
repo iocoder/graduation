@@ -29,6 +29,9 @@
 #ifndef ARCH_MEM_H
 #define ARCH_MEM_H
 
+#define L       5   /* 2^L is the smallest size block (32 bytes) */
+#define U       25  /* 2^U is the upper size block (32MB)        */
+
 #define MEMORY_LIMIT        __extension__ 0x100000000ULL    /* 4GB. */
 #define MEMORY_PAGES        ((uint32_t)(MEMORY_LIMIT/PAGE_SIZE))
 
@@ -57,15 +60,11 @@ extern uint32_t kernel_physical_end;
 #define USER_MEMORY_PTABLES     (USER_MEMORY_PAGES/PAGE_TABLE_ENTRY_COUNT)
 
 #define KERNEL_MEMORY_BASE      USER_MEMORY_END
-#define KERNEL_MEMORY_END       MEMORY_LIMIT
+#define KERNEL_MEMORY_END       USER_MEMORY_END+(1<<U)
 #define KERNEL_MEMORY_SIZE      ((uint32_t)(\
                                     KERNEL_MEMORY_END-KERNEL_MEMORY_BASE))
 #define KERNEL_MEMORY_PAGES     (KERNEL_MEMORY_SIZE/PAGE_SIZE)
 #define KERNEL_MEMORY_PTABLES   (KERNEL_MEMORY_PAGES/PAGE_TABLE_ENTRY_COUNT)
 
-/* buddy algorithm parameters */
-
-#define L       5   /* 2^L is the smallest size block (32 bytes) */
-#define U       25  /* 2^U is the upper size block (32MB)        */
 
 #endif

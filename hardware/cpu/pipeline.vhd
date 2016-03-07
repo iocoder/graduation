@@ -1015,9 +1015,9 @@ begin
                 if (if_exphndl = '1') then
                     mem_exception <= '0';
                 end if;
-            elsif (ex_exception='1' or
+            elsif ((not mem_busy) and (ex_exception='1' or
                    ((ex_ctrlsig(MEM_READ)='1' OR
-                    ex_ctrlsig(MEM_WRITE)='1') and data_miss)) then
+                    ex_ctrlsig(MEM_WRITE)='1') and data_miss))) then
                 -- introduce a bubble in MEM
                 mem_instr     <= x"00000000";
                 mem_memop     <= x"00";
@@ -1056,15 +1056,15 @@ begin
                         -- first cycle
                         mem_pagemiss <= '0';
                         mem_busy    <= true;
-                        mem_addr    <= ex_alu_output(31 downto 2) & "00";
-                        mem_phase   <= conv_integer(ex_alu_output(1 downto 0));
+                        mem_addr    <= data_paddr(31 downto 2) & "00";
+                        mem_phase   <= conv_integer(data_paddr(1 downto 0));
                         mem_tmp     <= ex_muxop2;
                         mem_tmp2    <= ex_muxop2;
-                        if (ex_alu_output(1 downto 0) = "00") then
+                        if (data_paddr(1 downto 0) = "00") then
                             mem_data_in <= x"000000" & ex_muxop2(31 downto 24);
-                        elsif (ex_alu_output(1 downto 0) = "01") then
+                        elsif (data_paddr(1 downto 0) = "01") then
                             mem_data_in <= x"000000" & ex_muxop2(23 downto 16);
-                        elsif (ex_alu_output(1 downto 0) = "10") then
+                        elsif (data_paddr(1 downto 0) = "10") then
                             mem_data_in <= x"000000" & ex_muxop2(15 downto  8);
                         else
                             mem_data_in <= x"000000" & ex_muxop2( 7 downto  0);
@@ -1073,15 +1073,15 @@ begin
                         -- first cycle
                         mem_pagemiss <= '0';
                         mem_busy    <= true;
-                        mem_addr    <= ex_alu_output(31 downto 2) & "11";
-                        mem_phase   <= conv_integer(ex_alu_output(1 downto 0));
+                        mem_addr    <= data_paddr(31 downto 2) & "11";
+                        mem_phase   <= conv_integer(data_paddr(1 downto 0));
                         mem_tmp     <= ex_muxop2;
                         mem_tmp2    <= ex_muxop2;
-                        if (ex_alu_output(1 downto 0) = "00") then
+                        if (data_paddr(1 downto 0) = "00") then
                             mem_data_in <= x"000000" & ex_muxop2(31 downto 24);
-                        elsif (ex_alu_output(1 downto 0) = "01") then
+                        elsif (data_paddr(1 downto 0) = "01") then
                             mem_data_in <= x"000000" & ex_muxop2(23 downto 16);
-                        elsif (ex_alu_output(1 downto 0) = "10") then
+                        elsif (data_paddr(1 downto 0) = "10") then
                             mem_data_in <= x"000000" & ex_muxop2(15 downto  8);
                         else
                             mem_data_in <= x"000000" & ex_muxop2( 7 downto  0);

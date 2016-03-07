@@ -42,13 +42,10 @@ void init()  {
     /* Device Manager: */
     dev_init();
 
-    printk("Initialized!\n");
-    while(1);
-
     /* Initialize Filesystem: */
-    /*fs_init();*/
+    fs_init();
 
     /* Initialize Process Manager and load "init" process: */
-    /*proc_init();*/
+    proc_init();
 
 }
