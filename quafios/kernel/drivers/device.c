@@ -64,7 +64,9 @@ driver_t *drivers[] = {
     &usbmass_driver,
     &scsidisk_driver,
     &partition_driver,
-    &gppic_driver
+    &gppic_driver,
+    &gppit_driver,
+    &gpkbd_driver,
 };
 
 /* Data Structures:  */

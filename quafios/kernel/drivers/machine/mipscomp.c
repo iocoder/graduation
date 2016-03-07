@@ -166,6 +166,40 @@ uint32_t mips_probe(device_t* dev, void* config) {
     reslist.list  = resv;
     dev_add(&t, hostbus, cls, reslist, NULL);
 
+    /* add PIT */
+    cls.bus    = BUS_GP;
+    cls.base   = BASE_GP_PIT;
+    cls.sub    = SUB_GP_PIT;
+    cls.progif = IF_ANY;
+    resv = (resource_t *) kmalloc(sizeof(resource_t)*1);
+    if (resv == NULL)
+        return ENOMEM;
+    resv[0].type = RESOURCE_TYPE_MEM;
+    resv[0].data.mem.base = 0xBE801000;
+    resv[0].data.mem.size = 1;
+    resv[1].type = RESOURCE_TYPE_IRQ;
+    resv[1].data.irq.number = 0;
+    reslist.count = 1;
+    reslist.list  = resv;
+    dev_add(&t, hostbus, cls, reslist, NULL);
+
+    /* add KBD */
+    cls.bus    = BUS_GP;
+    cls.base   = BASE_GP_KBD;
+    cls.sub    = SUB_GP_KBD;
+    cls.progif = IF_ANY;
+    resv = (resource_t *) kmalloc(sizeof(resource_t)*1);
+    if (resv == NULL)
+        return ENOMEM;
+    resv[0].type = RESOURCE_TYPE_MEM;
+    resv[0].data.mem.base = 0xBE800000;
+    resv[0].data.mem.size = 1;
+    resv[1].type = RESOURCE_TYPE_IRQ;
+    resv[1].data.irq.number = 1;
+    reslist.count = 1;
+    reslist.list  = resv;
+    dev_add(&t, hostbus, cls, reslist, NULL);
+
     /* done */
     return ESUCCESS;
 }

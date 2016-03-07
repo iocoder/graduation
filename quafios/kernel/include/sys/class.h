@@ -245,19 +245,25 @@
 #define   IF_USB_HUB_ROOTHUB            0xFF
 
 /* ============================================================== */
-/*                         GP Bus Codes                           */
-/* ============================================================== */
-
-#define BASE_GP_PIC                     0x01
-#define  SUB_GP_PIC                     0x00
-
-/* ============================================================== */
 /*                        DISK Bus Codes                          */
 /* ============================================================== */
 
 #define BASE_DISK_PARTITION             0x0000
 #define  SUB_DISK_PARTITION_ID0         0x0000
 #define   IF_DISK_PARTITION_ID0_DEVID0  0x0000
+
+/* ============================================================== */
+/*                         GP Bus Codes                           */
+/* ============================================================== */
+
+#define BASE_GP_PIC                     0x01
+#define  SUB_GP_PIC                     0x00
+
+#define BASE_GP_PIT                     0x02
+#define  SUB_GP_PIT                     0x00
+
+#define BASE_GP_KBD                     0x03
+#define  SUB_GP_KBD                     0x00
 
 /* ============================================================== */
 /*                          Don't Care                            */

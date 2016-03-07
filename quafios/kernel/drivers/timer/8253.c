@@ -108,17 +108,6 @@ typedef struct {
     } clock[3]; /* 3 clocks are embedded in the 8253. */
 } info_t;
 
-typedef struct internal_alert {
-
-    struct internal_alert *next;
-    int32_t  pid;
-    int8_t   prefix;
-    uint64_t when;
-
-} internal_alert_t;
-
-internal_alert_t *first_alert = NULL;
-
 /* ================================================================= */
 /*                             Chip I/O                              */
 /* ================================================================= */
@@ -246,33 +235,18 @@ uint32_t i8253_ioctl(device_t *dev, uint32_t cmd, void *data) {
     info_t *info = (info_t *) dev->drvreg;
     if (info == NULL)
         return ENOMEM; /* i am sorry :D */
-
+    /* handle request */
     if (cmd == TIMER_ALERT) {
-
-        internal_alert_t *alert = kmalloc(sizeof(internal_alert_t));
-        alert->pid    = curproc->pid;
-        alert->prefix = ((timer_alert_t *) data)->prefix;
-        alert->when=(((timer_alert_t *) data)->time/10)+info->clock[0].ticks;
-        alert->next = first_alert;
-        first_alert = alert;
-
-        /*printk("ticks: %d\n", (int) info->clock[0].ticks);*/
-
-
+        alarm_reg(data);
     }
-
+    /* done */
     return ESUCCESS;
 }
 
 uint32_t i8253_irq(device_t *dev, uint32_t irqn) {
 
     /* respond to timer IRQ. */
-    extern uint8_t *legacy_vga;
-    uint32_t i, status;
-    uint32_t tt;
-    char buf[10] = {0};
-    msg_t msg;
-    internal_alert_t *ptr, *prev = NULL, *next;
+    uint32_t i;
 
     /* get info_t structure: */
     info_t *info = (info_t *) dev->drvreg;
@@ -283,38 +257,13 @@ uint32_t i8253_irq(device_t *dev, uint32_t irqn) {
     for(i = 0; i < 3; i++)
         if (info->clock[i].catch_irq && info->clock[i].irqn == irqn)
             break;
-    if (i == 3) return ENOENT;
+    if (i == 3)
+        return ENOENT;
 
-    /* increase tick counter. */
-    info->clock[i].ticks++;
+    /* call alarm */
+    alert();
 
-    /* alert all the processes that need to be alerted */
-    ptr = first_alert;
-    while (ptr != NULL) {
-        internal_alert_t *next = ptr->next;
-        if (info->clock[i].ticks >= ptr->when) {
-            next = ptr->next;
-            msg.buf = buf;
-            msg.size = 10;
-            buf[0] = ptr->prefix;
-            /*printk("ticks: %d\n", (int) info->clock[0].ticks);*/
-            send(ptr->pid, &msg);
-            kfree(ptr);
-            if (prev == NULL) {
-                first_alert = next;
-            } else {
-                prev->next = next;
-            }
-            ptr = next;
-        }
-    }
-
-    /* i sometimes enjoy watching this: */
-#if 0
-    tt = (uint32_t) info->clock[i].ticks;
-    if (!(tt % 100))
-        printk("second: %d\n", tt/100);
-#endif
-
+    /* done */
     return ESUCCESS;
+
 }

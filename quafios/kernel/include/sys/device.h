@@ -79,6 +79,8 @@ extern driver_t usbmass_driver;
 extern driver_t scsidisk_driver;
 extern driver_t partition_driver;
 extern driver_t gppic_driver;
+extern driver_t gppit_driver;
+extern driver_t gpkbd_driver;
 extern driver_t *drivers[];
 #define DRIVER_COUNT    (sizeof(drivers)/sizeof(driver_t*))
 
