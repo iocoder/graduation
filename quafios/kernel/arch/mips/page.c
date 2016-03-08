@@ -515,7 +515,6 @@ void tlb_miss() {
     /* ------------------------------ */
     tmp = system_console;
     system_console = NULL; /* to prevent faults on printk */
-    printk("PF!\n");
 
     /* get umem structures of current process:  */
     /* ---------------------------------------- */
@@ -536,7 +535,7 @@ void tlb_miss() {
         panic(NULL, "Page fault!\n");
     }
 
-    printk("vaddr: %x %x %x %x\n", vaddr, pagetbl, pagetbl[pe], get_epc());
+    /*printk("vaddr: %x %x %x %x\n", vaddr, pagetbl, pagetbl[pe], get_epc());*/
 
     /* allocate memory:  */
     /* ----------------- */

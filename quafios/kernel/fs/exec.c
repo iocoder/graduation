@@ -137,8 +137,10 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
 
     /* Open the executable file:  */
     /* -------------------------- */
-    if (err = file_open(filename, 0, &file))
+    if (err = file_open(filename, 0, &file)) {
+        printk("execve(): cannot open file %s.\n", filename);
         return -err;
+    }
 
     /* not a regular file? */
     if ((file->inode->mode & FT_MASK) != FT_REGULAR) {
@@ -184,7 +186,7 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
         header.e_machine != EM_386) {
             /* We only support Intel 386 32-bit programs. */
             file_close(file);
-            printk("execve(): Invalid ELF file\n");
+            printk("execve(): Invalid ELF file %s\n", &header);
             return -EINVAL;
     }
 

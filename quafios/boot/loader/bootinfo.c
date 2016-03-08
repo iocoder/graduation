@@ -28,6 +28,7 @@
 
 #include <arch/type.h>
 #include <sys/bootinfo.h>
+#include "../../../firmware/bios.h"
 
 bootinfo_t *bootinfo = (bootinfo_t *) 0x8000C000;
 
@@ -50,8 +51,8 @@ void bootinfo_init() {
     bootinfo->res[BI_KERNEL].base     = 0x10000;
     bootinfo->res[BI_KERNEL].end      = 0x10000; /* temp value */
 
-    bootinfo->res[BI_RAMDISK].base    = 0x00000;
-    bootinfo->res[BI_RAMDISK].end     = 0x00000; /* temp value */
+    bootinfo->res[BI_RAMDISK].base    = 0x1F000000;
+    bootinfo->res[BI_RAMDISK].end     = 0x1FC00000;
 
     bootinfo->res[BI_ARCH0].base      = 0x00000;
     bootinfo->res[BI_ARCH0].end       = 0x08000; /* BIOS */
@@ -63,6 +64,7 @@ void bootinfo_init() {
     bootinfo->res[BI_ARCH2].end       = 0x00000;
 
     /* live? */
-    bootinfo->live = 0;
+    bootinfo->live = 1;
+    bios.diskfs.getuuid(bootinfo->uuid);
 
 }

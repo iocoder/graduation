@@ -47,7 +47,7 @@ linkedlist pfreelist;
 extern bootinfo_t *bootinfo;
 
 /* a kernel page for physical memory IO: */
-uint8_t physical_page[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+uint8_t *physical_page = NULL;
 uint32_t cur_physical_page = NULL;
 
 /* physical memory access routines */
@@ -73,6 +73,11 @@ uint8_t pmem_readb(void *p_addr) {
     /* p_addr = p_page (page base) + p_off (offset to that base). */
     uint32_t p_page = ((uint32_t) p_addr) & PAGE_BASE_MASK;
     uint32_t p_off  = ((uint32_t) p_addr) & (PAGE_SIZE-1);
+
+    if (!physical_page) {
+        physical_page = kmalloc(PAGE_SIZE);
+        physical_page[0] = 0; /* trigger page fault */
+    }
 
     if (p_page != cur_physical_page)
         arch_set_page(NULL, physical_page, cur_physical_page=p_page);
@@ -100,6 +105,11 @@ void pmem_writeb(void *p_addr, uint8_t val) {
     /* p_addr = p_page (page base) + p_off (offset to that base). */
     uint32_t p_page = ((uint32_t) p_addr) & PAGE_BASE_MASK;
     uint32_t p_off  = ((uint32_t) p_addr) & (PAGE_SIZE-1);
+
+    if (!physical_page) {
+        physical_page = kmalloc(PAGE_SIZE);
+        physical_page[0] = 0; /* trigger page fault */
+    }
 
     if (p_page != cur_physical_page)
         arch_set_page(NULL, physical_page, cur_physical_page=p_page);
@@ -144,7 +154,7 @@ void *ppalloc() {
     arch_set_int_status(status);
 
     /* report increase in usage */
-    ram_usage += PAGE_SIZE;
+    ram_usage++;
 
     /* return allocated frame */
     return (void *)((((uint32_t) entry) - ((uint32_t) &pmmap))*
@@ -167,7 +177,7 @@ void ppfree(void *base) {
     linkedlist_add(&pfreelist, entry);
 
     /* report decrease in usage */
-    ram_usage -= PAGE_SIZE;
+    ram_usage--;
 
     /* exit critical region */
     arch_set_int_status(status);
@@ -213,7 +223,7 @@ void pmem_init() {
 
         /* mark the page frames as reserved */
         for (frame=base/PAGE_SIZE; frame<end/PAGE_SIZE; frame++) {
-            if (frame < MEMORY_PAGES) {
+            if (frame < ram_size) {
                 pmmap[frame] = 0xFFFFFFFF;
             }
         }
@@ -241,6 +251,8 @@ void pmem_init() {
             }
         }
     }
-    ppalloc();
+
+    /*printk("first ppalloc: %x, size: %d, usable: %d, used: %d\n",
+           ppalloc(), ram_size, pmem_usable_pages, ram_usage);*/
 
 }

@@ -123,8 +123,8 @@ void diskfs_getuuid(char *uuid) {
     int32_t i = 0;
     /*printf("uuid: ");*/
     for (i = 0; i < 17; i++) {
-        /*printf("%c%c", "0123456789ABCDEF"[(sb->uuid[i]>>4)&0xF],
-                       "0123456789ABCDEF"[(sb->uuid[i]>>0)&0xF]);*/
+        /*print_fmt("%c%c", "0123456789ABCDEF"[(sb->uuid[i]>>4)&0xF],
+                          "0123456789ABCDEF"[(sb->uuid[i]>>0)&0xF]);*/
         uuid[i] = sb->uuid[i];
     }
 }

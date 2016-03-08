@@ -430,6 +430,8 @@ void write_tlb_entry() {
     tlb[Index].phy   = (EntryLo>>12)&0xFFFFF;
     tlb[Index].virt  = (EntryHi>>12)&0xFFFFF;
     tlb[Index].valid = (EntryLo>> 9)&1;
+    /*printf("write tlb: %d %x %x %d\n", Index,
+           tlb[Index].virt, tlb[Index].phy, tlb[Index].valid);*/
 }
 
 /* read coprocessor 0 register */
@@ -1269,7 +1271,7 @@ int cpu_clk() {
             ex_alu_output = ((unsigned int) ex_alu2) >> ex_shamt;
             break;
         case ALUOP_SRA:
-            ex_alu_output = (((signed int) ex_alu2) / (1<<ex_shamt));
+            ex_alu_output = ((signed int) ex_alu2) >> ex_shamt;
             break;
         case ALUOP_SLLV:
             ex_alu_output = ((unsigned int) ex_alu2) << (ex_alu1&31);
@@ -1278,7 +1280,7 @@ int cpu_clk() {
             ex_alu_output = ((unsigned int) ex_alu2) >> (ex_alu1&31);
             break;
         case ALUOP_SRAV:
-            ex_alu_output = (((signed int) ex_alu2) / (1<<(ex_alu1&31)));
+            ex_alu_output = ((signed int) ex_alu2) >> (ex_alu1&31);
             break;
         default:
             /* not implemented */

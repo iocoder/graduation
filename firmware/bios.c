@@ -35,6 +35,7 @@ void bios_init() {
 
     /* diskfs routines */
     bios.diskfs.loadfile  = diskfs_loadfile;
+    bios.diskfs.getuuid   = diskfs_getuuid;
 
     /* isr routines */
     bios.isr.ptrs         = isr;

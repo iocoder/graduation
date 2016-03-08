@@ -48,7 +48,7 @@ isr:
 .set noat
 .set noreorder
     /* re-align stack */
-    addi  $sp, -4*32
+    addi  $sp, -4*40
     /* push registers */
     sw    $0,  4* 0($sp)
     sw    $1,  4* 1($sp)
@@ -82,6 +82,9 @@ isr:
     sw    $29, 4*29($sp)
     sw    $30, 4*30($sp)
     sw    $31, 4*31($sp)
+    /* store cop0 regs */
+    mfc0  $a0, $14
+    sw    $a0, 4*32($sp)
     /* store pointer to regs */
     move  $a0, $sp
     addi  $sp, -4*32
@@ -140,9 +143,9 @@ return:
     lw    $29, 4*29($sp)
     lw    $30, 4*30($sp)
     lw    $31, 4*31($sp)
+    lw    $k0, 4*32($sp)
     /* reset stack pointer */
-    addi  $sp, 4*32
+    addi  $sp, 4*40
     /* jmp to EPC */
-    mfc0  $k0, $14
     jr    $k0
     rfe

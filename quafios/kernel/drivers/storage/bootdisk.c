@@ -36,7 +36,7 @@
 
 extern bootinfo_t *bootinfo;
 
-int diskfs_getuuid(device_t *dev, uint8_t *uuid) {
+int diskfs_getuuid(device_t *dev, int8_t *uuid) {
     diskfs_sb_t *sb;
     int32_t i;
     int32_t ret = -1;
@@ -56,7 +56,7 @@ int diskfs_getuuid(device_t *dev, uint8_t *uuid) {
 int32_t detect_bootdisk() {
     extern linkedlist devices;
     device_t *dev = (device_t *) devices.first;
-    uint8_t uuid[17];
+    int8_t uuid[17];
     int32_t i;
     while (dev) {
         disk_t *disk = (disk_t *) get_disk_by_devid(dev->devid);

@@ -34,8 +34,6 @@
 #include <sys/fs.h>
 #include <arch/stack.h>
 
-#include <mips/asm.h>
-
 void proc_init() {
 
     /* Process Manager Initialization */
@@ -104,23 +102,19 @@ void proc_init() {
 
     /* (III) Run the "init" process:  */
     /* ------------------------------ */
-    printk("step iii\n");
     arch_disable_interrupts();
     arch_vmswitch(&(initproc->umem));
     curproc = initproc;
     arch_enable_interrupts();
-    while(1);
 
     /* (IV) Enable multitasking:  */
     /* -------------------------- */
-    printk("step iv\n");
     /*scheduler_enabled = 1; /* start multitasking! */
 
     /* (V) Open console streams:  */
     /* -------------------------- */
     /* create device file for console: */
     mknod("/console", FT_SPECIAL, system_console->devid);
-    while(1);
 
     /* open console file: */
     open("/console", 0); /* this will open the file at fd "0". */

@@ -31,11 +31,12 @@ typedef struct {
 
 typedef struct {
     /*13*/ int (*loadfile)(int id,int firstsect,char *path,unsigned int base);
+    /*14*/ void (*getuuid)(char *uuid);
 } bios_diskfs_t;
 
 typedef struct {
-    /*14*/ void (**ptrs)(int *regs);
-    /*15*/ void (*set_isr_loc)(void *loc);
+    /*15*/ void (**ptrs)(int *regs);
+    /*16*/ void (*set_isr_loc)(void *loc);
 } bios_isr_t;
 
 typedef struct {

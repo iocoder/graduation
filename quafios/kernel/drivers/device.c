@@ -208,7 +208,7 @@ uint32_t dev_write(device_t *dev, uint64_t off, uint32_t size, char *buff) {
 /* ================================================================= */
 
 uint32_t dev_ioctl(device_t *dev, uint32_t cmd, void *data) {
-
+    
     if (dev == NULL)
         return ENOENT;
 

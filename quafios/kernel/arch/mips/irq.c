@@ -150,6 +150,12 @@ void irq_entry() {
 
 }
 
+void test() {
+    int n;
+    dev_ioctl(irq[0].pic_device, 1, &n);
+    printk("n: %d\n", n);
+}
+
 #else
 
 typedef int dummy;

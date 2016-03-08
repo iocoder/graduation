@@ -196,5 +196,6 @@ diskfs_blk_to_lvl(diskfs_sb_t *sb, diskfs_blk_t blk_off) {
 }
 
 int diskfs_loadfile(int id, int firstsect, char *path, uint32_t base);
+void diskfs_getuuid(char *uuid);
 
 #endif

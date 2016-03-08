@@ -109,7 +109,7 @@ typedef struct diskfs_inode {
     #define DISKFS_LVL3         1
     #define DISKFS_PTR_L3       14
     diskfs_blk_t  ptr[DISKFS_PTRS];
-} __attribute__ ((aligned (128))) diskfs_inode_t;
+} __attribute__ ((packed, aligned (128))) diskfs_inode_t;
 
 typedef struct diskfs_inode_info {
     diskfs_blk_t  ptr[DISKFS_PTRS];
