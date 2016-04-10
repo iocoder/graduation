@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  9 APR 2016 19:40
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  10 APR 2016 14:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1036,14 +1036,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 76--81
 
  []
 
-LaTeX Font Info:    Try loading font information for TS1+clms on input line 87.
-
-(/usr/share/texmf-dist/tex/latex/cfr-lm/ts1clms.fd
-File: ts1clms.fd 2008/02/13 Fontinst v1.928 font definitions for TS1/clms.
-) [1
+[1
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./logo.png>]
+LaTeX Font Info:    Try loading font information for TS1+clms on input line 87.
+
+
+(/usr/share/texmf-dist/tex/latex/cfr-lm/ts1clms.fd
+File: ts1clms.fd 2008/02/13 Fontinst v1.928 font definitions for TS1/clms.
+)
 Underfull \hbox (badness 10000) in paragraph at lines 111--116
 
  []
@@ -1098,12 +1100,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 631--635
 
  []
 
-
+[9]
 Underfull \hbox (badness 10000) in paragraph at lines 669--675
 
  []
 
-[9]
+
 Underfull \hbox (badness 10000) in paragraph at lines 731--735
 
  []
@@ -1123,12 +1125,11 @@ File: encoding1.png Graphic file (type png)
  <use encoding1.png>
 Package pdftex.def Info: encoding1.png used on input line 753.
 (pdftex.def)             Requested size: 426.79135pt x 205.83798pt.
-
+ [11 <./formats.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 759--767
 
  []
 
-[11 <./formats.png> <./encoding1.png>]
 <encoding2.png, id=45, 875.27pt x 408.52625pt>
 File: encoding2.png Graphic file (type png)
  <use encoding2.png>
@@ -1144,31 +1145,152 @@ File: encoding3.png Graphic file (type png)
  <use encoding3.png>
 Package pdftex.def Info: encoding3.png used on input line 784.
 (pdftex.def)             Requested size: 426.79135pt x 152.9266pt.
+ [12 <./encoding1.png> <./encoding2.png>] [13 <./encoding3.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 915--918
+
+ []
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+Underfull \hbox (badness 10000) in paragraph at lines 919--923
 
-[12 <./encoding2.png> <./encoding3.png>] [13] [14] (./cpu.aux) ) 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 924--928
+
+ []
+
+[14]
+Underfull \hbox (badness 10000) in paragraph at lines 1000--1008
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1018--1024
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1025--1029
+
+ []
+
+[15]
+Underfull \hbox (badness 10000) in paragraph at lines 1061--1064
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1067--1068
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1102--1103
+
+ []
+
+[16]
+Underfull \hbox (badness 10000) in paragraph at lines 1160--1161
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1203--1204
+
+ []
+
+[17]
+Underfull \hbox (badness 10000) in paragraph at lines 1246--1247
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1281--1283
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1284--1291
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1292--1299
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1300--1305
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1306--1310
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1315--1319
+
+ []
+
+[18]
+Underfull \hbox (badness 10000) in paragraph at lines 1320--1325
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1326--1330
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1331--1334
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1337--1338
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1388--1389
+
+ []
+
+[19]
+Underfull \hbox (badness 10000) in paragraph at lines 1413--1421
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1422--1428
+
+ []
+
+[20] (./cpu.aux) ) 
 Here is how much of TeX's memory you used:
- 9146 strings out of 493061
- 141563 string characters out of 6140740
- 303316 words of memory out of 5000000
- 12450 multiletter control sequences out of 15000+600000
+ 9161 strings out of 493061
+ 141739 string characters out of 6140740
+ 306412 words of memory out of 5000000
+ 12465 multiletter control sequences out of 15000+600000
  104911 words of font info for 84 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 47i,10n,72p,233b,321s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/tex
-mf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/
-lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texm
-f-dist/fonts/enc/dvips/cfr-lm/dotdigits-clm.enc}{/usr/share/texmf-dist/fonts/en
-c/dvips/cfr-lm/t1-clm.enc}</usr/share/texmf-dist/fonts/type1/public/lm/lmr10.pf
-b></usr/share/texmf-dist/fonts/type1/public/lm/lmss10.pfb></usr/share/texmf-dis
-t/fonts/type1/public/lm/lmss12.pfb></usr/share/texmf-dist/fonts/type1/public/lm
-/lmssbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsso10.pfb>
-Output written on cpu.pdf (14 pages, 248483 bytes).
+ 47i,11n,72p,233b,470s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/sha
+re/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvi
+ps/lm/lm-ts1.enc}{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/dotdigits-clm.en
+c}{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/t1-clm.enc}</usr/share/texmf-di
+st/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fonts/type1/public/lm
+/lmss10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/share
+/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/share/texmf-dist/fonts/typ
+e1/public/lm/lmsso10.pfb>
+Output written on cpu.pdf (20 pages, 274434 bytes).
 PDF statistics:
- 84 PDF objects out of 1000 (max. 8388607)
- 57 compressed objects within 1 object stream
+ 103 PDF objects out of 1000 (max. 8388607)
+ 70 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  22554 words of extra memory for PDF output out of 24883 (max. 10000000)
 

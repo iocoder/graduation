@@ -741,8 +741,8 @@ encoded instruction itself, not the format.\\
 \label{formats}
 \end{figure}
 
-In all J-TYPE and I-TYPE instructions 
-(except branch instructions comparing one register against zero), 
+In all J-TYPE and I-TYPE instructions
+(except branch instructions comparing one register against zero),
 the opcode field is used to specify instruction type. This class
 of instructions is called `instructions encoded by opcode field'.
 All possible values for opcode field under this class are shown
@@ -776,7 +776,7 @@ members of this class.\\
 Finally, branch instructions comparing one register against zero are
 encoded using rt field, while opcode field hold a constant value
 equal to $REGIMM$ constant (register-immediate).
-This class, shown in figure \ref{encoding3}, is called `instructions 
+This class, shown in figure \ref{encoding3}, is called `instructions
 encoded by the rt field when opcode field = $REGIMM$'.\\
 
 \begin{figure}[H]
@@ -789,21 +789,21 @@ encoded by the rt field when opcode field = $REGIMM$'.\\
 
 \subsubsection{Addressing Modes}
 
-Figure \ref{addrmodes} summarizes all possible addressing modes 
+Figure \ref{addrmodes} summarizes all possible addressing modes
 along with instructions that support them:
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{center}
 \resizebox{0.9\textwidth}{!} {
 \begin{tabular}{|c|c|}
 
-\hline \textbf{Addressing Mode} & 
+\hline \textbf{Addressing Mode} &
        \textbf{Corresponding Instructions} \\
 
-\hline Register, [Base Register]+Immediate Offset & 
+\hline Register, [Base Register]+Immediate Offset &
        Load/Store Instructions \\
 
-\hline Register, Register, Immediate & 
+\hline Register, Register, Immediate &
        ALU Instructions with Immediate Operand \\
 
 \hline \multirow{2}{*}{Register, Register, Register} &
@@ -817,7 +817,7 @@ along with instructions that support them:
        MULT, MULTU, DIV, and DIVU \\
 
 \hline Register &
-       MFHI, MTHI, MFLO, and MTLO \\   
+       MFHI, MTHI, MFLO, and MTLO \\
 
 \hline Absolute Address Within 256MB Segment &
        Jump Instructions Jumping Within 256MB Region \\
@@ -855,7 +855,7 @@ word.
 
 \subsubsection{Programmer-Visible Pipeline Effects}
 
-Several effects related to the behaviour of the pipeline should be stated 
+Several effects related to the behaviour of the pipeline should be stated
 clearly so the programmer can be aware of the exact performance parameters
 of the running program:
 
@@ -871,7 +871,7 @@ of the running program:
 
 \item \textbf{Load data not available}: If a memory load instruction is
       followed by an ALU instruction that requires the data
-      acquired by the load instruction (addresses the same 
+      acquired by the load instruction (addresses the same
       register), a data hazard will occur since ALU must wait
       until MEM unit is done fetching data from memory. This
       shall delay the execution of the ALU instruction by
@@ -887,33 +887,562 @@ of the running program:
       instruction (or second previous instruction), the pipeline
       will stall until data is ready.
 
-\item \textbf{Multiply/divide instructions}: These four special 
-      instructions take more than one CPU clock cycle to complete, 
+\item \textbf{Multiply/divide instructions}: These four special
+      instructions take more than one CPU clock cycle to complete,
       therefore they might stall the pipeline.
 
-\item \textbf{Cache misses}: 
+\item \textbf{Cache misses}:
       The pipeline shall stall if the instruction to
       be fetched or data specified by load instruction is not in cache.
-      Furthermore, store instructions would always stall the pipeline 
+      Furthermore, store instructions would always stall the pipeline
       since the cache system is write-through. This means that an
       instruction will take more than one CPU clock cycle if a cache
       miss happens.
 
-\item \textbf{Unaligned memory access}: 
+\item \textbf{Unaligned memory access}:
       This class of instructions shall take
       more than one CPU clock cycles because atomic access to unaligned
       word is not possible.
 
 \end{itemize}
 
-Other than the cases specified above, the pipeline will have no 
+Other than the cases specified above, the pipeline will have no
 hazards/stalls and every instruction will take no more than one clock cycle
 delay.
 
 \subsection{Registers}
+
+A register is a small amount of memory that can be accessible
+faster than memory/cache. Processor provides direct register
+access through `register' addressing mode.\\
+
+MIPS architecture defines number of registers to be used
+as general-purpose registers by the running software. MIPS
+architecture also defines two special-purpose registers called
+LO and HI registers.\\
+
+In addition to registers defined by MIPS standard, our processor
+contains special registers that control the behaviour of the processor,
+called `control registers'. Surprisingly, control registers are
+accessible through control instructions.\\ 
+
+\subsubsection{General-Purpose Registers}
+
+Strictly speaking, MIPS architecture doesn't make any assumptions
+about the use of the 32 general-purpose registers. It's up to the
+programmer to use the register the way she likes, and the hardware
+will just perform the operations on those registers as specified
+by the programmer. However, there are two exceptions to this:
+
+\begin{enumerate}
+
+\item Register 0 is always zero, no matter what value the programmer
+      writes to it.
+
+\item Register 31 is used as a link register (register containing
+      return address from subroutine). Some instructions implicitly
+      address this register.
+
+\end{enumerate}
+
+Although MIPS architecture doesn't make any assumptions on the use
+of general-purpose registers (except for register 0 and 31), people
+used to use those registers according to conventions listed in
+figure \ref{regs}. The figure shows conventional names and uses
+associated with the registers. Available assemblers and compilers
+for MIPS architecture are expected to follow the same conventions.
+
+\begin{figure}[H]
+\begin{center}
+\resizebox{0.9\textwidth}{!} {
+\begin{tabular}{|c|c|c|}
+
+\hline \textbf{Reg\#} & \textbf{Name}  & \textbf{Description} \\
+
+\hline 0     & zero  & Always zero \\
+
+\hline 1     & at    & Used by assembler ($at = assembler\ temporary$) \\
+
+\hline 2-3   & v0-v1 & Value returned by subroutine \\
+
+\hline 4-7   & a0-a3 & Subroutine parameters ($a\# = argument\#$) \\
+
+\hline 8-15  & t0-t7 & \multirow{2}{*}{
+                       Used by subroutines without saving 
+                       ($t\# = temporary\#$)} \\
+\cline{1-2} 24-25 & t8-t9 & \\
+
+\hline 16-23 & s0-s7 & Must be saved before use 
+                       ($s\# = subroutine\_var\#$) \\
+
+\hline 26-27 & k0-k1 & Used by exception handler \\
+
+\hline 28    & gp    & Global pointer \\
+
+\hline 29    & sp    & Stack pointer \\
+
+\hline 30    & s8/fp & 9th register variable/frame pointer \\
+
+\hline 31    & ra    & Return address \\
+
+\hline
+
+\end{tabular}
+}
+
+\end{center}
+\caption{Conventional names/uses of MIPS registers}
+\label{regs}
+\end{figure}
+
+\subsubsection{LO and HI Registers}
+
+Along with the 32 registers defined above, two special registers
+are defined by the MIPS architecture to store results of MULT, MULTU,
+DIV, and DIVU instructions. Since these four instructions produce
+64-bit results, they need two destination registers. Since MIPS 
+architecture doesn't define more than one destination register
+for an instruction (for hardware considerations), the result
+should first stored in an intermediate 64-bit register (or two
+parallel 32-bit registers) then moved to the GPRs in two steps.\\
+ 
+The intermediate registers are called LO and HI registers. Each
+one of them is 32-bit wide, so you can see them as one 64-bit
+register which is can be accessed in halfs. LO
+and HI can be read using MFLO and MFHI instructions, each of which
+copies the value of LO or HI register into a general-purpose register.
+The HI and LO registers can also altered by MTLO and MTHI instructions.
+
+\subsubsection{Control Registers}
+
+Now we turn our attention to the last class of registers, registers
+that control the behaviour of the processor. These registers are
+not defined by MIPS architecture itself, yet a processor needs
+to have a set of registers to store control switches. These
+registers are analogous to CR0, CR2, CR3, and EFLAGS registers of
+x86 architecture.\\
+
+Control registers are accessible only through MFC0 and MTC0 instructions,
+which transfer values between GPRs and control registers. Every control 
+register is addressed by a special index. Figure \ref{ctrlregs} shows
+all the control registers of our processor and their uses. \\
+
+\begin{figure}[H]
+\begin{center}
+\resizebox{0.9\textwidth}{!} {
+\begin{tabular}{|c|c|c|}
+
+\hline \textbf{Reg Indx} & \textbf{Name}  & \textbf{Description} \\
+
+\hline 0     & Index    & Stores index of TLB entry to be read/written \\
+
+\hline 2     & EntryLo  & The lowest half of TLB entry to be read/written \\
+
+\hline 9     & BadVaddr & Stores the memory address that caused TLB miss \\
+
+\hline 10    & EntryHi  & The highest half of TLB entry to be read/written \\
+
+\hline 12    & SR       & Status register \\
+
+\hline 13    & Cause    & Exception type \\
+
+\hline 14    & EPC      & Address of the instruction that caused an exception\\
+
+\hline
+
+\end{tabular}
+}
+
+\end{center}
+\caption{Control registers}
+\label{ctrlregs}
+\end{figure}
+
+Every control register has a specific format with a special function
+for every field. Next we show the format of every control register
+with a detailed description for the fields and how they can be used.\\
+
+\begin{itemize}
+
+\item \textbf{\underline{Index Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \multicolumn{5}{|c|}{Index Register (0)} \\
+
+\hline \textbf{Field bit(s):} & 31 & 30..14 & 13..8 & 7..0 \\
+
+\hline \textbf{Field name:}   & 0  & x      & Index & x    \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of Index register}
+\label{index_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{index_reg}:
+
+\begin{itemize}
+
+\item \textbf{Index}: Before the operating system reads
+      or modifies a TLB entry, it shall first write the 
+      index for the target TLB entry in this field using
+      MTC0 instruction. After then, the OS issues a TLB
+      read or TLB write using TLBR or TLBWI instruction.
+      Index takes a value from 0 to 63, which implies
+      that our TLB has 64 entries.
+
+\end{itemize}
+
+\item \textbf{\underline{EntryLo Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \multicolumn{5}{|c|}{EntryLo Register (2)} \\
+
+\hline \textbf{Field bit(s):} & 31..12 & 11..10 & 9 & 8..0 \\
+
+\hline \textbf{Field name:}   & PFN    & 0      & V & 0    \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of EntryLo register}
+\label{entrylo_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{entrylo_reg}:
+
+\begin{itemize}
+
+\item \textbf{V}: This field matches the valid bit (V) of the
+                  TLB entry to be read or written by the OS.
+                  Before the OS writes a TLB entry, it writes
+                  the valid bit of the entry in this field. When
+                  TLBWI instruction is issued, the V field of
+                  EntryLo register is copied into the V field
+                  of TLB entry addressed by Index register. On
+                  the other hand, when a TLBR instruction is
+                  executed, the V field of TLB entry addressed
+                  by Index register is copied into V field of
+                  EntryLo register; a read for EntryLo.V field
+                  (using MFC0 instruction) reveals what
+                  the value of the V field of the addressed
+                  TLB entry was when TLBR was issued. 
+
+\item \textbf{PFN}: This field matches the physical frame number
+                    (PFN) field of the
+                    TLB entry to be read or written by the OS.
+                    Before the OS writes a TLB entry, it writes
+                    the PFN of the entry in this field. When
+                    TLBWI instruction is issued, the PFN field of
+                    EntryLo register is copied into the PFN field
+                    of TLB entry addressed by Index register. On
+                    the other hand, when a TLBR instruction is
+                    executed, the PFN field of TLB entry addressed
+                    by Index register is copied into PFN field of
+                    EntryLo register; a read for EntryLo.PFN field
+                    (using MFC0 instruction) reveals what
+                    the value of the PFN field of the addressed
+                    TLB entry was when TLBR was issued. 
+
+\end{itemize}
+
+\item \textbf{\underline{BadVaddr Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|}
+
+\hline \multicolumn{2}{|c|}{BadVaddr Register (9)} \\
+
+\hline \textbf{Field bit(s):} & 31..0    \\
+
+\hline \textbf{Field name:}   & BadVaddr \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of BadVaddr register}
+\label{badvaddr_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{badvaddr_reg}:
+
+\begin{itemize}
+
+\item \textbf{BadVaddr}: When a TLB miss happens, the memory
+      address that causes the TLB miss is copied in this
+      field. There are two cases here:
+      \begin{enumerate}
+      \item If a TLB miss happens while fetching an instruction
+            from memory, the address of the instruction is
+            copied into BadVaddr field before the exception
+            handler is called.
+      \item If the instruction is fetched successfully, but it
+            happens that the instruction is a load/store instruction,
+            and a TLB miss happens during fetching/writing data
+            from/to memory, the effective address of the data element
+            addressed by this instruction is placed in BadVaddr before
+            the exception handler is called.
+      \end{enumerate}
+
+\end{itemize}
+
+\item \textbf{\underline{EntryHi Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+
+\hline \multicolumn{3}{|c|}{EntryHi Register (10)} \\
+
+\hline \textbf{Field bit(s):} & 31..12 & 11..0 \\
+
+\hline \textbf{Field name:}   & VPN    & 0     \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of EntryHi register}
+\label{entryhi_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{entryhi_reg}:
+
+\begin{itemize}
+
+\item \textbf{VPN}: This field matches the virtual page number
+                    (VPN) of the
+                    TLB entry to be read or written by the OS.
+                    Before the OS writes a TLB entry, it writes
+                    the VPN field of the entry in this field. When
+                    TLBWI instruction is issued, the VPN field of
+                    EntryHi register is copied into the VPN field
+                    of TLB entry addressed by Index register. On
+                    the other hand, when a TLBR instruction is
+                    executed, the VPN field of TLB entry addressed
+                    by Index register is copied into VPN field of
+                    EntryHi register; a read for EntryHi.VPN field
+                    (using MFC0 instruction) reveals what
+                    the value of the VPN field of the addressed
+                    TLB entry was when TLBR was issued. 
+
+\end{itemize}
+
+\item \textbf{\underline{Status Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+
+\hline \multicolumn{7}{|c|}{Status Register (12)} \\
+
+\hline \textbf{Field bit(s):} & 31..5 & 4   & 3 & 2   & 1 & 0  \\
+
+\hline \textbf{Field name:}   & 0     & IEo & 0 & IEp & 0 & IEc \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of Status register}
+\label{status_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{status_reg}:
+
+\begin{itemize}
+
+\item \textbf{IEc}: Interrupt enable/disable flag. When software
+      writes 1 to this field, interrupts are enabled. When software
+      writes to this field, interrupts are disabled and do not trigger
+      any exception. This field is reset to 0 by hardware on two events:
+
+      \begin{enumerate}
+      \item CPU is reset.
+      \item An exception has taken place.
+      \end{enumerate}
+
+      This field is also modified by RFE instruction which copies the
+      value of IEp field into IEc field.\\
+
+      It's important to note that when an exception happens and the
+      value of IEc is reset to 0, the old value of IEc is not lost
+      but rather is copied into IEp. Also, the old value of IEp
+      is copied into IEo before IEc is copied into IEp. When exception
+      handler returns (by executing RFE instruction), the value
+      of IEp is copied back to IEc, and the value of IEo is copied
+      back to IEp.\\
+
+      Actually, the three fields (IEc, IEp, and IEo) behave like
+      a 3-level stack for the value of the interrupt flag. The
+      top of the stack (IEc) is the current state of the interrupt
+      flag. When an exception happens, a 0 is pushed into stack,
+      causing interrupts to be disabled and the values of the
+      three entries are shifted by 1 (IEp copied into IEo and
+      IEc copied into IEp).\\
+      
+      If a nested exception occurs again,
+      the process repeats, thus IEo shall then hold the old value
+      of the interrupt flag, IEp shall hold the value of the
+      interrupt flag during handling the first exception, and IEc will be
+      reset to 0.\\
+      
+      When the exception handler returns, RFE instruction
+      will cause the stack to pop; IEp will be copied back to IEc
+      and IEo will be copied back to IEp, thus IEc returns
+      back to its original state before the exception has occured.\\
+      
+      This behaviour allows an exception to be nested into
+      another exception without need to push status register
+      into the software stack before the inner exception happens.
+
+\item \textbf{IEp}: As discussed above, this field functions as backup
+      for IEc field during exception handling. The three fields 
+      (IEc, IEp, IEo) can be seen as a 3-level stack to store the value 
+      of the interrupt flag across exceptions.\\
+
+      When an exception happens, the value of this field is copied into 
+      IEo field and the value of IEc is copied into this field before 
+      IEc is reset to 0. When an RFE instruction is executed, the value
+      of this field is copied back to IEc and the value of IEo is copied 
+      into this field. \\
+
+\item \textbf{IEo}: As discussed above, this field functions as backup
+      for IEp field during exception handling. The three fields 
+      (IEc, IEp, IEo) can be seen as a 3-level stack to store the value 
+      of the interrupt flag across exceptions.\\
+
+      When an exception happens, the value of IEp is copied into this field
+      before IEc is copied into IEp. When an RFE instruction is executed, 
+      the value of this field is copied back to IEp. \\
+
+\end{itemize}
+
+\item \textbf{\underline{Cause Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \multicolumn{5}{|c|}{Cause Register (13)} \\
+
+\hline \textbf{Field bit(s):} & 31 & 30..7 & 6..2    & 1..0 \\
+
+\hline \textbf{Field name:}   & BD & 0     & ExcCode & 0    \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of Cause register}
+\label{cause_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{cause_reg}:
+
+\begin{itemize}
+
+\item \textbf{ExcCode}: When an exception occurs, the type
+      of the exception is copied into this field before
+      the exception handler is called. Currently, only
+      the types of exceptions shown in figure \ref{exccode}
+      are supported.
+
+      \begin{figure}[H]
+      \begin{center}
+      \begin{tabular}{|c|c|}
+      \hline \textbf{ExcCode Value} & \textbf{Description} \\
+      \hline 0                      & Interrupt Exception \\
+      \hline 1                      & TLB Miss Exception \\
+      \hline
+      \end{tabular}
+      \end{center}
+      \caption{ExcCode values with their meaning}
+      \label{exccode}
+      \end{figure}
+
+\item \textbf{BD}: When an instruction causes exception (or
+      gets interrutpted), this field is set to 1 if the
+      instruction is a delay slot instruction, otherwise
+      it is reset to 0; thus `BD' means branch detected.
+
+\end{itemize}
+
+\item \textbf{\underline{EPC Register:}}\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|}
+
+\hline \multicolumn{2}{|c|}{EPC Register (14)} \\
+
+\hline \textbf{Field bit(s):} & 31..0 \\
+
+\hline \textbf{Field name:}   & EPC   \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of EPC register}
+\label{epc_reg}
+\end{figure}
+
+Detailed description for fields in figure \ref{epc_reg}:
+
+\begin{itemize}
+
+\item \textbf{EPC}: When an instruction that is currently
+      executed by the processor causes an exception (like
+      TLB miss) or gets interrupted (by en external I/O device),
+      the address of the instruction is copied into EPC field,
+      then exception handler is called. 
+      If the instruction is a delay slot instruction, the address
+      of the previous jump/branch instruction is copied into
+      EPC field instead of the address of the delay slot instruction.\\
+      
+      This behaviour prevents software to misbehave when the exception
+      handler returns (as the branch instruction needs to be executed 
+      again or the processor will keep fetching instructions that follow
+      the delay slot no matter the branch is taken or not). This
+      special case causes BD field of Cause register to set as
+      described above.\\
+       
+      It's also important to note
+      that before exception handler is called, the CPU makes
+      sure that the instruciton doesn't have any effect on
+      the architectural state of the processor (i.e, any
+      effect caused by the instruction is undone).
+
+\end{itemize}
+
+\end{itemize}
+
+\subsection{Memory Management}
+
+\subsubsection{MIPS Memory Address Space}
+\subsubsection{Translation Look-aside Buffer (TLB)}
+\subsubsection{Cache Memory}
+
 \subsection{Exception Handling}
-\subsection{Paging}
-\subsection{Cache Management}
 \subsection{VHDL Implementation: Introduction}
 \subsection{VHDL Implementation: The Pipeline}
 \subsection{VHDL Implementation: Exceptions}
