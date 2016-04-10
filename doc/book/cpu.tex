@@ -31,6 +31,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{multirow}
+\usepackage{tikz}
 
 % table of contents
 \usepackage{tocloft}
@@ -153,8 +154,10 @@ always zero), a behaviour which implies that:
 
 \begin{itemize}
 
-\item Instructions are executed in sequence unless there is a branch,
-      jump, or exception.
+\item Unless there is a branch, a jump, or an exception, instructions
+      are always executed in sequence, as opposed to machines with
+      one-plus-one addressing scheme like RPC-4000 where a program
+      could be scattered over the drum.
 
 \item Instructions should always be stored in 4-byte aligned words.
 
@@ -162,8 +165,8 @@ always zero), a behaviour which implies that:
 
 It is important to note that MIPS-I instruction set is a proper
 subset of the instruction set of our processor; meaning that
-the processor supports additional instructions that control
-the behaviour of the processor as will be seen below.\\
+the processor supports additional instructions and registers that 
+control the behaviour of the processor as will be seen below.\\
 
 CPU instructions are divided into the following groups:
 
@@ -277,6 +280,15 @@ according to how they are encoded:
 
 \end{enumerate}
 
+We call the last three groups together as `R-TYPE ALU instructions'
+for reasons illustrated below. In the next lines we describe the
+instruction groups in detail.
+
+\begin{itemize}
+\item 
+
+\textbf{\underline{ALU Instructions With Immediate Operand:}} \\
+
 The reader may expect that the first group (ALU instructions
 with immediate operand) is encoded exactly the same way as
 memory instructions. Both groups are included in the same
@@ -337,10 +349,13 @@ for the opcode field:
 The detailed behaviour of those instructions is described
 in the appendix.\\
 
+\item \textbf{\underline{R-TYPE ALU Instructions:}} \\
+
 The remaining three groups of ALU instructions (ALU instructions
 with three operands, shift instructions, and multiply/divide
-instructions) are all encoded the same and have the following
-fields for each instruction:
+instructions) are all encoded the same way which is shown below.
+All instructions encoded that way are called R-TYPE instructions. 
+We will summarize all encoding classes later in this section.\\
 
 \begin{itemize}
 
@@ -401,9 +416,6 @@ fields for each instruction:
                               to be performed. (6 bits).
 \end{itemize}
 
-All instructions encoded that way are called R-TYPE instructions. We will
-summarize all encoding classes later in this section.\\
-
 With a unique function code for every instruction (and an opcode of 0),
 ALU instructions with 3 operands group includes the following instructions:
 
@@ -454,6 +466,8 @@ group (multiply/divide instructions):
 For detailed description for the behaviour of all of the instructions listed
 above, please refer to the appendix.
 
+\end{itemize}
+
 \subsubsection{Jump and Branch Instructions}
 
 MIPS-I architecture defines a number of operations that control the path
@@ -471,6 +485,12 @@ Jump and branch instructions are divided into four groups:
 \item PC-Relative Conditional Branch Instructions Comparing Against Zero
 
 \end{enumerate}
+
+Next we illustrate every group in detail.
+
+\begin{itemize}
+
+\item \textbf{\underline{Jump Instructions Jumping Within 256MB Region:}} \\
 
 The way the instructions of the first group (jump instructions jumping
 within 256MB region) are encoded is different from I-TYPE and R-TYPE. It's
@@ -499,6 +519,8 @@ This group only contains two instructions:
 \item \textbf{JAL}: Jump and Link
 
 \end{enumerate}
+
+\item \textbf{\underline{Jump Instructions to Absolute Address:}} \\
 
 Second group (jump instructions to absolute address) consists of instructions
 similar to instructions of the first group, yet have the ability to jump
@@ -538,13 +560,16 @@ Analogous to the first group, this group consists of these two instructions:
 
 \end{enumerate}
 
+\item \textbf{\underline{Conditional Branch Instructions
+                         Comparing 2 Registers:}} \\
+
 The remaining two groups are concerned with conditional branching. The
 third group consists of instructions that compare two registers, then
 jump if the comparison yields a specific result, while the last
 group compare one register against zero, and jump if the comparison
 yields a specific result.\\
 
-The third group are just encoded as I-TYPE (like ALU immediate
+The third group is just encoded as I-TYPE (like ALU immediate
 instructions and load/store instructions). The fields of the instruction
 word are interpreted as following:
 
@@ -585,6 +610,9 @@ The group consists of the following instructions:
 
 \end{enumerate}
 
+\item \textbf{\underline{Conditional Branch Instructions 
+                         Comparing Against Zero:}} \\
+
 The fourth group is also encoded as I-TYPE instructions,
 however, the fields shall have special values and meanings:
 
@@ -621,6 +649,8 @@ Finally, this last group consists of the following instructions:
 
 For detailed description for the behaviour of all of the instructions listed
 above, please refer to the appendix.
+
+\end{itemize}
 
 \subsubsection{Miscellaneous Instructions}
 
@@ -1438,8 +1468,220 @@ Detailed description for fields in figure \ref{epc_reg}:
 
 \subsection{Memory Management}
 
-\subsubsection{MIPS Memory Address Space}
+Having discussed the instruction set and registers of our CPU, we now
+turn our attention to how the CPU translates memory accesses. When
+an instruction is fetched from memory, or when a load/store instruction
+requests data from memory, the memory address is first translated
+by means of translation look-aside buffer (TLB). The translated
+address is then used to look-up data in the cache which might then
+issue an access request to main memory if data is not found in cache. 
+Figure \ref{memaccess} summarizes the process.\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}
+
+\draw[black, thick] 
+    (0,0)  node[minimum width =50, rectangle, 
+                minimum height=50, draw](w) {CPU Core}
+    (4,0.25) node[minimum width =50, rectangle, 
+                minimum height=25, draw](x) {TLB}
+    (8,0)  node[minimum width =50, rectangle, 
+                minimum height=50, draw](y) {Cache}
+    (13,0) node[minimum width =50, rectangle, 
+                minimum height=50, draw](z) {Memory}
+    ;
+\draw[->, black, transform canvas={yshift=10}] 
+    ([yshift=-25]w) -- node[above]{\scriptsize logical address} (x);
+\draw[->, black, transform canvas={yshift=2.7}] 
+    ([yshift=25]x) -- node[above]{\scriptsize physical address} (y);
+\draw[->, black, transform canvas={yshift=10}] 
+    (y) -- node[above]{\scriptsize only on a cache miss} (z);
+\draw[->, black, transform canvas={yshift=-13}] 
+    (z) -- node[below]{\scriptsize data returned} (y);
+\draw[->, black, transform canvas={yshift=-13}] 
+    (y) -- node[below]{\scriptsize data returned} (w);
+
+\end{tikzpicture}
+\end{center}
+\caption{Memory access levels}
+\label{memaccess}
+\end{figure}
+
+The figure presents two different types of addresses: logical address
+and physical address. We define both terms as follows:
+
+\begin{enumerate}
+
+\item \textbf{Logical address}: the address of a memory location or
+an instruction from the prespective of the running program. This simply
+means that a program doesn't see memory as it is in reality. The
+running program doesn't need to know the real address of the memory
+item it is currently addressing, but the operating system must
+provide the mapping between the logical address of a memory item
+and its real location in memory. This mapping is used by translation
+circuitry that translates logical address to the real location
+before main memory is queried.
+
+\item \textbf{Physical address}: this is the real location of
+the memory item or the instruction that is being accessed. Physical
+address is the address that is put on the bus when main memory
+access is established by the processor. Also, as will be seen later,
+data in cache is looked up by its physical address, not
+logical address.
+
+\end{enumerate}
+
+The reason why there are two separate types of addresses and a translation
+circuitry is to allow every process to have its own address space by
+providing a distinct logical-to-physical address mapping for every
+running process. The process of translating a logical address
+to its corresponding physical address is called 
+\textbf{address translation}. \\
+
+Figure \ref{translation} illustrates how we can
+achieve process-level isolation using this technique.
+Every process has its own set of memory items: blue items belong
+to process 1, and red items belong to process 2. The OS needn't
+allocate the items in physical address space in a specific order 
+(they are scattered over memory) since the running program
+doesn't need to know the physical locations and doesn't need
+to make any assumptions about them.\\
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{translation.png}
+\end{center}
+\caption{Process logical address spaces and mappings to physical addresses}
+\label{translation}
+\end{figure}
+
+The OS provides two separate mappings for both processes in the figure.
+Each mapping provides enough information needed to translate
+logical addresses of memory items belonging to the process to
+physical addresses. Each process only sees its own items in the
+logical address space, therefore a process can never access
+memory items of other processes because there is no mapping for them.
+By this mechanism, we have achieved the required isolation between 
+processes: every process can only access the items allocated to it.\\
+
+The OS might allow some memory items to be shared between more
+than one process. The purple item in the figure is seen in the
+logical address space of both process 1 and process 2. This implies
+that an item in main memory can have more than one logical address (for
+several mappings). However, every memory item can have no more than
+one physical address.\\
+
+The process of allocating and organizing items in main memory is the
+responsibility of the OS. Also, the OS is responsible for providing
+the required mapping between logical and physical addresses. The OS
+provides the CPU with the mapping of the process that is currently
+being executed, and the CPU is responsible only for doing the translation
+on every memory access. Later in this section we show how the OS
+informs the CPU of the mapping. \\
+
+It's important to note that some authors use terms like
+`virtual address' and `program address' to refer to logical addresses. 
+We shall use the term `logical address' throughout the document to 
+prevent confusion with other terms and techniques, like `virtual memory', 
+which shouldn't be confused with `logical address space', or equivalently,
+`logical memory'.\\
+
+\subsubsection{MIPS Logical Address Space}
+
+Since a logical address is 32 bits (as seen earlier), every process
+shall has a logical address space of 4GB. This 4GB address space
+is divided into four regions, each region is translated differently
+as will be seen below. The four regions are:
+
+\begin{enumerate}
+
+\item \textbf{kuseg} 0x00000000 - 0x7FFFFFFF (2GB): 
+      any address in this region is translated by the translation 
+      circuitry to its corresponding physical address using the 
+      mapping provided by the OS. This area usually contains the 
+      text and data of the running process.
+
+\item \textbf{kseg0} 0x80000000 - 0x9FFFFFFF (512MB): 
+      addresses in this region are not translated using the
+      mapping provided by the OS, but rather they are translated
+      by stripping off the most significant bit. Thus, this
+      region simply maps to the physical region: 
+      0x00000000 - 0x1FFFFFFF. Operating system kernel can
+      be simply put inside the lower 512MB zone of the
+      main memory, and consequently it will appear inside kseg0.
+      This implies that the kernel doesn't need to setup
+      any mapping for itself, it is just mapped automatically
+      to this region. This also implies that kernel memory
+      area is shared among all processes.
+
+\item \textbf{kseg1} 0xA0000000 - 0xBFFFFFFF (512MB):
+      just like kseg0, addresses in this region also translate
+      to the lower 512MB of physical address space. The only
+      difference between kseg0 and kseg1 is that memory access
+      of any address in kseg1 will skip the cache, so it is
+      always uncached, while kseg0 is always cached. Access
+      to memory-mapped I/O registers should always be done
+      through this segment (to prevent caching). System
+      designers must make sure that I/O registers have
+      physical addresses in the low 512MB physical zone so that
+      they can appear in kseg1.
+
+\item \textbf{kseg2} 0xC0000000 - 0xFFFFFFFF (1GB):
+      any address in this region is simply translated
+      using the mapping provided by the operating system,
+      this area is usually used to contain OS data structures
+      which are maintained by the kernel.
+
+\end{enumerate}
+
+We conclude that addresses in kuseg and kseg2 are translated
+the same way, using the mapping provided by the operating system,
+while addresses in kseg0 and kseg1 are translated by mapping them
+directly to the lower 512MB zone of physical memory. The only
+difference between kseg0 and kseg1 is that the former is cached
+while the later is uncached. The difference between kuseg and kseg2
+is that kuseg is used to hold current process code and data,
+while kseg2 is used to hold kernel objects.\\
+
+Having a static mapping for kseg0 and kseg1 has several advantages:
+
+\begin{enumerate}
+
+\item Processor reset vector is put in kseg1. Consequently, system 
+      initialization code (i.e, firmware) can start execution
+      before translation circuitry is initialized. Caching also
+      might not be wanted during system initialization, thus
+      kseg1 is a safe place to start the system from.
+
+\item Kernel is shared among all processes and doesn't need a specific
+      mapping. This means that kernel initialization code can be
+      executed before the translation circuitry is initialized. This
+      also implies that a system call from process code running in
+      kuseg can be handled in kseg0 without need to switch logical address
+      space (i.e, without providing translation circuitry with another
+      mapping). Microkernels can also use this area to put the tiny
+      code that does the logical address switching.
+
+\end{enumerate}
+
+When a process switch occurs, the OS must alter the translation
+circuitry with the mapping of the new process. The kernel
+can fix the mapping of kseg2 among all processes. Consequently, kernel
+objects can also be shared by all processes, allowing system calls
+to be handled without need to switching logical address space
+or alter the mapping.
+
 \subsubsection{Translation Look-aside Buffer (TLB)}
+
+\begin{itemize}
+\item Describe paging
+\item Describe why page tables may be too large to store in CPU
+\item Introduce TLB as a cache
+\item Show how to read/write TLB entries
+\item What happens on a TLB miss
+\end{itemize}
+
 \subsubsection{Cache Memory}
 
 \subsection{Exception Handling}

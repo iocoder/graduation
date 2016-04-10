@@ -13,11 +13,11 @@
 \contentsline {subsubsection}{\numberline {1.2.2}LO and HI Registers}{15}
 \contentsline {subsubsection}{\numberline {1.2.3}Control Registers}{15}
 \contentsline {subsection}{\numberline {1.3}Memory Management}{20}
-\contentsline {subsubsection}{\numberline {1.3.1}MIPS Memory Address Space}{20}
-\contentsline {subsubsection}{\numberline {1.3.2}Translation Look-aside Buffer (TLB)}{20}
-\contentsline {subsubsection}{\numberline {1.3.3}Cache Memory}{20}
-\contentsline {subsection}{\numberline {1.4}Exception Handling}{20}
-\contentsline {subsection}{\numberline {1.5}VHDL Implementation: Introduction}{20}
-\contentsline {subsection}{\numberline {1.6}VHDL Implementation: The Pipeline}{20}
-\contentsline {subsection}{\numberline {1.7}VHDL Implementation: Exceptions}{20}
-\contentsline {subsection}{\numberline {1.8}VHDL Implementation: Cache and TLB}{20}
+\contentsline {subsubsection}{\numberline {1.3.1}MIPS Logical Address Space}{22}
+\contentsline {subsubsection}{\numberline {1.3.2}Translation Look-aside Buffer (TLB)}{23}
+\contentsline {subsubsection}{\numberline {1.3.3}Cache Memory}{23}
+\contentsline {subsection}{\numberline {1.4}Exception Handling}{23}
+\contentsline {subsection}{\numberline {1.5}VHDL Implementation: Introduction}{23}
+\contentsline {subsection}{\numberline {1.6}VHDL Implementation: The Pipeline}{23}
+\contentsline {subsection}{\numberline {1.7}VHDL Implementation: Exceptions}{23}
+\contentsline {subsection}{\numberline {1.8}VHDL Implementation: Cache and TLB}{23}
