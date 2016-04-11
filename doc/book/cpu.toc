@@ -5,8 +5,8 @@
 \contentsline {subsubsection}{\numberline {1.1.3}Jump and Branch Instructions}{7}
 \contentsline {subsubsection}{\numberline {1.1.4}Miscellaneous Instructions}{9}
 \contentsline {subsubsection}{\numberline {1.1.5}Control Instructions}{10}
-\contentsline {subsubsection}{\numberline {1.1.6}Instruction Encoding Summary}{10}
-\contentsline {subsubsection}{\numberline {1.1.7}Addressing Modes}{12}
+\contentsline {subsubsection}{\numberline {1.1.6}Instruction Encoding Summary}{11}
+\contentsline {subsubsection}{\numberline {1.1.7}Addressing Modes}{13}
 \contentsline {subsubsection}{\numberline {1.1.8}Programmer-Visible Pipeline Effects}{13}
 \contentsline {subsection}{\numberline {1.2}Registers}{14}
 \contentsline {subsubsection}{\numberline {1.2.1}General-Purpose Registers}{14}
@@ -17,3 +17,7 @@
 \contentsline {subsubsection}{\numberline {1.3.2}Translation Look-aside Buffer (TLB)}{23}
 \contentsline {subsubsection}{\numberline {1.3.3}Cache Memory}{28}
 \contentsline {subsection}{\numberline {1.4}Exception Handling}{28}
+\contentsline {subsubsection}{\numberline {1.4.1}Exception Cases}{29}
+\contentsline {subsubsection}{\numberline {1.4.2}Exception Vectors}{30}
+\contentsline {subsubsection}{\numberline {1.4.3}Exception Protocol}{30}
+\contentsline {subsubsection}{\numberline {1.4.4}Precise Exceptions}{31}
