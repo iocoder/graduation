@@ -1,7 +1,7 @@
-\documentclass[]{scrartcl}
+\documentclass[]{book}
 
 \title{MIPS Home Computer System}
-\subtitle{System Design Reference}
+%\subtitle{System Design Reference}
 \author{
     \large Student\\
     \large Mostafa Abd El-Aziz\\
@@ -19,6 +19,8 @@
 \usepackage{microtype}
 \usepackage[utf8]{inputenc}
 \usepackage{cfr-lm} % font package
+\usepackage{scrextend}
+\changefontsizes{12pt}
 
 % listings
 \usepackage{listings}
@@ -37,11 +39,13 @@
 \usepackage{tocloft}
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % for chapters
 \renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}} % for parts
+\setcounter{tocdepth}{5}
 
 % section style
 \usepackage{enumitem}
 \usepackage{sectsty}
 \sectionfont{\LARGE}
+\setcounter{secnumdepth}{5}
 
 % page orientation
 \usepackage{lscape}
@@ -51,17 +55,17 @@
 \begin{document}
 
 % university logo
-\titlehead{
+%\titlehead{
+%
+%    \small Alexandria University\\
+%    \small Faculty of Engineering\\
+%    \small Computer and Systems Engineering Department\\
+%    \small CS 402 - Graduation Project
 
-    \small Alexandria University\\
-    \small Faculty of Engineering\\
-    \small Computer and Systems Engineering Department\\
-    \small CS 402 - Graduation Project
-
-    \vspace{-2.2cm}
-    \hfill
-    \includegraphics[scale=0.6]{logo.png}
-}
+%    \vspace{-2.2cm}
+%    \hfill
+%    \includegraphics[scale=0.6]{logo.png}
+%}
 
 % document title
 \maketitle
@@ -69,8 +73,14 @@
 % table of contents
 \renewcommand{\contentsname}{Table of Contents}
 \tableofcontents
+\newpage
+\listoffigures
 
 %------------------------------------------------------------------------------%
+
+\chapter{Introduction}
+
+\chapter{Architecture}
 
 \section{Central Processing Unit}
 

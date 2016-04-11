@@ -1,0 +1,23 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces MIPS-I instruction formats}}{17}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Instructions encoded by opcode field}}{18}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Instructions encoded by function field when opcode field = $SPECIAL$}}{18}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Instructions encoded by rt field when opcode = $REGIMM$}}{19}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces All possible addressing modes}}{19}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Conventional names/uses of MIPS registers}}{21}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Control registers}}{22}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Format of Index register}}{22}
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Format of EntryLo register}}{23}
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Format of BadVaddr register}}{23}
+\contentsline {figure}{\numberline {2.11}{\ignorespaces Format of EntryHi register}}{24}
+\contentsline {figure}{\numberline {2.12}{\ignorespaces Format of Status register}}{24}
+\contentsline {figure}{\numberline {2.13}{\ignorespaces Format of Cause register}}{26}
+\contentsline {figure}{\numberline {2.14}{\ignorespaces ExcCode values with their meaning}}{26}
+\contentsline {figure}{\numberline {2.15}{\ignorespaces Format of EPC register}}{26}
+\contentsline {figure}{\numberline {2.16}{\ignorespaces Memory access levels}}{27}
+\contentsline {figure}{\numberline {2.17}{\ignorespaces Process logical address spaces and mappings to physical addresses}}{28}
+\contentsline {figure}{\numberline {2.18}{\ignorespaces Address translation using page table}}{31}
+\contentsline {figure}{\numberline {2.19}{\ignorespaces Address translation using two-level page table scheme}}{32}
+\contentsline {figure}{\numberline {2.20}{\ignorespaces Format of TLB entry}}{33}
+\contentsline {figure}{\numberline {2.21}{\ignorespaces Excetion vectors for various exception types}}{38}

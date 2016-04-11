@@ -1,97 +1,30 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  11 APR 2016 22:20
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  11 APR 2016 23:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**cpu.tex
-(./cpu.tex
+**book.tex
+(./book.tex
 LaTeX2e <2015/10/01> patch level 2
 Babel <3.9m> and hyphenation patterns for 79 languages loaded.
-(/usr/share/texmf-dist/tex/latex/koma-script/scrartcl.cls
-Document Class: scrartcl 2015/10/03 v3.19a KOMA-Script document class (article)
-
-(/usr/share/texmf-dist/tex/latex/koma-script/scrkbase.sty
-Package: scrkbase 2015/10/03 v3.19a KOMA-Script package (KOMA-Script-dependent 
-basics and keyval usage)
-
-(/usr/share/texmf-dist/tex/latex/koma-script/scrbase.sty
-Package: scrbase 2015/10/03 v3.19a KOMA-Script package (KOMA-Script-independent
- basics and keyval usage)
-
-(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
-Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
-\KV@toks@=\toks14
+(/usr/share/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/bk10.clo
+File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 )
-(/usr/share/texmf-dist/tex/latex/koma-script/scrlfile.sty
-Package: scrlfile 2015/10/03 v3.19a KOMA-Script package (loading files)
-
-Package scrlfile, 2015/10/03 v3.19a KOMA-Script package (loading files)
-                  Copyright (C) Markus Kohm
-
-))) (/usr/share/texmf-dist/tex/latex/koma-script/tocbasic.sty
-Package: tocbasic 2015/10/03 v3.19a KOMA-Script package (handling toc-files)
-)
-Package tocbasic Info: omitting babel extension for `toc'
-(tocbasic)             because of feature `nobabel' available
-(tocbasic)             for `toc' on input line 123.
-Package tocbasic Info: omitting babel extension for `lof'
-(tocbasic)             because of feature `nobabel' available
-(tocbasic)             for `lof' on input line 124.
-Package tocbasic Info: omitting babel extension for `lot'
-(tocbasic)             because of feature `nobabel' available
-(tocbasic)             for `lot' on input line 125.
-Class scrartcl Info: File `scrsize11pt.clo' used instead of
-(scrartcl)           file `scrsize11.clo' to setup font sizes on input line 203
-3.
-
-(/usr/share/texmf-dist/tex/latex/koma-script/scrsize11pt.clo
-File: scrsize11pt.clo 2015/10/03 v3.19a KOMA-Script font size class option (11p
-t)
-)
-(/usr/share/texmf-dist/tex/latex/koma-script/typearea.sty
-Package: typearea 2015/10/03 v3.19a KOMA-Script package (type area)
-
-Package typearea, 2015/10/03 v3.19a KOMA-Script package (type area)
-                  Copyright (C) Frank Neukam, 1992-1994
-                  Copyright (C) Markus Kohm, 1994-
-
-\ta@bcor=\skip41
-\ta@div=\count79
-\ta@hblk=\skip42
-\ta@vblk=\skip43
-\ta@temp=\skip44
-\footheight=\skip45
-Package typearea Info: These are the values describing the layout:
-(typearea)             DIV  = 10
-(typearea)             BCOR = 0.0pt
-(typearea)             \paperwidth      = 597.50793pt
-(typearea)              \textwidth      = 418.25555pt
-(typearea)              DIV departure   = -6%
-(typearea)              \evensidemargin = 17.3562pt
-(typearea)              \oddsidemargin  = 17.3562pt
-(typearea)             \paperheight     = 845.04694pt
-(typearea)              \textheight     = 595.80026pt
-(typearea)              \topmargin      = -25.16531pt
-(typearea)              \headheight     = 17.0pt
-(typearea)              \headsep        = 20.40001pt
-(typearea)              \topskip        = 11.0pt
-(typearea)              \footskip       = 47.6pt
-(typearea)              \baselineskip   = 13.6pt
-(typearea)              on input line 1509.
-)
-\c@part=\count80
+\c@part=\count79
+\c@chapter=\count80
 \c@section=\count81
 \c@subsection=\count82
 \c@subsubsection=\count83
 \c@paragraph=\count84
 \c@subparagraph=\count85
-LaTeX Info: Redefining \textsubscript on input line 3906.
-\abovecaptionskip=\skip46
-\belowcaptionskip=\skip47
-\c@pti@nb@sid@b@x=\box26
 \c@figure=\count86
 \c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
 \bibindent=\dimen102
-) (/usr/share/texmf-dist/tex/latex/base/fontenc.sty
+)
+(/usr/share/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 
 (/usr/share/texmf-dist/tex/latex/base/t1enc.def
@@ -205,6 +138,11 @@ LaTeX Font Info:    Overwriting math alphabet `\mathsl' in version `bold'
 )
 (/usr/share/texmf-dist/tex/latex/microtype/microtype.sty
 Package: microtype 2013/05/23 v2.5a Micro-typographical refinements (RS)
+
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+)
 \MT@toks=\toks15
 \MT@count=\count88
 LaTeX Info: Redefining \textls on input line 766.
@@ -217,7 +155,7 @@ File: microtype-pdftex.def 2013/05/23 v2.5a Definitions specific to pdftex (RS)
 
 LaTeX Info: Redefining \lsstyle on input line 915.
 LaTeX Info: Redefining \lslig on input line 915.
-\MT@outer@space=\skip48
+\MT@outer@space=\skip43
 )
 Package microtype Info: Loading configuration file microtype.cfg.
 
@@ -688,9 +626,29 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 (Font)                  OT1/lmtt/m/n --> OT1/lmtt/m/n on input line 201.
 )
-(/usr/share/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texmf-dist/tex/latex/koma-script/scrextend.sty
+Package: scrextend 2015/10/03 v3.19a KOMA-Script package (extend other classes 
+with features of KOMA-Script classes)
+
+(/usr/share/texmf-dist/tex/latex/koma-script/scrkbase.sty
+Package: scrkbase 2015/10/03 v3.19a KOMA-Script package (KOMA-Script-dependent 
+basics and keyval usage)
+
+(/usr/share/texmf-dist/tex/latex/koma-script/scrbase.sty
+Package: scrbase 2015/10/03 v3.19a KOMA-Script package (KOMA-Script-independent
+ basics and keyval usage)
+
+(/usr/share/texmf-dist/tex/latex/koma-script/scrlfile.sty
+Package: scrlfile 2015/10/03 v3.19a KOMA-Script package (loading files)
+
+Package scrlfile, 2015/10/03 v3.19a KOMA-Script package (loading files)
+                  Copyright (C) Markus Kohm
+
+)))
+LaTeX Info: Redefining \textsubscript on input line 1277.
+) (/usr/share/texmf-dist/tex/latex/listings/listings.sty
 \lst@mode=\count92
-\lst@gtempboxa=\box27
+\lst@gtempboxa=\box26
 \lst@token=\toks20
 \lst@length=\count93
 \lst@currlwidth=\dimen104
@@ -706,7 +664,7 @@ LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
 \c@lstnumber=\count98
 \lst@skipnumbers=\count99
-\lst@framebox=\box28
+\lst@framebox=\box27
 )
 (/usr/share/texmf-dist/tex/latex/listings/listings.cfg
 File: listings.cfg 2015/06/04 1.6 listings configuration
@@ -775,9 +733,9 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count104
 \float@exts=\toks22
-\float@box=\box29
+\float@box=\box28
 \@float@everytoks=\toks23
-\@floatcapt=\box30
+\@floatcapt=\box29
 )
 (/usr/share/texmf-dist/tex/latex/multirow/multirow.sty
 \bigstrutjot=\dimen118
@@ -792,7 +750,7 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 
 (/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfutil-common-lists.tex))
 (/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
-\pgfutil@abb=\box31
+\pgfutil@abb=\box30
 
 (/usr/share/texmf-dist/tex/latex/ms/everyshi.sty
 Package: everyshi 2001/05/15 v3.00 EveryShipout Package (MS)
@@ -877,7 +835,7 @@ Package: pgfcore 2010/04/11 v3.0.1a (rcs-revision 1.7)
 (/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
 \pgfmath@dimen=\dimen129
 \pgfmath@count=\count111
-\pgfmath@box=\box32
+\pgfmath@box=\box31
 \pgfmath@toks=\toks31
 \pgfmath@stack@operand=\toks32
 \pgfmath@stack@operation=\toks33
@@ -922,9 +880,9 @@ File: pgfcorepathusage.code.tex 2014/11/02  (rcs-revision 1.24)
 )
 (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2015/05/08  (rcs-revision 1.46)
-\pgfpic=\box33
-\pgf@hbox=\box34
-\pgf@layerbox@main=\box35
+\pgfpic=\box32
+\pgf@hbox=\box33
+\pgf@layerbox@main=\box34
 \pgf@picture@serial@count=\count113
 )
 (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
@@ -960,7 +918,7 @@ File: pgfcoreimage.code.tex 2013/07/15  (rcs-revision 1.18)
 
 (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
 File: pgfcoreexternal.code.tex 2014/07/09  (rcs-revision 1.21)
-\pgfexternal@startupbox=\box36
+\pgfexternal@startupbox=\box35
 ))
 (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
 File: pgfcorelayers.code.tex 2013/07/18  (rcs-revision 1.7)
@@ -972,7 +930,7 @@ File: pgfcorepatterns.code.tex 2013/11/07  (rcs-revision 1.5)
 )))
 (/usr/share/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
 File: pgfmoduleshapes.code.tex 2014/03/21  (rcs-revision 1.35)
-\pgfnodeparttextbox=\box37
+\pgfnodeparttextbox=\box36
 )
 (/usr/share/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
 File: pgfmoduleplot.code.tex 2015/08/03  (rcs-revision 1.13)
@@ -1014,10 +972,10 @@ File: pgflibraryplothandlers.code.tex 2013/08/31 v3.0.1a (rcs-revision 1.20)
 \tikz@lastysaved=\dimen162
 \tikzleveldistance=\dimen163
 \tikzsiblingdistance=\dimen164
-\tikz@figbox=\box38
-\tikz@figbox@bg=\box39
-\tikz@tempbox=\box40
-\tikz@tempbox@bg=\box41
+\tikz@figbox=\box37
+\tikz@figbox@bg=\box38
+\tikz@tempbox=\box39
+\tikz@tempbox@bg=\box40
 \tikztreelevel=\count116
 \tikznumberofchildren=\count117
 \tikznumberofcurrentchild=\count118
@@ -1035,47 +993,50 @@ topaths.code.tex
 File: tikzlibrarytopaths.code.tex 2008/06/17 v3.0.1a (rcs-revision 1.2)
 ))) (/usr/share/texmf-dist/tex/latex/tocloft/tocloft.sty
 Package: tocloft 2013/05/02 v2.3f parameterised ToC, etc., typesetting
-Package tocloft Info: The document has section divisions on input line 44.
-\cftparskip=\skip49
-\cftbeforetoctitleskip=\skip50
-\cftaftertoctitleskip=\skip51
-\cftbeforepartskip=\skip52
-\cftpartnumwidth=\skip53
-\cftpartindent=\skip54
-\cftbeforesecskip=\skip55
-\cftsecindent=\skip56
-\cftsecnumwidth=\skip57
-\cftbeforesubsecskip=\skip58
-\cftsubsecindent=\skip59
-\cftsubsecnumwidth=\skip60
-\cftbeforesubsubsecskip=\skip61
-\cftsubsubsecindent=\skip62
-\cftsubsubsecnumwidth=\skip63
-\cftbeforeparaskip=\skip64
-\cftparaindent=\skip65
-\cftparanumwidth=\skip66
-\cftbeforesubparaskip=\skip67
-\cftsubparaindent=\skip68
-\cftsubparanumwidth=\skip69
-\cftbeforeloftitleskip=\skip70
-\cftafterloftitleskip=\skip71
-\cftbeforefigskip=\skip72
-\cftfigindent=\skip73
-\cftfignumwidth=\skip74
+Package tocloft Info: The document has chapter divisions on input line 44.
+\cftparskip=\skip44
+\cftbeforetoctitleskip=\skip45
+\cftaftertoctitleskip=\skip46
+\cftbeforepartskip=\skip47
+\cftpartnumwidth=\skip48
+\cftpartindent=\skip49
+\cftbeforechapskip=\skip50
+\cftchapindent=\skip51
+\cftchapnumwidth=\skip52
+\cftbeforesecskip=\skip53
+\cftsecindent=\skip54
+\cftsecnumwidth=\skip55
+\cftbeforesubsecskip=\skip56
+\cftsubsecindent=\skip57
+\cftsubsecnumwidth=\skip58
+\cftbeforesubsubsecskip=\skip59
+\cftsubsubsecindent=\skip60
+\cftsubsubsecnumwidth=\skip61
+\cftbeforeparaskip=\skip62
+\cftparaindent=\skip63
+\cftparanumwidth=\skip64
+\cftbeforesubparaskip=\skip65
+\cftsubparaindent=\skip66
+\cftsubparanumwidth=\skip67
+\cftbeforeloftitleskip=\skip68
+\cftafterloftitleskip=\skip69
+\cftbeforefigskip=\skip70
+\cftfigindent=\skip71
+\cftfignumwidth=\skip72
 \c@lofdepth=\count124
 \c@lotdepth=\count125
-\cftbeforelottitleskip=\skip75
-\cftafterlottitleskip=\skip76
-\cftbeforetabskip=\skip77
-\cfttabindent=\skip78
-\cfttabnumwidth=\skip79
+\cftbeforelottitleskip=\skip73
+\cftafterlottitleskip=\skip74
+\cftbeforetabskip=\skip75
+\cfttabindent=\skip76
+\cfttabnumwidth=\skip77
 )
 (/usr/share/texmf-dist/tex/latex/enumitem/enumitem.sty
 Package: enumitem 2011/09/28 v3.5.2 Customized lists
-\labelindent=\skip80
+\labelindent=\skip78
 \enit@outerparindent=\dimen165
 \enit@toks=\toks36
-\enit@inbox=\box42
+\enit@inbox=\box41
 \enitdp@description=\count126
 )
 (/usr/share/texmf-dist/tex/latex/sectsty/sectsty.sty
@@ -1084,56 +1045,56 @@ les
 )
 (/usr/share/texmf-dist/tex/latex/graphics/lscape.sty
 Package: lscape 2000/10/22 v3.01 Landscape Pages (DPC)
-) (./cpu.aux)
-\openout1 = `cpu.aux'.
+) (./book.aux)
+\openout1 = `book.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/lmm/m/it on input line 51.
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 51.
+LaTeX Font Info:    Checking defaults for OML/lmm/m/it on input line 55.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 55.
 
 (/usr/share/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 51.
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Checking defaults for OT1/lmr/m/n on input line 51.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 51.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 55.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for OT1/lmr/m/n on input line 55.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 55.
 
 (/usr/share/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Checking defaults for OMS/lmsy/m/n on input line 51.
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 51.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for OMS/lmsy/m/n on input line 55.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 55.
 
 
 (/usr/share/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Checking defaults for OMX/lmex/m/n on input line 51.
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 51.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for OMX/lmex/m/n on input line 55.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 55.
 
 
 (/usr/share/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 51.
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 51.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 51.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 55.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 55.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 55.
 
 (/usr/share/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 51.
-LaTeX Font Info:    Try loading font information for T1+clms on input line 51.
+LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Try loading font information for T1+clms on input line 55.
 
 (/usr/share/texmf-dist/tex/latex/cfr-lm/t1clms.fd
 File: t1clms.fd 2010/05/25 Fontinst v1.933 font definitions for T1/clms.
 )
-LaTeX Info: Redefining \microtypecontext on input line 51.
+LaTeX Info: Redefining \microtypecontext on input line 55.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1157,7 +1118,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 * paper: a4paper
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
-* modes: 
+* modes: twoside 
 * h-part:(L,W,R)=(85.35826pt, 426.79135pt, 85.35826pt)
 * v-part:(T,H,B)=(85.35826pt, 674.33032pt, 85.35826pt)
 * \paperwidth=597.50787pt
@@ -1166,21 +1127,21 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 * \textheight=674.33032pt
 * \oddsidemargin=13.08827pt
 * \evensidemargin=13.08827pt
-* \topmargin=-24.31174pt
-* \headheight=17.0pt
-* \headsep=20.40001pt
-* \topskip=11.0pt
-* \footskip=47.6pt
-* \marginparwidth=59.7508pt
-* \marginparsep=12.8401pt
+* \topmargin=-16.97922pt
+* \headheight=12.0pt
+* \headsep=18.06749pt
+* \topskip=10.0pt
+* \footskip=25.29494pt
+* \marginparwidth=125.0pt
+* \marginparsep=7.0pt
 * \columnsep=10.0pt
-* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \skip\footins=10.79997pt plus 4.79947pt minus 2.4005pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
 * \@twocolumnfalse
-* \@twosidefalse
-* \@mparswitchfalse
+* \@twosidetrue
+* \@mparswitchtrue
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
@@ -1188,7 +1149,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count128
 \scratchdimen=\dimen166
-\scratchbox=\box43
+\scratchbox=\box42
 \nofMPsegments=\count129
 \nofMParguments=\count130
 \everyMPshowfont=\toks37
@@ -1242,24 +1203,15 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 ABD: EveryShipout initializing macros
-<logo.png, id=4, 79.04532pt x 121.95563pt>
-File: logo.png Graphic file (type png)
- <use logo.png>
-Package pdftex.def Info: logo.png used on input line 68.
-(pdftex.def)             Requested size: 47.42754pt x 73.17392pt.
-LaTeX Font Info:    Try loading font information for T1+clm2js on input line 68
+LaTeX Font Info:    Calculating math sizes for size <14.39996> on input line 71
 .
-
-(/usr/share/texmf-dist/tex/latex/cfr-lm/t1clm2js.fd
-File: t1clm2js.fd 2010/05/25 Fontinst v1.933 font definitions for T1/clm2js.
-)
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 68.
+(Font)              <14.39996> on input line 71.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 68.
+(Font)              <10.07993> on input line 71.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 68.
-LaTeX Font Info:    Try loading font information for T1+lmss on input line 68.
+(Font)              <7.19998> on input line 71.
+LaTeX Font Info:    Try loading font information for T1+lmss on input line 71.
 
 (/usr/share/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
@@ -1272,479 +1224,503 @@ Package microtype Info: Loading generic settings for font family
 (microtype)             `cmss' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- (./cpu.toc
+ [1
+
+
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./book.toc
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 1.
+(Font)              <12> on input line 1.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <8> on input line 1.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <6> on input line 1.
 )
 \tf@toc=\write4
-\openout4 = `cpu.toc'.
+\openout4 = `book.toc'.
+
+ [2] (./book.lof)
+\tf@lof=\write5
+\openout5 = `book.lof'.
+
+ [3] [4
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--82
+]
+Chapter 1.
+[5] [6
+
+
+]
+Chapter 2.
+
+Underfull \hbox (badness 10000) in paragraph at lines 87--92
 
  []
 
-[1
-
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./logo.png>]
-LaTeX Font Info:    Try loading font information for TS1+clms on input line 88.
-
+LaTeX Font Info:    Try loading font information for TS1+clms on input line 98.
 
 (/usr/share/texmf-dist/tex/latex/cfr-lm/ts1clms.fd
 File: ts1clms.fd 2008/02/13 Fontinst v1.928 font definitions for TS1/clms.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 112--117
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--140
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 141--146
-
- []
-
-[2]
-Underfull \hbox (badness 10000) in paragraph at lines 166--170
-
- []
-
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 243--245
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 290--291
-
- []
-
-[4]
-Underfull \hbox (badness 10000) in paragraph at lines 349--351
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 352--353
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 354--359
-
- []
-
-[5] [6]
-Underfull \hbox (badness 10000) in paragraph at lines 473--477
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 493--494
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 523--524
+Underfull \hbox (badness 10000) in paragraph at lines 122--127
 
  []
 
 [7]
-Underfull \hbox (badness 10000) in paragraph at lines 564--565
+Underfull \hbox (badness 10000) in paragraph at lines 146--150
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 566--571
+Underfull \hbox (badness 10000) in paragraph at lines 151--156
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 176--180
 
  []
 
 [8]
-Underfull \hbox (badness 10000) in paragraph at lines 614--615
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 657--660
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 661--665
+Underfull \hbox (badness 10000) in paragraph at lines 253--255
 
  []
 
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 699--705
+Underfull \hbox (badness 10000) in paragraph at lines 300--301
+
+ []
+
+[10]
+Underfull \hbox (badness 10000) in paragraph at lines 359--361
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 761--765
-
- []
-
-<formats.png, id=40, 841.1425pt x 552.0625pt>
-File: formats.png Graphic file (type png)
- <use formats.png>
-Package pdftex.def Info: formats.png used on input line 768.
-(pdftex.def)             Requested size: 426.79135pt x 280.1161pt.
- [10]
-Underfull \hbox (badness 10000) in paragraph at lines 774--780
-
- []
-
-<encoding1.png, id=44, 878.28125pt x 423.5825pt>
-File: encoding1.png Graphic file (type png)
- <use encoding1.png>
-Package pdftex.def Info: encoding1.png used on input line 783.
-(pdftex.def)             Requested size: 426.79135pt x 205.83798pt.
- [11 <./formats.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 789--797
-
- []
-
-<encoding2.png, id=48, 875.27pt x 408.52625pt>
-File: encoding2.png Graphic file (type png)
- <use encoding2.png>
-Package pdftex.def Info: encoding2.png used on input line 800.
-(pdftex.def)             Requested size: 426.79135pt x 199.20093pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 806--811
-
- []
-
-<encoding3.png, id=49, 857.2025pt x 307.1475pt>
-File: encoding3.png Graphic file (type png)
- <use encoding3.png>
-Package pdftex.def Info: encoding3.png used on input line 814.
-(pdftex.def)             Requested size: 426.79135pt x 152.9266pt.
- [12 <./encoding1.png> <./encoding2.png>] [13 <./encoding3.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 945--948
+Underfull \hbox (badness 10000) in paragraph at lines 362--363
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 949--953
+Underfull \hbox (badness 10000) in paragraph at lines 364--369
+
+ []
+
+[11] [12]
+Underfull \hbox (badness 10000) in paragraph at lines 483--487
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 954--958
+Underfull \hbox (badness 10000) in paragraph at lines 503--504
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 533--534
+
+ []
+
+[13]
+Underfull \hbox (badness 10000) in paragraph at lines 574--575
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 576--581
 
  []
 
 [14]
-Underfull \hbox (badness 10000) in paragraph at lines 1030--1038
+Underfull \hbox (badness 10000) in paragraph at lines 624--625
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1048--1054
+Underfull \hbox (badness 10000) in paragraph at lines 667--670
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1055--1059
+Underfull \hbox (badness 10000) in paragraph at lines 671--675
 
  []
 
 [15]
-Underfull \hbox (badness 10000) in paragraph at lines 1091--1094
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1097--1098
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1132--1133
+Underfull \hbox (badness 10000) in paragraph at lines 709--715
 
  []
 
 [16]
-Underfull \hbox (badness 10000) in paragraph at lines 1190--1191
+Underfull \hbox (badness 10000) in paragraph at lines 771--775
+
+ []
+
+<formats.png, id=62, 841.1425pt x 552.0625pt>
+File: formats.png Graphic file (type png)
+ <use formats.png>
+Package pdftex.def Info: formats.png used on input line 778.
+(pdftex.def)             Requested size: 426.79135pt x 280.1161pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 784--790
+
+ []
+
+<encoding1.png, id=63, 878.28125pt x 423.5825pt>
+File: encoding1.png Graphic file (type png)
+ <use encoding1.png>
+Package pdftex.def Info: encoding1.png used on input line 793.
+(pdftex.def)             Requested size: 426.79135pt x 205.83798pt.
+ [17 <./formats.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 799--807
+
+ []
+
+<encoding2.png, id=67, 875.27pt x 408.52625pt>
+File: encoding2.png Graphic file (type png)
+ <use encoding2.png>
+Package pdftex.def Info: encoding2.png used on input line 810.
+(pdftex.def)             Requested size: 426.79135pt x 199.20093pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 816--821
+
+ []
+
+[18 <./encoding1.png> <./encoding2.png>]
+<encoding3.png, id=72, 857.2025pt x 307.1475pt>
+File: encoding3.png Graphic file (type png)
+ <use encoding3.png>
+Package pdftex.def Info: encoding3.png used on input line 824.
+(pdftex.def)             Requested size: 426.79135pt x 152.9266pt.
+ [19 <./encoding3.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 955--958
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1233--1234
-
- []
-
-[17]
-Underfull \hbox (badness 10000) in paragraph at lines 1276--1277
+Underfull \hbox (badness 10000) in paragraph at lines 959--963
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1311--1313
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1314--1321
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1322--1329
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1330--1335
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1336--1340
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1345--1349
-
- []
-
-[18]
-Underfull \hbox (badness 10000) in paragraph at lines 1350--1355
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1356--1360
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1361--1364
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1367--1368
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1418--1419
-
- []
-
-[19]
-Underfull \hbox (badness 10000) in paragraph at lines 1443--1451
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1452--1458
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1471--1479
+Underfull \hbox (badness 10000) in paragraph at lines 964--968
 
  []
 
 [20]
-Underfull \hbox (badness 10000) in paragraph at lines 1535--1541
+Underfull \hbox (badness 10000) in paragraph at lines 1040--1048
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1542--1550
+Underfull \hbox (badness 10000) in paragraph at lines 1058--1064
 
  []
 
-<translation.png, id=82, 347.79938pt x 261.97874pt>
-File: translation.png Graphic file (type png)
- <use translation.png>
-Package pdftex.def Info: translation.png used on input line 1553.
-(pdftex.def)             Requested size: 256.07741pt x 192.89784pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 1559--1567
+[21]
+Underfull \hbox (badness 10000) in paragraph at lines 1065--1069
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1568--1574
+Underfull \hbox (badness 10000) in paragraph at lines 1101--1104
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1575--1582
-
- []
-
-[21 <./translation.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1583--1589
+Underfull \hbox (badness 10000) in paragraph at lines 1107--1108
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1638--1646
+Underfull \hbox (badness 10000) in paragraph at lines 1142--1143
 
  []
 
 [22]
-Underfull \hbox (badness 10000) in paragraph at lines 1677--1683
+Underfull \hbox (badness 10000) in paragraph at lines 1200--1201
+
+ []
+
+[23]
+Underfull \hbox (badness 10000) in paragraph at lines 1243--1244
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1684--1690
+Underfull \hbox (badness 10000) in paragraph at lines 1286--1287
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1691--1696
+Underfull \hbox (badness 10000) in paragraph at lines 1321--1323
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1702
+Underfull \hbox (badness 10000) in paragraph at lines 1324--1331
+
+ []
+
+[24]
+Underfull \hbox (badness 10000) in paragraph at lines 1332--1339
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1703--1709
+Underfull \hbox (badness 10000) in paragraph at lines 1340--1345
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1710--1717
-
- []
-
-[23] <pagetable1.png, id=94, 451.6875pt x 213.79875pt>
-File: pagetable1.png Graphic file (type png)
- <use pagetable1.png>
-Package pdftex.def Info: pagetable1.png used on input line 1731.
-(pdftex.def)             Requested size: 256.07741pt x 121.21735pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 1737--1748
-
- []
-
-<pagetable2.png, id=95, 839.75705pt x 530.31929pt>
-File: pagetable2.png Graphic file (type png)
- <use pagetable2.png>
-Package pdftex.def Info: pagetable2.png used on input line 1762.
-(pdftex.def)             Requested size: 320.0935pt x 202.13841pt.
-
-[24 <./pagetable1.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1768--1777
+Underfull \hbox (badness 10000) in paragraph at lines 1346--1350
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1778--1784
+Underfull \hbox (badness 10000) in paragraph at lines 1355--1359
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1785--1793
+Underfull \hbox (badness 10000) in paragraph at lines 1360--1365
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1794--1804
+Underfull \hbox (badness 10000) in paragraph at lines 1366--1370
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1805--1813
+Underfull \hbox (badness 10000) in paragraph at lines 1371--1374
 
  []
 
-[25 <./pagetable2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1814--1823
+
+Underfull \hbox (badness 10000) in paragraph at lines 1377--1378
+
+ []
+
+[25]
+Underfull \hbox (badness 10000) in paragraph at lines 1428--1429
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1453--1461
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1462--1468
 
  []
 
 [26]
-Underfull \hbox (badness 10000) in paragraph at lines 1969--1973
-
- []
-
-[27]
-Underfull \hbox (badness 10000) in paragraph at lines 1992--2000
-
- []
-
-[28]
-Underfull \hbox (badness 10000) in paragraph at lines 2050--2056
+Underfull \hbox (badness 10000) in paragraph at lines 1481--1489
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2057--2065
+Underfull \hbox (badness 10000) in paragraph at lines 1545--1551
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2117--2123
+Underfull \hbox (badness 10000) in paragraph at lines 1552--1560
+
+ []
+
+[27] <translation.png, id=103, 347.79938pt x 261.97874pt>
+File: translation.png Graphic file (type png)
+
+<use translation.png>
+Package pdftex.def Info: translation.png used on input line 1563.
+(pdftex.def)             Requested size: 256.07741pt x 192.89784pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 1569--1577
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1578--1584
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1585--1592
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1593--1599
+
+ []
+
+[28 <./translation.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1648--1656
 
  []
 
 [29]
-Underfull \hbox (badness 10000) in paragraph at lines 2124--2129
+Underfull \hbox (badness 10000) in paragraph at lines 1687--1693
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2130--2137
+Underfull \hbox (badness 10000) in paragraph at lines 1694--1700
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2162--2168
-
- []
-
-[30]
-Underfull \hbox (badness 10000) in paragraph at lines 2228--2234
+Underfull \hbox (badness 10000) in paragraph at lines 1701--1706
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2235--2247
+Underfull \hbox (badness 10000) in paragraph at lines 1707--1712
 
  []
 
-[31] (./cpu.aux) ) 
+
+Underfull \hbox (badness 10000) in paragraph at lines 1713--1719
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1720--1727
+
+ []
+
+[30] <pagetable1.png, id=115, 451.6875pt x 213.79875pt>
+File: pagetable1.png Graphic file (type png)
+ <use pagetable1.png>
+Package pdftex.def Info: pagetable1.png used on input line 1741.
+(pdftex.def)             Requested size: 256.07741pt x 121.21735pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 1747--1758
+
+ []
+
+<pagetable2.png, id=116, 839.75705pt x 530.31929pt>
+File: pagetable2.png Graphic file (type png)
+ <use pagetable2.png>
+Package pdftex.def Info: pagetable2.png used on input line 1772.
+(pdftex.def)             Requested size: 320.0935pt x 202.13841pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31 <./pagetable1.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1778--1787
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1788--1794
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1795--1803
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1804--1814
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1815--1823
+
+ []
+
+[32 <./pagetable2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1824--1833
+
+ []
+
+[33] [34]
+Underfull \hbox (badness 10000) in paragraph at lines 1979--1983
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2002--2010
+
+ []
+
+[35]
+Underfull \hbox (badness 10000) in paragraph at lines 2060--2066
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2067--2075
+
+ []
+
+[36]
+Underfull \hbox (badness 10000) in paragraph at lines 2127--2133
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2134--2139
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2140--2147
+
+ []
+
+
+Overfull \hbox (10.51224pt too wide) in paragraph at lines 2155--2167
+ [] 
+ []
+
+
+Underfull \vbox (badness 1259) has occurred while \output is active []
+
+ [37]
+Underfull \hbox (badness 10000) in paragraph at lines 2172--2178
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2238--2244
+
+ []
+
+[38]
+Underfull \hbox (badness 10000) in paragraph at lines 2245--2257
+
+ []
+
+[39] (./book.aux) ) 
 Here is how much of TeX's memory you used:
- 19186 strings out of 493061
- 354485 string characters out of 6140740
- 491255 words of memory out of 5000000
- 22277 multiletter control sequences out of 15000+600000
- 108188 words of font info for 86 fonts, out of 8000000 for 9000
+ 18246 strings out of 493061
+ 337048 string characters out of 6140740
+ 429642 words of memory out of 5000000
+ 21356 multiletter control sequences out of 15000+600000
+ 107426 words of font info for 78 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 64i,12n,72p,384b,729s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/t1-clm.enc}{/us
-r/share/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf-dist/fonts/en
-c/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr
-/share/texmf-dist/fonts/enc/dvips/cfr-lm/dotdigits-clm.enc}</usr/share/texmf-di
-st/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fonts/type1/public/lm
-/lmss10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/share
-/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf-dist/fonts/type1/
-public/lm/lmssbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsso10.pfb
->
-Output written on cpu.pdf (31 pages, 415681 bytes).
+ 64i,12n,72p,385b,727s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/t1-clm.enc}{/u
+sr/share/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf-dist/fonts/e
+nc/dvips/lm/lm-ts1.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</us
+r/share/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf-dist/fonts
+/type1/public/lm/lmss12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss17
+.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf-d
+ist/fonts/type1/public/lm/lmssbx10.pfb></usr/share/texmf-dist/fonts/type1/publi
+c/lm/lmsso12.pfb>
+Output written on book.pdf (39 pages, 405925 bytes).
 PDF statistics:
- 152 PDF objects out of 1000 (max. 8388607)
- 101 compressed objects within 2 object streams
+ 177 PDF objects out of 1000 (max. 8388607)
+ 119 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 23093 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 20016 words of extra memory for PDF output out of 20736 (max. 10000000)
 

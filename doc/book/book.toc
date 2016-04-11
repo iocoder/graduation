@@ -1,0 +1,25 @@
+\contentsline {chapter}{\numberline {1}Introduction}{5}
+\contentsline {chapter}{\numberline {2}Architecture}{7}
+\contentsline {section}{\numberline {2.1}Central Processing Unit}{7}
+\contentsline {subsection}{\numberline {2.1.1}Introduction}{8}
+\contentsline {subsubsection}{\numberline {2.1.1.1}Load and Store Instructions}{9}
+\contentsline {subsubsection}{\numberline {2.1.1.2}ALU Instructions}{10}
+\contentsline {subsubsection}{\numberline {2.1.1.3}Jump and Branch Instructions}{13}
+\contentsline {subsubsection}{\numberline {2.1.1.4}Miscellaneous Instructions}{15}
+\contentsline {subsubsection}{\numberline {2.1.1.5}Control Instructions}{16}
+\contentsline {subsubsection}{\numberline {2.1.1.6}Instruction Encoding Summary}{17}
+\contentsline {subsubsection}{\numberline {2.1.1.7}Addressing Modes}{19}
+\contentsline {subsubsection}{\numberline {2.1.1.8}Programmer-Visible Pipeline Effects}{19}
+\contentsline {subsection}{\numberline {2.1.2}Registers}{20}
+\contentsline {subsubsection}{\numberline {2.1.2.1}General-Purpose Registers}{21}
+\contentsline {subsubsection}{\numberline {2.1.2.2}LO and HI Registers}{21}
+\contentsline {subsubsection}{\numberline {2.1.2.3}Control Registers}{22}
+\contentsline {subsection}{\numberline {2.1.3}Memory Management}{27}
+\contentsline {subsubsection}{\numberline {2.1.3.1}MIPS Logical Address Space}{29}
+\contentsline {subsubsection}{\numberline {2.1.3.2}Translation Look-aside Buffer (TLB)}{30}
+\contentsline {subsubsection}{\numberline {2.1.3.3}Cache Memory}{35}
+\contentsline {subsection}{\numberline {2.1.4}Exception Handling}{35}
+\contentsline {subsubsection}{\numberline {2.1.4.1}Exception Cases}{36}
+\contentsline {subsubsection}{\numberline {2.1.4.2}Exception Vectors}{37}
+\contentsline {subsubsection}{\numberline {2.1.4.3}Exception Protocol}{38}
+\contentsline {subsubsection}{\numberline {2.1.4.4}Precise Exceptions}{39}
