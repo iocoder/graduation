@@ -1674,20 +1674,340 @@ or alter the mapping.
 
 \subsubsection{Translation Look-aside Buffer (TLB)}
 
+Now we show how the operating system provides the CPU with a certain
+mapping for current process. Since there are 3GB of the address
+space (kuseg and kseg2 regions, see above) that can be dynamically
+mapped to physical memory, we need a data structure that describes
+how to map every logical address inside the two regions (kuseg and
+kseg2) into physical address. \\
+
+One can think of an array of 4G elements, where the index of the array 
+is the logical address, and the contents of an array element is
+the physical address that maps to the logical address associated
+with that entry. Notice that the third quarter of such an
+array would always be sparse, since kseg0 and kseg1 are not dynamically
+mapped as shown before. \\
+
+Since a physical address is 32 bits, we need an array of 4Gx4B which
+is a 16GB data structure for every process. This is certainly
+unfeasible and we would need to think for another solution.
+Instead of mapping each logical address to a certain physical address,
+we can map every block of logical address to a block of physical addresses.\\
+
+Using this technique, we just need an array with n elements, where
+n is number of blocks of the logical address space which is also
+equal to number of block of the address space. We call this scheme
+\textbf{`Paging'}, where a physical address is called a `frame'
+and logical address block is called a `page'. \\
+
+Given a page size of 4KB, the 4GB address space could be divided
+into 1M pages, requiring an array of only 1M elements. The array
+is called a `page table' and maps every page of the logical address
+space to a frame in the physical memory. A page table entry
+will simply contains the number of the frame it maps to, which
+is a 20-bit word (because we've got a total number of 1M frames). \\
+
+Extra information might need to be stored along with frame number,
+like whether this page is mapped or not (a page can be unmapped
+if doesn't map to any physical address) as well as OS-specific flags.
+Hence we can extend the 20-bit entry to 32 bits: 12 bits for flags
+and 20 bits for frame number (FN). Hence we need an array of 1M*4B
+which is equal to 4MB page table for every process. This is much
+smaller than 16GB. \\
+
+To translate a logical address, we divide the address into two parts:
+\begin{enumerate}
+\item Page number: the highest 20 bits of the address 
+\item Offset inside the page: the lowest 12 bits of the address.
+\end{enumerate}
+Page number is then used to index the page table to get the
+corresponding page table entry. The frame number is extracted
+from the entry and concatenated with the 12-bit offset to form
+the actual physical address that this logical address maps to.
+Figure \ref{pagetable1} illustrates this translation process.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{pagetable1.png}
+\end{center}
+\caption{Address translation using page table}
+\label{pagetable1}
+\end{figure}
+
+A page table of 4MB fo every process is still big, since when
+number of processes increase, a big portion of main memory will
+just be used to store page tables. Furthermore, a process
+won't usually need to map the whole 4GB address space. It can leave
+some pages unmapped, and only map pages where it needs to put
+its code and data. Actually, the usual case is that most pages are 
+unmapped. And if virtual memory is not implemented, the total
+number of mapped pages across all page tables (across all processes)
+must be less than or equal to size of RAM (given that no frame
+is mapped to by more than one page), and RAM is usually
+much smaller than 4GB.\\
+
+Since most entries in the page table are sparse (because most pages
+in the logical address space are unmapped), the OS can make use
+of this characteristic to make the size of the page table smaller.
+Thus two-level page tables where introduced. The big 1M-entry page 
+table is divided into 1024 parts, with each part having 1024 entries.
+Each part is called a second-level page table. These second-level
+page tables could be scattered around memory. An 1024-entry table
+could be used to store the addresses of these 1024 2nd-level tables.
+Figure \ref{pagetable2} shows how translation works under this
+two-level scheme.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{pagetable2.png}
+\end{center}
+\caption{Address translation using two-level page table scheme}
+\label{pagetable2}
+\end{figure}
+
+This way, if all the entries of a second-level page tables are
+unmapped, the whole second-level page table could be unmapped,
+setting a flag in the page directory that this page table
+doesn't exist at all, and all pages in this region are unmapped.
+Consequently, many second-level page tables wouldn't need to
+exist at all, reducing the size of allocated memory for page
+tables to a reasonable limit. However, if the process maps
+all of its logical memory, page table increases to 4MB plus
+the 4KB of the page directory. \\
+
+This result implies that we cannot store the whole page table
+in the processor, since we would need 4MB of memory inside
+the CPU dedicated for page table. We would also need
+to re-initialize the whole 4MB on every process switch, a process
+that will take much time. That's why page tables are stored
+in memory and with a multi-level scheme to redcue their sizes.\\
+
+So, how the CPU makes use of these page tables to do translation?
+The processor could simply be given the base physical address
+of the page directory that controls the current process. When
+a logical address is generated by core processor, the translation
+circuitry looks up the page directory then the corresponding 2nd-level 
+page table to get frame number, as shown in the figure above.
+On a process switch, the CPU is given the page directory of
+next process.\\
+
+This translation scheme requires two memory access for each translation,
+which is too much since memory access takes much time, so we need
+to cache page entries that are used frequently. Caching page
+entries will effectively reduce average translation time.
+This special-purpose cache is called \textbf{`translation
+look-aside buffer'}, or simply TLB. When a logical address is generated
+by core processor, TLB is queried for that logical address. If
+the entry of this address is found inside TLB, the physical
+address is returned immediately. If a TLB miss happens, the processor
+shall access main memory to get page entry.\\
+
+The type of TLB described above is called \textbf{`hardware-managed TLB'},
+where TLB is totally isolated from the OS and is managed by
+hardware. Another mechanism would be \textbf{`software-managed TLB'},
+where TLB is controlled by the OS, and CPU doesn't need
+to know any information about page table. In a software-managed TLB,
+when a TLB miss happens, the CPU raises an exception, and it is
+the responsibility of the exception handler to look-up page
+tables and refill TLB with the missed entry.\\
+
+Since our processor is designed for systems where resources 
+are very limited (like FPGA), we chose to use software-managed
+TLB to simplify the implementation of the processor. On a process
+switch, the OS just needs to clear TLB from entries related
+to old process. After TLB is cleared, and when a logical address 
+is generated, a TLB miss happens and exception handler is called.
+The OS queries page tables and refills TLB. Page tables are
+totally managed by the OS; the processor doesn't need
+to know anything about their structure and locations. \\
+
+The TLB consists of 64 entries. Every entry is 64-bits wide
+with the structure illustrated by figure \ref{tlb_entry}.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+
+\hline \multicolumn{7}{|c|}{TLB Entry} \\
+
+\hline \textbf{Field bit(s):} & 63..44 & 43..32 & 31..12 & 11..10 & 9 & 8..0 \\
+
+\hline \textbf{Field name:}   & VPN    & 0      & PFN    & 0      & V & 0    \\
+
+\hline
+
+\end{tabular}
+
+\end{center}
+\caption{Format of TLB entry}
+\label{tlb_entry}
+\end{figure}
+
+Fields are:
+
 \begin{itemize}
-\item Describe paging
-\item Describe why page tables may be too large to store in CPU
-\item Introduce TLB as a cache
-\item Show how to read/write TLB entries
-\item What happens on a TLB miss
+
+\item \textbf{VPN}: the 20-bit logical page number to be translated.
+
+\item \textbf{PFN}: the 20-bit physical frame number this VPN maps to.
+
+\item \textbf{V}: valid bit. If this bit is set to 1, this is entry
+      is valid and can be used for translation. If this bit is set to
+      0, this entry is not valid and won't be used for translation.
+
 \end{itemize}
+
+The reader can notice the similarity between TLB entry and EntryLo/EntryHi
+registers. The structure of the lower 32 bits of a TLB entry is identical
+to EntryLo register, and the structure of the upper 32 bits is identical
+to EntryHi register. EntryLo and EntryHi registers, along with Index
+register, are used to read and write TLB entries. For reading a TLB
+entry, the steps are:
+
+\begin{enumerate}
+
+\item The OS writes the index (0->63) of the TLB entry to be read into
+      Index register using MTC0 instruction.
+
+\item TLBR instruction is executed. The instruction causes the lower 32
+      bits of the TLB entry indexed by Index register to be copied into 
+      EntryLo register, and the upper 32 bits of the TLB entry to be copied
+      into EntryHi register.
+
+\item The operating system reads EntryLo register using MFC0 instruction.
+      Result is the lower 32 bits of the target TLB entry. 
+
+\item The operating system reads EntryHi register using MFC0 instruction.
+      Result is the upper 32 bits of the target TLB entry.
+
+\end{enumerate}
+
+A similar sequence could be used for writing a TLB entry 
+
+\begin{enumerate}
+
+\item The OS writes the index (0->63) of the TLB entry to be written into
+      Index register using MTC0 instruction.
+
+\item The operating system writes the lower 32 bits of the target TLB
+      entry into EntryLo register using MTC0 instruction.
+
+\item The operating system writes the upper 32 bits of the target TLB
+      entry into EntryHi register using MTC0 instruction.
+
+\item TLBWI instruction is executed. The instruction causes EntryLo register
+      to be copied into the lower 32 bits of the TLB entry indexed by Index register,
+      and EntryHi register to be copied into the upper 32 bits of the target
+      TLB entry.
+
+\end{enumerate}
+
+Now since the operating system has full access to TLB, paging can be
+implemented easily. Whenever a logical address is generated by
+the processor, the following steps happen:
+
+\begin{enumerate}
+
+\item The CPU reads TLB entry which has an index that is equal to
+      bits 12 to 17 (inclusive) of the logical address.
+
+\item If V flag of the read entry is 0, the CPU copies the logical
+      address into BadVaddr register, and TLB miss exception happens.
+      In this case translation stops. If V flag is 1, continue to
+      step 3.
+
+\item The VPN of the read field is compared with the highest 20
+      bits of the logical address. If both values are not equal,
+      the logical address is copied into BadVaddr register and
+      TLB miss exception happens. In this case translation stops.
+      If both values are equal, continue to step 4.
+
+\item The PFN of the read field is concatenated with the lower
+      12 bits of the generated logical address, the result is
+      the physical address that will be used to access memory.
+      Translation is done and the CPU continues work normally
+      without exception.
+
+\end{enumerate}
+
+Step 1 implies that our TLB is actually a \textbf{direct-mapped cache}
+where the index is computed using bits 12 to 17 of the logical address,
+and tag is VPN. Using this information, the OS can handle TLB miss exception
+as follows:
+
+\begin{enumerate}
+
+\item The OS reads the value of BadVaddr register using MFC0 instruction.
+
+\item The OS then queries page tables to know the mapping of the address
+      in BadVaddr register. If there is no mapping, the operating system
+      may decide to stop the program or send an error signal for instance.
+      If there is mapping, the operating system reads the physical
+      frame number that this logical address maps to.
+
+\item The operating system calculates the index of the TLB entry which
+      should be modified to solve the miss. The index is actually
+      equal to bits 12 to 17 (inclusive) of the logical address as
+      explained above.
+
+\item Now the OS has the index, VPN, and the corresponding PFN. The OS
+      simply writes the index to Index register, writes VPN to EntryHi
+      register, and writes PFN to EntryLo register (and sets V flag 
+      of EntryLo register to 1).
+
+\item The OS executes TLBWI instruction. EntryLo and EntryHi registers
+      are then copied into the TLB entry.
+      
+\item Exception handler returns and the instruction that causes the miss
+      is executed again, but this time it doesn't cause a TLB miss and
+      execution continues normally.
+
+\end{enumerate}
 
 \subsubsection{Cache Memory}
 
+After logical address is translated into physical address, physical
+address is used to access RAM. However, because memory access
+takes long time (i.e, has high penalty), a cache is put
+between TLB and RAM to fasten memory access time.\\
+
+Since the pipeline of our processor might be fetching an instruction
+and handling memory access for a load/store instruction at the same time,
+two separate caches are employed: an instruction cache and a data cache.
+Both caches are direct-mapped caches. Every entry in the cache consists of
+three fields:
+
+\begin{itemize}
+
+\item \textbf{Valid flag}: If 1, data and tag fields are valid. Otherwise
+      the entry is invalid.
+
+\item \textbf{Data field}: The 4-byte datum cached by this entry.
+
+\item \textbf{Tag field}: A 20-bit field storing the higher 20 bits
+      of the physical address associated with this entry.
+
+\end{itemize}
+
+Every cache has 1024 entries, resulting in two 4KB caches. The process
+of looking up data in the cache is completely transparent from software.
+Bits 2 to 11 (inclusive) of the physical address are used as index.
+The tag of the entry at the calculated index is compared to the
+higher 20 bits of the physical address. If valid bit is 1 and
+comparison matches, data field of the entry is return to core processor.
+If valid bit or 0 or comparison doesn't match, the CPU initiates
+a memory cycle to bring data from RAM and updates the cache automatically.\\
+
+Cache is write-through; any store instruction will cause data to
+be written to both cache and RAM. A cache miss (or a store instruction) 
+causes the instruction to delay until data is brought from or written to 
+memory. However, cache hit can be handled without any delay; pipeline doesn't 
+stall and advance normally. Although caching is totally isolated from the 
+programmer, the programmer can use her knowledge of how cache works to 
+be able to write optimized programs that make full use of caching.\\
+
 \subsection{Exception Handling}
-\subsection{VHDL Implementation: Introduction}
-\subsection{VHDL Implementation: The Pipeline}
-\subsection{VHDL Implementation: Exceptions}
-\subsection{VHDL Implementation: Cache and TLB}
+
+
 
 \end{document}

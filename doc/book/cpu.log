@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  10 APR 2016 23:52
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  11 APR 2016 14:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1288,16 +1288,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 77--82
 
  []
 
-[1
-
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./logo.png>]
 LaTeX Font Info:    Try loading font information for TS1+clms on input line 88.
-
 
 (/usr/share/texmf-dist/tex/latex/cfr-lm/ts1clms.fd
 File: ts1clms.fd 2008/02/13 Fontinst v1.928 font definitions for TS1/clms.
-)
+) [1
+
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./logo.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 112--117
 
  []
@@ -1367,12 +1365,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 566--571
 
  []
 
-[8]
+
 Underfull \hbox (badness 10000) in paragraph at lines 614--615
 
  []
 
-
+[8]
 Underfull \hbox (badness 10000) in paragraph at lines 657--660
 
  []
@@ -1382,12 +1380,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 661--665
 
  []
 
-[9]
+
 Underfull \hbox (badness 10000) in paragraph at lines 699--705
 
  []
 
-
+[9]
 Underfull \hbox (badness 10000) in paragraph at lines 761--765
 
  []
@@ -1407,11 +1405,12 @@ File: encoding1.png Graphic file (type png)
  <use encoding1.png>
 Package pdftex.def Info: encoding1.png used on input line 783.
 (pdftex.def)             Requested size: 426.79135pt x 205.83798pt.
- [11 <./formats.png>]
+
 Underfull \hbox (badness 10000) in paragraph at lines 789--797
 
  []
 
+[11 <./formats.png> <./encoding1.png>]
 <encoding2.png, id=48, 875.27pt x 408.52625pt>
 File: encoding2.png Graphic file (type png)
  <use encoding2.png>
@@ -1427,7 +1426,7 @@ File: encoding3.png Graphic file (type png)
  <use encoding3.png>
 Package pdftex.def Info: encoding3.png used on input line 814.
 (pdftex.def)             Requested size: 426.79135pt x 152.9266pt.
- [12 <./encoding1.png> <./encoding2.png>] [13 <./encoding3.png>]
+ [12 <./encoding2.png> <./encoding3.png>] [13]
 Underfull \hbox (badness 10000) in paragraph at lines 945--948
 
  []
@@ -1597,28 +1596,119 @@ Underfull \hbox (badness 10000) in paragraph at lines 1638--1646
 
  []
 
-[22] [23] (./cpu.aux) ) 
+[22]
+Underfull \hbox (badness 10000) in paragraph at lines 1677--1683
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1684--1690
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1691--1696
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1697--1702
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1703--1709
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1717
+
+ []
+
+[23] <pagetable1.png, id=94, 451.6875pt x 213.79875pt>
+File: pagetable1.png Graphic file (type png)
+ <use pagetable1.png>
+Package pdftex.def Info: pagetable1.png used on input line 1731.
+(pdftex.def)             Requested size: 256.07741pt x 121.21735pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 1737--1748
+
+ []
+
+<pagetable2.png, id=95, 839.75705pt x 530.31929pt>
+File: pagetable2.png Graphic file (type png)
+ <use pagetable2.png>
+Package pdftex.def Info: pagetable2.png used on input line 1762.
+(pdftex.def)             Requested size: 320.0935pt x 202.13841pt.
+
+[24 <./pagetable1.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1768--1777
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1778--1784
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1785--1793
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1794--1804
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1805--1813
+
+ []
+
+[25 <./pagetable2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1814--1823
+
+ []
+
+[26]
+Underfull \hbox (badness 10000) in paragraph at lines 1969--1973
+
+ []
+
+[27]
+Underfull \hbox (badness 10000) in paragraph at lines 1992--2000
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2001--2008
+
+ []
+
+[28] (./cpu.aux) ) 
 Here is how much of TeX's memory you used:
- 19172 strings out of 493061
- 354263 string characters out of 6140740
- 491215 words of memory out of 5000000
- 22265 multiletter control sequences out of 15000+600000
+ 19185 strings out of 493061
+ 354476 string characters out of 6140740
+ 491245 words of memory out of 5000000
+ 22276 multiletter control sequences out of 15000+600000
  108188 words of font info for 86 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  64i,12n,72p,384b,729s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/t1-clm.enc
-}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf-dist/fon
-ts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}
-{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/dotdigits-clm.enc}</usr/share/tex
-mf-dist/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fonts/type1/publ
-ic/lm/lmss10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/
-share/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf-dist/fonts/t
-ype1/public/lm/lmssbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsso1
-0.pfb>
-Output written on cpu.pdf (23 pages, 308811 bytes).
+{/usr/share/texmf-dist/fonts/enc/dvips/cfr-lm/t1-clm.enc}{/us
+r/share/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf-dist/fonts/en
+c/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr
+/share/texmf-dist/fonts/enc/dvips/cfr-lm/dotdigits-clm.enc}</usr/share/texmf-di
+st/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fonts/type1/public/lm
+/lmss10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss12.pfb></usr/share
+/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf-dist/fonts/type1/
+public/lm/lmssbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsso10.pfb
+>
+Output written on cpu.pdf (28 pages, 406724 bytes).
 PDF statistics:
- 122 PDF objects out of 1000 (max. 8388607)
- 83 compressed objects within 1 object stream
+ 141 PDF objects out of 1000 (max. 8388607)
+ 94 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 23083 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 23093 words of extra memory for PDF output out of 24883 (max. 10000000)
 
