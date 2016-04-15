@@ -1,4 +1,4 @@
-\documentclass[]{book}
+\documentclass[oneside]{book}
 
 \title{MIPS Home Computer System}
 %\subtitle{System Design Reference}
@@ -21,6 +21,7 @@
 \usepackage{cfr-lm} % font package
 \usepackage{scrextend}
 \changefontsizes{12pt}
+\usepackage{inconsolata}
 
 % listings
 \usepackage{listings}
@@ -50,35 +51,125 @@
 % page orientation
 \usepackage{lscape}
 
+% title page
+\usepackage[eng,exjobb]{KTHEEtitlepage}
+
+% navigation window
+\usepackage{hyperref}
+\hypersetup{pdftex,colorlinks=true,allcolors=blue}
+\usepackage{hypcap}
+
+% verbatim
+\usepackage{fancyvrb}
+
 %------------------------------------------------------------------------------%
 
 \begin{document}
 
-% university logo
-%\titlehead{
-%
-%    \small Alexandria University\\
-%    \small Faculty of Engineering\\
-%    \small Computer and Systems Engineering Department\\
-%    \small CS 402 - Graduation Project
+\frontmatter
 
-%    \vspace{-2.2cm}
-%    \hfill
-%    \includegraphics[scale=0.6]{logo.png}
-%}
+%------------------------------------------------------------------------------%
 
-% document title
-\maketitle
+\ititle{MIPS Computer System on FPGA}
+%\isubtitle{My Subtitle} % Optional
+\idate{July 2016}
+\iauthor{Mostafa Abd El-Aziz}
+\makeititle
 
-% table of contents
-\renewcommand{\contentsname}{Table of Contents}
+%------------------------------------------------------------------------------%
+
+\newpage
+\thispagestyle{plain}
+\chapter{Abstract}
+
+%------------------------------------------------------------------------------%
+
+\newpage
+\thispagestyle{plain}
+\chapter{Acknowledgements}
+
+%------------------------------------------------------------------------------%
+
+\newpage
+\thispagestyle{plain}
+\topskip0pt
+\vspace*{\fill}
+\bfseries
+\begin{Verbatim}[showspaces=false,fontsize=\small]
+                     ,----------------,              ,---------,
+                ,-----------------------,          ,"        ,"|
+              ,"                      ,"|        ,"        ,"  |
+             +-----------------------+  |      ,"        ,"    |
+             |  .-----------------.  |  |     +---------+      |
+             |  |                 |  |  |     | -==----'|      |
+             |  |  WE LOVE MIPS   |  |  |     |         |      |
+             |  |  QUAF> _        |  |  |/----|`---=    |      |
+             |  |                 |  |  |   ,/|==== ooo |      ;
+             |  |                 |  |  |  // |(((( [33]|    ,"
+             |  `-----------------'  |," .;'| |((((     |  ,"
+             +-----------------------+  ;;  | |         |,"
+                /_)______________(_/  //'   | +---------+
+           ___________________________/___  `,
+          /  oooooooooooooooo  .o.  oooo /,   \,"-----------
+         / ==ooooooooooooooo==.o.  ooo= //   ,`\--{)B     ,"
+        /_==__==========__==_ooo__ooo=_/'   /___________,"
+        `-----------------------------'
+\end{Verbatim}
+\normalfont
+\vspace*{\fill}
+
+%------------------------------------------------------------------------------%
+
+\newpage
+\renewcommand{\contentsname}{Contents}
 \tableofcontents
+
+%------------------------------------------------------------------------------%
+
 \newpage
 \listoffigures
 
 %------------------------------------------------------------------------------%
 
-\chapter{Introduction}
+\mainmatter
+
+%------------------------------------------------------------------------------%
+
+{\let\clearpage\relax \chapter{Introduction}}
+%Before going into details, we shall define two keywords that will be used
+%throughout the section:
+
+%\begin{itemize}
+
+%\item \textbf{Architecture}:
+%      The behaviour of the processor as seen by the programmer.
+%      This includes the instruction set, their opcodes and formats,
+%      architectural registers, interrupt/exception protocols, and other
+%      behavioral concerns that will be seen later in the section.
+%      The architecture describes all that can be abstracted from the
+%      implementation of the processor. Other authors may call this an
+%      instruction set architecture (ISA) or macro-architecture.
+
+%\item \textbf{Micro-architecture}:
+%      How the architecture of the processor is implemented
+%      in switching circuits. We use this keyword to refer to our VHDL
+%      implementation for the architecture described in this section. There
+%      may exist several different implementations for the same architecture.
+%      The only restriction on the micro-architecture of a processor is to
+%      behave exactly as described by the architecture, but the implementation
+%      itself doesn't matter. For example, the architecture might guarantee
+%      that the 'effect' of the execution of a set of instructions will be
+%      in order, however, the processor might execute the instructions in an
+%      out of order fashion (OoOE) yet effectively behaves the same as
+%      described by the architecture.
+
+%\end{itemize}
+
+%------------------------------------------------------------------------------%
+
+\chapter{Related Work}
+
+%------------------------------------------------------------------------------%
 
 \chapter{Architecture}
 
@@ -88,58 +179,7 @@ The CPU module implements MIPS-I instruction set architecture along with
 additional instructions that control the behavior of the processor. In this
 section we present detailed description for the programming interface
 of the CPU, followed by a description for the implementation of that
-interface.\\
-
-Before going into details, we shall define two keywords that will be used
-throughout the section:
-
-\begin{itemize}
-
-\item \textbf{Architecture}:
-      The behaviour of the processor as seen by the programmer.
-      This includes the instruction set, their opcodes and formats,
-      architectural registers, interrupt/exception protocols, and other
-      behavioral concerns that will be seen later in the section.
-      The architecture describes all that can be abstracted from the
-      implementation of the processor. Other authors may call this an
-      instruction set architecture (ISA) or macro-architecture.
-
-\item \textbf{Micro-architecture}:
-      How the architecture of the processor is implemented
-      in switching circuits. We use this keyword to refer to our VHDL
-      implementation for the architecture described in this section. There
-      may exist several different implementations for the same architecture.
-      The only restriction on the micro-architecture of a processor is to
-      behave exactly as described by the architecture, but the implementation
-      itself doesn't matter. For example, the architecture might guarantee
-      that the 'effect' of the execution of a set of instructions will be
-      in order, however, the processor might execute the instructions in an
-      out of order fashion (OoOE) yet effectively behaves the same as
-      described by the architecture.
-
-\end{itemize}
-
-The following subsections are divided into two sets corresponding to
-the two titles described above; Until subsection 5 (inclusive), we are just
-talking about the architecture. It's not before subsection 6 where we
-start to show how we implement the behaviour described in earlier
-subsections. Programmers can skip subsections 6, 7, 8, and 9.\\
-
-Here we summarize what the subsections are about (SS\# = subsection \#):
-
-\begin{enumerate}[label=SS\arabic*.]
-
-\item an introduction to the basics of the architecture of our CPU.
-\item detailed description for the architectural registers.
-\item interrupt and exception handling.
-\item paging and translation look-aside buffer (TLB).
-\item caching as seen by the programmer.
-\item introduction to the VHDL implementation of our CPU.
-\item VHDL implementation for the pipeline.
-\item VHDL implementation for interrupts and exceptions.
-\item VHDL implementation for the cache and TLB.
-
-\end{enumerate}
+interface.
 
 \subsection{Introduction}
 
@@ -175,7 +215,7 @@ always zero), a behaviour which implies that:
 
 It is important to note that MIPS-I instruction set is a proper
 subset of the instruction set of our processor; meaning that
-the processor supports additional instructions and registers that 
+the processor supports additional instructions and registers that
 control the behaviour of the processor as will be seen below.\\
 
 CPU instructions are divided into the following groups:
@@ -295,7 +335,7 @@ for reasons illustrated below. In the next lines we describe the
 instruction groups in detail.
 
 \begin{itemize}
-\item 
+\item
 
 \textbf{\underline{ALU Instructions With Immediate Operand:}} \\
 
@@ -364,7 +404,7 @@ in the appendix.\\
 The remaining three groups of ALU instructions (ALU instructions
 with three operands, shift instructions, and multiply/divide
 instructions) are all encoded the same way which is shown below.
-All instructions encoded that way are called R-TYPE instructions. 
+All instructions encoded that way are called R-TYPE instructions.
 We will summarize all encoding classes later in this section.\\
 
 \begin{itemize}
@@ -620,7 +660,7 @@ The group consists of the following instructions:
 
 \end{enumerate}
 
-\item \textbf{\underline{Conditional Branch Instructions 
+\item \textbf{\underline{Conditional Branch Instructions
                          Comparing Against Zero:}} \\
 
 The fourth group is also encoded as I-TYPE instructions,
@@ -964,7 +1004,7 @@ LO and HI registers.\\
 In addition to registers defined by MIPS standard, our processor
 contains special registers that control the behaviour of the processor,
 called `control registers'. Surprisingly, control registers are
-accessible through control instructions.\\ 
+accessible through control instructions.\\
 
 \subsubsection{General-Purpose Registers}
 
@@ -1008,11 +1048,11 @@ for MIPS architecture are expected to follow the same conventions.
 \hline 4-7   & a0-a3 & Subroutine parameters ($a\# = argument\#$) \\
 
 \hline 8-15  & t0-t7 & \multirow{2}{*}{
-                       Used by subroutines without saving 
+                       Used by subroutines without saving
                        ($t\# = temporary\#$)} \\
 \cline{1-2} 24-25 & t8-t9 & \\
 
-\hline 16-23 & s0-s7 & Must be saved before use 
+\hline 16-23 & s0-s7 & Must be saved before use
                        ($s\# = subroutine\_var\#$) \\
 
 \hline 26-27 & k0-k1 & Used by exception handler \\
@@ -1040,12 +1080,12 @@ for MIPS architecture are expected to follow the same conventions.
 Along with the 32 registers defined above, two special registers
 are defined by the MIPS architecture to store results of MULT, MULTU,
 DIV, and DIVU instructions. Since these four instructions produce
-64-bit results, they need two destination registers. Since MIPS 
+64-bit results, they need two destination registers. Since MIPS
 architecture doesn't define more than one destination register
 for an instruction (for hardware considerations), the result
 should first stored in an intermediate 64-bit register (or two
 parallel 32-bit registers) then moved to the GPRs in two steps.\\
- 
+
 The intermediate registers are called LO and HI registers. Each
 one of them is 32-bit wide, so you can see them as one 64-bit
 register which is can be accessed in halfs. LO
@@ -1063,7 +1103,7 @@ registers are analogous to CR0, CR2, CR3, and EFLAGS registers of
 x86 architecture.\\
 
 Control registers are accessible only through MFC0 and MTC0 instructions,
-which transfer values between GPRs and control registers. Every control 
+which transfer values between GPRs and control registers. Every control
 register is addressed by a special index. Figure \ref{ctrlregs} shows
 all the control registers of our processor and their uses. \\
 
@@ -1130,7 +1170,7 @@ Detailed description for fields in figure \ref{index_reg}:
 \begin{itemize}
 
 \item \textbf{Index}: Before the operating system reads
-      or modifies a TLB entry, it shall first write the 
+      or modifies a TLB entry, it shall first write the
       index for the target TLB entry in this field using
       MTC0 instruction. After then, the OS issues a TLB
       read or TLB write using TLBR or TLBWI instruction.
@@ -1177,7 +1217,7 @@ Detailed description for fields in figure \ref{entrylo_reg}:
                   EntryLo register; a read for EntryLo.V field
                   (using MFC0 instruction) reveals what
                   the value of the V field of the addressed
-                  TLB entry was when TLBR was issued. 
+                  TLB entry was when TLBR was issued.
 
 \item \textbf{PFN}: This field matches the physical frame number
                     (PFN) field of the
@@ -1193,7 +1233,7 @@ Detailed description for fields in figure \ref{entrylo_reg}:
                     EntryLo register; a read for EntryLo.PFN field
                     (using MFC0 instruction) reveals what
                     the value of the PFN field of the addressed
-                    TLB entry was when TLBR was issued. 
+                    TLB entry was when TLBR was issued.
 
 \end{itemize}
 
@@ -1279,7 +1319,7 @@ Detailed description for fields in figure \ref{entryhi_reg}:
                     EntryHi register; a read for EntryHi.VPN field
                     (using MFC0 instruction) reveals what
                     the value of the VPN field of the addressed
-                    TLB entry was when TLBR was issued. 
+                    TLB entry was when TLBR was issued.
 
 \end{itemize}
 
@@ -1336,40 +1376,40 @@ Detailed description for fields in figure \ref{status_reg}:
       causing interrupts to be disabled and the values of the
       three entries are shifted by 1 (IEp copied into IEo and
       IEc copied into IEp).\\
-      
+
       If a nested exception occurs again,
       the process repeats, thus IEo shall then hold the old value
       of the interrupt flag, IEp shall hold the value of the
       interrupt flag during handling the first exception, and IEc will be
       reset to 0.\\
-      
+
       When the exception handler returns, RFE instruction
       will cause the stack to pop; IEp will be copied back to IEc
       and IEo will be copied back to IEp, thus IEc returns
       back to its original state before the exception has occured.\\
-      
+
       This behaviour allows an exception to be nested into
       another exception without need to push status register
       into the software stack before the inner exception happens.
 
 \item \textbf{IEp}: As discussed above, this field functions as backup
-      for IEc field during exception handling. The three fields 
-      (IEc, IEp, IEo) can be seen as a 3-level stack to store the value 
+      for IEc field during exception handling. The three fields
+      (IEc, IEp, IEo) can be seen as a 3-level stack to store the value
       of the interrupt flag across exceptions.\\
 
-      When an exception happens, the value of this field is copied into 
-      IEo field and the value of IEc is copied into this field before 
+      When an exception happens, the value of this field is copied into
+      IEo field and the value of IEc is copied into this field before
       IEc is reset to 0. When an RFE instruction is executed, the value
-      of this field is copied back to IEc and the value of IEo is copied 
+      of this field is copied back to IEc and the value of IEo is copied
       into this field. \\
 
 \item \textbf{IEo}: As discussed above, this field functions as backup
-      for IEp field during exception handling. The three fields 
-      (IEc, IEp, IEo) can be seen as a 3-level stack to store the value 
+      for IEp field during exception handling. The three fields
+      (IEc, IEp, IEo) can be seen as a 3-level stack to store the value
       of the interrupt flag across exceptions.\\
 
       When an exception happens, the value of IEp is copied into this field
-      before IEc is copied into IEp. When an RFE instruction is executed, 
+      before IEc is copied into IEp. When an RFE instruction is executed,
       the value of this field is copied back to IEp. \\
 
 \end{itemize}
@@ -1454,18 +1494,18 @@ Detailed description for fields in figure \ref{epc_reg}:
       executed by the processor causes an exception (like
       TLB miss) or gets interrupted (by en external I/O device),
       the address of the instruction is copied into EPC field,
-      then exception handler is called. 
+      then exception handler is called.
       If the instruction is a delay slot instruction, the address
       of the previous jump/branch instruction is copied into
       EPC field instead of the address of the delay slot instruction.\\
-      
+
       This behaviour prevents software to misbehave when the exception
-      handler returns (as the branch instruction needs to be executed 
+      handler returns (as the branch instruction needs to be executed
       again or the processor will keep fetching instructions that follow
       the delay slot no matter the branch is taken or not). This
       special case causes BD field of Cause register to set as
       described above.\\
-       
+
       It's also important to note
       that before exception handler is called, the CPU makes
       sure that the instruciton doesn't have any effect on
@@ -1484,32 +1524,32 @@ an instruction is fetched from memory, or when a load/store instruction
 requests data from memory, the memory address is first translated
 by means of translation look-aside buffer (TLB). The translated
 address is then used to look-up data in the cache which might then
-issue an access request to main memory if data is not found in cache. 
+issue an access request to main memory if data is not found in cache.
 Figure \ref{memaccess} summarizes the process.\\
 
 \begin{figure}[H]
 \begin{center}
 \begin{tikzpicture}
 
-\draw[black, thick] 
-    (0,0)  node[minimum width =50, rectangle, 
+\draw[black, thick]
+    (0,0)  node[minimum width =50, rectangle,
                 minimum height=50, draw](w) {CPU Core}
-    (4,0.25) node[minimum width =50, rectangle, 
+    (4,0.25) node[minimum width =50, rectangle,
                 minimum height=25, draw](x) {TLB}
-    (8,0)  node[minimum width =50, rectangle, 
+    (8,0)  node[minimum width =50, rectangle,
                 minimum height=50, draw](y) {Cache}
-    (13,0) node[minimum width =50, rectangle, 
+    (13,0) node[minimum width =50, rectangle,
                 minimum height=50, draw](z) {Memory}
     ;
-\draw[->, black, transform canvas={yshift=10}] 
+\draw[->, black, transform canvas={yshift=10}]
     ([yshift=-25]w) -- node[above]{\scriptsize logical address} (x);
-\draw[->, black, transform canvas={yshift=2.7}] 
+\draw[->, black, transform canvas={yshift=2.7}]
     ([yshift=25]x) -- node[above]{\scriptsize physical address} (y);
-\draw[->, black, transform canvas={yshift=10}] 
+\draw[->, black, transform canvas={yshift=10}]
     (y) -- node[above]{\scriptsize only on a cache miss} (z);
-\draw[->, black, transform canvas={yshift=-13}] 
+\draw[->, black, transform canvas={yshift=-13}]
     (z) -- node[below]{\scriptsize data returned} (y);
-\draw[->, black, transform canvas={yshift=-13}] 
+\draw[->, black, transform canvas={yshift=-13}]
     (y) -- node[below]{\scriptsize data returned} (w);
 
 \end{tikzpicture}
@@ -1546,14 +1586,14 @@ The reason why there are two separate types of addresses and a translation
 circuitry is to allow every process to have its own address space by
 providing a distinct logical-to-physical address mapping for every
 running process. The process of translating a logical address
-to its corresponding physical address is called 
+to its corresponding physical address is called
 \textbf{address translation}. \\
 
 Figure \ref{translation} illustrates how we can
 achieve process-level isolation using this technique.
 Every process has its own set of memory items: blue items belong
 to process 1, and red items belong to process 2. The OS needn't
-allocate the items in physical address space in a specific order 
+allocate the items in physical address space in a specific order
 (they are scattered over memory) since the running program
 doesn't need to know the physical locations and doesn't need
 to make any assumptions about them.\\
@@ -1572,7 +1612,7 @@ logical addresses of memory items belonging to the process to
 physical addresses. Each process only sees its own items in the
 logical address space, therefore a process can never access
 memory items of other processes because there is no mapping for them.
-By this mechanism, we have achieved the required isolation between 
+By this mechanism, we have achieved the required isolation between
 processes: every process can only access the items allocated to it.\\
 
 The OS might allow some memory items to be shared between more
@@ -1591,9 +1631,9 @@ on every memory access. Later in this section we show how the OS
 informs the CPU of the mapping. \\
 
 It's important to note that some authors use terms like
-`virtual address' and `program address' to refer to logical addresses. 
-We shall use the term `logical address' throughout the document to 
-prevent confusion with other terms and techniques, like `virtual memory', 
+`virtual address' and `program address' to refer to logical addresses.
+We shall use the term `logical address' throughout the document to
+prevent confusion with other terms and techniques, like `virtual memory',
 which shouldn't be confused with `logical address space', or equivalently,
 `logical memory'.\\
 
@@ -1606,17 +1646,17 @@ as will be seen below. The four regions are:
 
 \begin{enumerate}
 
-\item \textbf{kuseg} 0x00000000 - 0x7FFFFFFF (2GB): 
-      any address in this region is translated by the translation 
-      circuitry to its corresponding physical address using the 
-      mapping provided by the OS. This area usually contains the 
+\item \textbf{kuseg} 0x00000000 - 0x7FFFFFFF (2GB):
+      any address in this region is translated by the translation
+      circuitry to its corresponding physical address using the
+      mapping provided by the OS. This area usually contains the
       text and data of the running process.
 
-\item \textbf{kseg0} 0x80000000 - 0x9FFFFFFF (512MB): 
+\item \textbf{kseg0} 0x80000000 - 0x9FFFFFFF (512MB):
       addresses in this region are not translated using the
       mapping provided by the OS, but rather they are translated
       by stripping off the most significant bit. Thus, this
-      region simply maps to the physical region: 
+      region simply maps to the physical region:
       0x00000000 - 0x1FFFFFFF. Operating system kernel can
       be simply put inside the lower 512MB zone of the
       main memory, and consequently it will appear inside kseg0.
@@ -1658,7 +1698,7 @@ Having a static mapping for kseg0 and kseg1 has several advantages:
 
 \begin{enumerate}
 
-\item Processor reset vector is put in kseg1. Consequently, system 
+\item Processor reset vector is put in kseg1. Consequently, system
       initialization code (i.e, firmware) can start execution
       before translation circuitry is initialized. Caching also
       might not be wanted during system initialization, thus
@@ -1691,7 +1731,7 @@ mapped to physical memory, we need a data structure that describes
 how to map every logical address inside the two regions (kuseg and
 kseg2) into physical address. \\
 
-One can think of an array of 4G elements, where the index of the array 
+One can think of an array of 4G elements, where the index of the array
 is the logical address, and the contents of an array element is
 the physical address that maps to the logical address associated
 with that entry. Notice that the third quarter of such an
@@ -1727,7 +1767,7 @@ smaller than 16GB. \\
 
 To translate a logical address, we divide the address into two parts:
 \begin{enumerate}
-\item Page number: the highest 20 bits of the address 
+\item Page number: the highest 20 bits of the address
 \item Offset inside the page: the lowest 12 bits of the address.
 \end{enumerate}
 Page number is then used to index the page table to get the
@@ -1749,7 +1789,7 @@ number of processes increase, a big portion of main memory will
 just be used to store page tables. Furthermore, a process
 won't usually need to map the whole 4GB address space. It can leave
 some pages unmapped, and only map pages where it needs to put
-its code and data. Actually, the usual case is that most pages are 
+its code and data. Actually, the usual case is that most pages are
 unmapped. And if virtual memory is not implemented, the total
 number of mapped pages across all page tables (across all processes)
 must be less than or equal to size of RAM (given that no frame
@@ -1759,7 +1799,7 @@ much smaller than 4GB.\\
 Since most entries in the page table are sparse (because most pages
 in the logical address space are unmapped), the OS can make use
 of this characteristic to make the size of the page table smaller.
-Thus two-level page tables where introduced. The big 1M-entry page 
+Thus two-level page tables where introduced. The big 1M-entry page
 table is divided into 1024 parts, with each part having 1024 entries.
 Each part is called a second-level page table. These second-level
 page tables could be scattered around memory. An 1024-entry table
@@ -1796,7 +1836,7 @@ So, how the CPU makes use of these page tables to do translation?
 The processor could simply be given the base physical address
 of the page directory that controls the current process. When
 a logical address is generated by core processor, the translation
-circuitry looks up the page directory then the corresponding 2nd-level 
+circuitry looks up the page directory then the corresponding 2nd-level
 page table to get frame number, as shown in the figure above.
 On a process switch, the CPU is given the page directory of
 next process.\\
@@ -1821,11 +1861,11 @@ when a TLB miss happens, the CPU raises an exception, and it is
 the responsibility of the exception handler to look-up page
 tables and refill TLB with the missed entry.\\
 
-Since our processor is designed for systems where resources 
+Since our processor is designed for systems where resources
 are very limited (like FPGA), we chose to use software-managed
 TLB to simplify the implementation of the processor. On a process
 switch, the OS just needs to clear TLB from entries related
-to old process. After TLB is cleared, and when a logical address 
+to old process. After TLB is cleared, and when a logical address
 is generated, a TLB miss happens and exception handler is called.
 The OS queries page tables and refills TLB. Page tables are
 totally managed by the OS; the processor doesn't need
@@ -1880,19 +1920,19 @@ entry, the steps are:
       Index register using MTC0 instruction.
 
 \item TLBR instruction is executed. The instruction causes the lower 32
-      bits of the TLB entry indexed by Index register to be copied into 
+      bits of the TLB entry indexed by Index register to be copied into
       EntryLo register, and the upper 32 bits of the TLB entry to be copied
       into EntryHi register.
 
 \item The operating system reads EntryLo register using MFC0 instruction.
-      Result is the lower 32 bits of the target TLB entry. 
+      Result is the lower 32 bits of the target TLB entry.
 
 \item The operating system reads EntryHi register using MFC0 instruction.
       Result is the upper 32 bits of the target TLB entry.
 
 \end{enumerate}
 
-A similar sequence could be used for writing a TLB entry 
+A similar sequence could be used for writing a TLB entry
 
 \begin{enumerate}
 
@@ -1962,12 +2002,12 @@ as follows:
 
 \item Now the OS has the index, VPN, and the corresponding PFN. The OS
       simply writes the index to Index register, writes VPN to EntryHi
-      register, and writes PFN to EntryLo register (and sets V flag 
+      register, and writes PFN to EntryLo register (and sets V flag
       of EntryLo register to 1).
 
 \item The OS executes TLBWI instruction. EntryLo and EntryHi registers
       are then copied into the TLB entry.
-      
+
 \item Exception handler returns and the instruction that causes the miss
       is executed again, but this time it doesn't cause a TLB miss and
       execution continues normally.
@@ -2009,11 +2049,11 @@ If valid bit or 0 or comparison doesn't match, the CPU initiates
 a memory cycle to bring data from RAM and updates the cache automatically.\\
 
 Cache is write-through; any store instruction will cause data to
-be written to both cache and RAM. A cache miss (or a store instruction) 
-causes the instruction to delay until data is brought from or written to 
-memory. However, cache hit can be handled without any delay; pipeline doesn't 
-stall and advance normally. Although caching is totally isolated from the 
-programmer, the programmer can use her knowledge of how cache works to 
+be written to both cache and RAM. A cache miss (or a store instruction)
+causes the instruction to delay until data is brought from or written to
+memory. However, cache hit can be handled without any delay; pipeline doesn't
+stall and advance normally. Although caching is totally isolated from the
+programmer, the programmer can use her knowledge of how cache works to
 be able to write optimized programs that make full use of caching.
 
 \subsection{Exception Handling}
@@ -2044,7 +2084,7 @@ The same mechanism is used to handle all exceptions, which include:
 
 \item \textbf{Page faults}: page faults need to be reported to
       operating system whenever they happen to fully support
-      paging. When a page fault happens, the running program is 
+      paging. When a page fault happens, the running program is
       interrupted and exception handler is called. Exception
       handler shall handle the fault then return back to the
       running program.
@@ -2089,22 +2129,22 @@ to raise an exception:
       if IRQ signal arrives to the processor, the processor
       sets ExcCode field of Cause register to 0, copies the
       address of instruction that is currently being executed
-      into EPC register, then calls exception handler. We note 
-      that there is only one IRQ signal that is fed to the processor. 
+      into EPC register, then calls exception handler. We note
+      that there is only one IRQ signal that is fed to the processor.
       System designer should allow the IRQ signal to be shared by various
-      I/O devices. Several techniques exist for sharing IRQ 
+      I/O devices. Several techniques exist for sharing IRQ
       signals.
 
 \item \textbf{TLB miss}: When logical address fails to be
       translated (as descibed earlier), the processor
-      sets ExcCode field of Cause register to 1, 
+      sets ExcCode field of Cause register to 1,
       copies the logical address into BadVaddr register,
       and copies the address of the instruction that
       has caused the TLB miss into EPC register. The processor
       then calls the exception handler.
 
 \item \textbf{Reset signal}: Processor reset is also a form
-      of exception, where the appropriate exception handler is 
+      of exception, where the appropriate exception handler is
       called whenever this event happens. Reset doesn't cause
       the Cause register, EPC register, or any other registers
       to be modified. On RESET, software should re-initialize
@@ -2132,7 +2172,7 @@ could be assigned to every type of exception. In this case,
 there is an exception handler for every type of exception.\\
 
 Exception vectors could be static or dynamic. For static exception
-vectors case, the vectors are predefined addresses that are hardwired 
+vectors case, the vectors are predefined addresses that are hardwired
 in the processor. Static vectors can never change. Examples
 for architectures with static vectors include MIPS, 6502, and PIC
 architectures.\\
@@ -2143,7 +2183,7 @@ The table will contains vectors for all possible exception types.
 Examples for architecture using dynamic vector mechanism include
 x86 and Zilog Z80. In some architectures, like 68K and PDP-11,
 the interrupting I/O device itself provides the processor
-with the interrupt vector when an interrupt is handled.\\ 
+with the interrupt vector when an interrupt is handled.\\
 
 Since MIPS processors use static hard-wired exception vectors, our
 processor jumps to predefined addresses when exceptions happens.
@@ -2154,7 +2194,7 @@ associated exceptions.
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 
-\hline \textbf{Logical Address} & \textbf{Region} & 
+\hline \textbf{Logical Address} & \textbf{Region} &
        \textbf{Physical Address} & \textbf{Exception Types} \\
 
 \hline 0xBFC00180  & kseg1 & 0x1FC00180 & All types of exception, except reset. \\
@@ -2172,7 +2212,7 @@ associated exceptions.
 We note that all exception handlers are located inside kseg1 memory
 region. This is important for reset vector to be located in kseg1
 region as it is the only safe region to start the system from
-as explained before. Thus firmware location should be adjusted 
+as explained before. Thus firmware location should be adjusted
 in memory (by system designer) such that first instruction of
 the firmware program matches reset vector.\\
 
@@ -2200,7 +2240,7 @@ an exception happens:
 \item Set the Cause register with appropriate ExcCode. If
       the exception is a TLB miss exception, the logical
       address is copied into BadVaddr register.
-      
+
 \item The processor transfers control to the exception handler.
 
 \end{enumerate}
@@ -2268,7 +2308,7 @@ the following:
 \item \textbf{Exceptions are seen in instruction sequence}:
        as described above, precise exceptions guarantees that
        all instructions before EPC has finished their execution
-       successfully. If several exceptions at several stages happen 
+       successfully. If several exceptions at several stages happen
        at the same time, the processor choose the earlier instruction
        of them to be put in EPC. When an exception happens
        at some stage of the pipeline, exception handler is not
@@ -2282,5 +2322,33 @@ the following:
       after EPC can be restarted safely after exception handler returns.
 
 \end{itemize}
+
+%------------------------------------------------------------------------------%
+
+\chapter{Implementation}
+
+%------------------------------------------------------------------------------%
+
+\chapter{Simulation}
+
+%------------------------------------------------------------------------------%
+
+\chapter{Evaluation}
+
+%------------------------------------------------------------------------------%
+
+\chapter{Conclusion}
+
+\section{Future Work}
+
+%------------------------------------------------------------------------------%
+
+\appendix
+
+\chapter{Instruction Listing}
+
+%------------------------------------------------------------------------------%
+
+%\backmatter
 
 \end{document}

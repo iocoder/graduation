@@ -1,72 +1,114 @@
 \relax 
-\@writefile{toc}{\contentsline {chapter}{\numberline {1}Introduction}{5}}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {chapter}{Abstract}{ii}{chapter*.1}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {chapter}{\numberline {2}Architecture}{7}}
+\@writefile{toc}{\contentsline {chapter}{Acknowledgements}{iii}{chapter*.2}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {2.1}Central Processing Unit}{7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Introduction}{8}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.1}Load and Store Instructions}{9}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.2}ALU Instructions}{10}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.3}Jump and Branch Instructions}{13}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.4}Miscellaneous Instructions}{15}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.5}Control Instructions}{16}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.6}Instruction Encoding Summary}{17}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces MIPS-I instruction formats}}{17}}
-\newlabel{formats}{{2.1}{17}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces Instructions encoded by opcode field}}{18}}
-\newlabel{encoding1}{{2.2}{18}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces Instructions encoded by function field when opcode field = $SPECIAL$}}{18}}
-\newlabel{encoding2}{{2.3}{18}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces Instructions encoded by rt field when opcode = $REGIMM$}}{19}}
-\newlabel{encoding3}{{2.4}{19}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.7}Addressing Modes}{19}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces All possible addressing modes}}{19}}
-\newlabel{addrmodes}{{2.5}{19}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1.8}Programmer-Visible Pipeline Effects}{19}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Registers}{20}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2.1}General-Purpose Registers}{21}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces Conventional names/uses of MIPS registers}}{21}}
-\newlabel{regs}{{2.6}{21}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2.2}LO and HI Registers}{21}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2.3}Control Registers}{22}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Control registers}}{22}}
-\newlabel{ctrlregs}{{2.7}{22}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.8}{\ignorespaces Format of Index register}}{22}}
-\newlabel{index_reg}{{2.8}{22}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.9}{\ignorespaces Format of EntryLo register}}{23}}
-\newlabel{entrylo_reg}{{2.9}{23}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.10}{\ignorespaces Format of BadVaddr register}}{23}}
-\newlabel{badvaddr_reg}{{2.10}{23}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.11}{\ignorespaces Format of EntryHi register}}{24}}
-\newlabel{entryhi_reg}{{2.11}{24}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.12}{\ignorespaces Format of Status register}}{24}}
-\newlabel{status_reg}{{2.12}{24}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.13}{\ignorespaces Format of Cause register}}{26}}
-\newlabel{cause_reg}{{2.13}{26}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.14}{\ignorespaces ExcCode values with their meaning}}{26}}
-\newlabel{exccode}{{2.14}{26}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.15}{\ignorespaces Format of EPC register}}{26}}
-\newlabel{epc_reg}{{2.15}{26}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Memory Management}{27}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.16}{\ignorespaces Memory access levels}}{27}}
-\newlabel{memaccess}{{2.16}{27}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.17}{\ignorespaces Process logical address spaces and mappings to physical addresses}}{28}}
-\newlabel{translation}{{2.17}{28}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.3.1}MIPS Logical Address Space}{29}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.3.2}Translation Look-aside Buffer (TLB)}{30}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.18}{\ignorespaces Address translation using page table}}{31}}
-\newlabel{pagetable1}{{2.18}{31}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.19}{\ignorespaces Address translation using two-level page table scheme}}{32}}
-\newlabel{pagetable2}{{2.19}{32}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.20}{\ignorespaces Format of TLB entry}}{33}}
-\newlabel{tlb_entry}{{2.20}{33}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.3.3}Cache Memory}{35}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Exception Handling}{35}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.4.1}Exception Cases}{36}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.4.2}Exception Vectors}{37}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.21}{\ignorespaces Excetion vectors for various exception types}}{38}}
-\newlabel{vectors}{{2.21}{38}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.4.3}Exception Protocol}{38}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.4.4}Precise Exceptions}{39}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.2}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Architecture}{5}{chapter.3}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Central Processing Unit}{5}{section.3.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Introduction}{5}{subsection.3.1.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.1}Load and Store Instructions}{6}{subsubsection.3.1.1.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.2}ALU Instructions}{7}{subsubsection.3.1.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.3}Jump and Branch Instructions}{10}{subsubsection.3.1.1.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.4}Miscellaneous Instructions}{12}{subsubsection.3.1.1.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.5}Control Instructions}{13}{subsubsection.3.1.1.5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.6}Instruction Encoding Summary}{14}{subsubsection.3.1.1.6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces MIPS-I instruction formats}}{14}{figure.3.1}}
+\newlabel{formats}{{3.1}{14}{MIPS-I instruction formats}{figure.3.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Instructions encoded by opcode field}}{15}{figure.3.2}}
+\newlabel{encoding1}{{3.2}{15}{Instructions encoded by opcode field}{figure.3.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces Instructions encoded by function field when opcode field = $SPECIAL$}}{15}{figure.3.3}}
+\newlabel{encoding2}{{3.3}{15}{Instructions encoded by function field when opcode field = $SPECIAL$}{figure.3.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Instructions encoded by rt field when opcode = $REGIMM$}}{16}{figure.3.4}}
+\newlabel{encoding3}{{3.4}{16}{Instructions encoded by rt field when opcode = $REGIMM$}{figure.3.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.7}Addressing Modes}{16}{subsubsection.3.1.1.7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces All possible addressing modes}}{16}{figure.3.5}}
+\newlabel{addrmodes}{{3.5}{16}{All possible addressing modes}{figure.3.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1.8}Programmer-Visible Pipeline Effects}{16}{subsubsection.3.1.1.8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Registers}{17}{subsection.3.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2.1}General-Purpose Registers}{18}{subsubsection.3.1.2.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Conventional names/uses of MIPS registers}}{18}{figure.3.6}}
+\newlabel{regs}{{3.6}{18}{Conventional names/uses of MIPS registers}{figure.3.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2.2}LO and HI Registers}{18}{subsubsection.3.1.2.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2.3}Control Registers}{19}{subsubsection.3.1.2.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Control registers}}{19}{figure.3.7}}
+\newlabel{ctrlregs}{{3.7}{19}{Control registers}{figure.3.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces Format of Index register}}{19}{figure.3.8}}
+\newlabel{index_reg}{{3.8}{19}{Format of Index register}{figure.3.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.9}{\ignorespaces Format of EntryLo register}}{20}{figure.3.9}}
+\newlabel{entrylo_reg}{{3.9}{20}{Format of EntryLo register}{figure.3.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.10}{\ignorespaces Format of BadVaddr register}}{20}{figure.3.10}}
+\newlabel{badvaddr_reg}{{3.10}{20}{Format of BadVaddr register}{figure.3.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.11}{\ignorespaces Format of EntryHi register}}{21}{figure.3.11}}
+\newlabel{entryhi_reg}{{3.11}{21}{Format of EntryHi register}{figure.3.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.12}{\ignorespaces Format of Status register}}{21}{figure.3.12}}
+\newlabel{status_reg}{{3.12}{21}{Format of Status register}{figure.3.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.13}{\ignorespaces Format of Cause register}}{23}{figure.3.13}}
+\newlabel{cause_reg}{{3.13}{23}{Format of Cause register}{figure.3.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.14}{\ignorespaces ExcCode values with their meaning}}{23}{figure.3.14}}
+\newlabel{exccode}{{3.14}{23}{ExcCode values with their meaning}{figure.3.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.15}{\ignorespaces Format of EPC register}}{23}{figure.3.15}}
+\newlabel{epc_reg}{{3.15}{23}{Format of EPC register}{figure.3.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.3}Memory Management}{24}{subsection.3.1.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.16}{\ignorespaces Memory access levels}}{24}{figure.3.16}}
+\newlabel{memaccess}{{3.16}{24}{Memory access levels}{figure.3.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.17}{\ignorespaces Process logical address spaces and mappings to physical addresses}}{25}{figure.3.17}}
+\newlabel{translation}{{3.17}{25}{Process logical address spaces and mappings to physical addresses}{figure.3.17}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3.1}MIPS Logical Address Space}{26}{subsubsection.3.1.3.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3.2}Translation Look-aside Buffer (TLB)}{27}{subsubsection.3.1.3.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.18}{\ignorespaces Address translation using page table}}{28}{figure.3.18}}
+\newlabel{pagetable1}{{3.18}{28}{Address translation using page table}{figure.3.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.19}{\ignorespaces Address translation using two-level page table scheme}}{29}{figure.3.19}}
+\newlabel{pagetable2}{{3.19}{29}{Address translation using two-level page table scheme}{figure.3.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.20}{\ignorespaces Format of TLB entry}}{30}{figure.3.20}}
+\newlabel{tlb_entry}{{3.20}{30}{Format of TLB entry}{figure.3.20}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3.3}Cache Memory}{32}{subsubsection.3.1.3.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.4}Exception Handling}{32}{subsection.3.1.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4.1}Exception Cases}{33}{subsubsection.3.1.4.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4.2}Exception Vectors}{34}{subsubsection.3.1.4.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.21}{\ignorespaces Excetion vectors for various exception types}}{35}{figure.3.21}}
+\newlabel{vectors}{{3.21}{35}{Excetion vectors for various exception types}{figure.3.21}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4.3}Exception Protocol}{35}{subsubsection.3.1.4.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4.4}Precise Exceptions}{36}{subsubsection.3.1.4.4}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Implementation}{38}{chapter.4}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Simulation}{40}{chapter.5}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}Evaluation}{42}{chapter.6}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {7}Conclusion}{44}{chapter.7}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {7.1}Future Work}{44}{section.7.1}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {A}Instruction Listing}{46}{appendix.A}}
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
