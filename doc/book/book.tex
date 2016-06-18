@@ -35,6 +35,8 @@
 \usepackage{float}
 \usepackage{multirow}
 \usepackage{tikz}
+\usepackage{colortbl}
+\usepackage{xcolor}
 
 % table of contents
 \usepackage{tocloft}
@@ -172,6 +174,112 @@
 %------------------------------------------------------------------------------%
 
 \chapter{Architecture}
+
+In this chapter we introduce the high-level design of the machine
+we propose in this project. We use the word `architecture' to refer
+to the programming model of the machine (the design of the machine as
+seen by the programmer), as we've already explained in chapter 1.\\
+
+First, we will show the major \textit{architectural} components of the
+system. Next, we describe every component
+in a separate section. We refer to our machine using the word `system', 
+since it can be seen as a set of interacting components whose behaviour can be
+described using black box model. This chapter is dedicated for getting
+into this black box; in order to explore the architecture (the behaviour
+and the interface) of every component by itself.
+ 
+\section{Top-Level Components}
+
+Similar to the majority of modern digital computers, our computer consists
+of a centeral processing unit, connected to memory and I/O devices
+through system bus. The I/O devices include a circuit for interfacing
+PS/2 keyboard (called keyboard controller), a programmable timer,
+interrupt controller, and a video graphics adapter (VGA) component.\\
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{toplevel.png}
+\end{center}
+\caption{Top-level components of the system.}
+\label{toplevel}
+\end{figure}
+
+Figure \ref{toplevel} shows the architectural components of the system 
+(yet it hides many details). The components are summarized in the 
+following points:
+
+\begin{itemize}
+
+\item \textbf{Central Processing Unit (CPU)}:
+The CPU is actually the bus master. It has the capability of
+driving the system bus at any time. CPU fetches/writes data from/to 
+memory and I/O devices through system bus. When CPU needs to access
+a word in memory (or an I/O device), CPU puts the address corresponding
+to the word in memory or the target I/O device on address bus. The device
+shall respond to the access request by reading/writing data from/to data
+bus.
+
+\item \textbf{System Bus}:
+The bus through which all components of the system are connected. The bus
+consists of three sub-buses:
+
+\begin{itemize}
+
+\item Address bus (32 lines): always driven by the CPU. Contains the address
+of the data word being read/written by CPU.
+
+\item Data bus (32 lines): holds the data during an access cycle.
+
+\item Control bus: set of control signals controlled by the processor and
+address decoder during an access cycle.
+
+\end{itemize}
+
+\item \textbf{Bus Decoder}:
+
+This component keeps listening to the address bus to control which device
+should respond to read/write request issued by CPU. The decoder takes
+the most significant bits of the address as input, and controls a number
+of chip select (CS) signals for all I/O devices in the system. A device
+whose CS signal is active is the one that should respond to CPU. 
+
+\item \textbf{Memory Interface}:
+
+This is a circuit that works as an interface between our system and a CMOS
+pseduo-static 16MB RAM chip used as main memory. Another ROM chip is also
+connected to the back side of the circuit. The circuit can be considered as
+a translation between the language of our system bus and the pinout
+of the memory chips.
+
+\item \textbf{VGA Interface}:
+
+This is an interface between our system and a VGA-compatible connector.
+It is used to provide a method of displaying text data on a CRT/LCD screen
+that supports VGA interface.
+
+\item \textbf{Interrupt Controller}:
+
+Provides a protocol for interrupting the processor by various I/O devices.
+Several interrupt lines are fed into the interrupt controller. The output
+of the controller is an interrupt signal that is delivered to the processor.
+When interrupt service routine (ISR) is executed, software should ask
+the interrupt controller for more information about the interrupt source.
+
+\item \textbf{Programmable Interval Timer}:
+
+Used by the operating system to keep track of the time of day. Can be
+programmed to trigger an interrupt every specific interval configured
+by the OS. Details of the architecture of the interval timer will be 
+seen later in this chapter.
+
+\item \textbf{Keyboard Controller}:
+
+Provides an interface between the system and an external PS/2 keyboard
+that is used as an input device. It is also connected to the interrupt
+controller through an interrupt signal (to interrupt the CPU whenever
+a key is pressed down).
+
+\end{itemize}
 
 \section{Central Processing Unit}
 
@@ -2322,6 +2430,471 @@ the following:
       after EPC can be restarted safely after exception handler returns.
 
 \end{itemize}
+
+\section{System Bus}
+
+System bus is a set of signals that provide a communication mechanism
+between the processor, memory interface, and various I/O devices. As
+we have already explained, system bus consists of three sub-buses:
+
+\begin{itemize}
+
+\item \textbf{Address bus (32 lines)}: Contains the address
+of the data word being read/written by CPU. Since the address bus
+is 32 bits, the address space of our system has 4G addresses. The smallest
+addressible unit is `byte'. Thus the whole address space is 4GB, with
+every address referring to a distinct byte in memory.
+
+\item \textbf{Data bus (32 lines)}: A bi-directional bus where CPU puts
+data word that is to be written to memory, or memory puts data word that
+is to be read by the processor. Since a data bus is 32 bits, the word size
+of our bus is 32 bits. Byte and half-word accesses are also supported.
+
+\item \textbf{Control bus}: This consists of a number of control signals
+that control the communication between the processor and I/O devices. Details
+on this will be seen below.
+
+\end{itemize}
+
+Address bus is always driven by the processor. No other devices are allowed to
+drive the bus (or contention may happen). Data bus is driven either by the
+processor (if data is to be written to memory) or by other devices (if 
+data is to be read by the processor). Control bus signals are driven by
+various devices. Control bus supports these signals:
+
+\begin{itemize}
+
+\item \textbf{CLK}: clock signal to synchronize all components together. Generated
+by clock circuitry and fed into all components.
+
+\item \textbf{MEME}: memory enable signal, driven by CPU. When MEME changes from
+inactive level to active level, a memory access cycle starts.
+
+\item \textbf{RW}: read/write signal, driven by CPU. When inactive, CPU wishes to
+read something from memory. When active, CPU wishes to write.
+
+\item \textbf{DTYPE}: specify whether the CPU wants to read/write a single byte,
+a half-word, or a word.
+
+\item \textbf{IRQ}: IRQ signal controlled by interrupt controller. It is fed
+into the processor and changes to active level when interrupt happens. The CPU
+senses the inactive-to-active edge to detect interrupt requests.
+
+\item \textbf{IAK}: interrupt acknowledge signal, driven by CPU and fed into
+the interrupt controller. It changes
+to active level when CPU wants to acknowledge the interrupt signal.
+
+\item \textbf{IRQ\#}: 8 IRQ lines controlled by various I/O devices are fed into
+the interrupt controller. When a device is interested in interrupting the 
+processor for some reason, it activates its own IRQ line. 
+
+\item \textbf{IAK\#}: 8 IAK lines controlled by the interrupt controller and fed
+into various I/O devices. They are used to acknowledge the interrupt requests
+issued by devices.
+
+\item \textbf{CS\#}: chip select lines fed into the I/O devices and driven by
+bus decoder. Bus decoder keeps listening to address bus. According to the
+address loaded on the address bus, a device is selected and its own CS signal
+changes to active level.
+
+\end{itemize}
+
+Now the sequence of a read/write cycle should be clear. First, the CPU puts
+the target address on the address bus, sets DTYPE and RW signals, then raises
+MEME to initiate the cycle. Bus decoder responds to MEME event by decoding 
+the address and driving the corresponding CS signal to the active level.\\
+
+Next, the device whose CS signal has been activated knows it should respond to
+the request. If RW is inactive (read cycle), the device puts data on the data
+bus. Otherwise, the device fetches data from data bus and processes it.\\
+
+\section{Bus Decoder}
+
+Bus decoder is a simple address decoder that selects an I/O device based on
+the state of the address bus. The decoder takes most significant bits of the
+address as input, and selects the I/O device based on the value of these bits.
+Thus, you can imagine the address space as a sequence of address blocks, where
+each block belongs to a specific I/O device.\\
+
+It should be clear by now that all I/O registers are mapped in the same
+address space where memory is mapped. Therefore all I/O registers are
+`memory-mapped registers' and no isolated I/O address space is supported.\\
+
+Figure \ref{memmap} shows the memory map of our system. The decoder shall activate
+the CS of a given device if and only if the address lies in the address range
+dedicated to that device.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+
+\hline \textbf{Start Address} & \textbf{End Address} &
+       \textbf{Size} & \textbf{Device} \\
+
+\hline 0x00000000 & 0x00FFFFFF & 16MB & RAM \\
+\hline 0x1E000000 & 0x1E003FFF & 16KB & VGA \\
+\hline 0x1E800000 & 0x1E800FFF &  4KB & KBD (Keyboard Controller) \\
+\hline 0x1E801000 & 0x1E801FFF &  4KB & PIT (Programmable Interval Timer) \\
+\hline 0x1E802000 & 0x1E802FFF &  4KB & PIC (Programmable Interrupt 
+                                                              Controller) \\
+\hline 0x1F000000 & 0x1FFFFFFF & 16MB & ROM \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Memory map.}
+\label{memmap}
+\end{figure}
+
+It is important to note that there is a separate CS signal for RAM and 
+another separate CS signal for ROM. However, there is only one memory
+interface circuit for interfacing both RAM and ROM chips. The interface
+takes both CS signals as input, and selects whether to work with the
+RAM chip or ROM chip based on the level of the signals.
+
+\section{Memory Interface}
+
+RAM and ROM chips have pinouts and interfaces that are not compatible
+with the bus. Therefore there must be a circuit that converts between
+both interfaces. The chips might not support 4-byte accesses (as will
+be seen in the implementation chapter). Furthermore, control signals
+need to be translated to the controls of the chips.\\
+
+The circuit takes the lower 24 bits of the address bus as input (this
+builds up to 16MB). CS\_ROM and CS\_RAM signals select whether the
+24-bit address corresponds to RAM or ROM. The interface is designed that
+way because the available RAM and ROM chips are actually 16MB each (as
+will be explained later in the implementation chapter).\\
+
+From programmer's point of view, ROM is accessed the same way as RAM.
+If the address specified in LW/SW instruction corresponds to the
+address range of RAM, then RAM chip is activated. Otherwise, if it
+corresponds to the address range of ROM, then ROM chips is activated, 
+and that's all. The implementation details of the circuit are hidden
+and do not affect the external behaviour seen by the programmer.\\
+
+It is also important to note that writes to ROM (using SW instruction) are
+just ignored. Since the chips need time until data is ready on
+the data bus (or data has been written), the CPU should give the
+circuit enough time before it deactivates MEME signal.
+
+\section{VGA Interface}
+
+This component provides an interface between our system and any CRT/LCD
+screen with a VGA connector. VGA appears in the address space at the
+range 0x1E00000-0x1E03FFF (16KB). Internally, the chip contains four
+memory blocks of 2Kx9. This means that every block has 2K data units,
+and every unit is 9 bits wide.\\ 
+
+A write to one of the addresses in the range 0x1E00000-0x1E03FFF selects
+a data unit in one (and only one) of the four RAM blocks.
+Any write should be peformed using SH (store half) instruction, and
+address should be always aligned to 2-byte boundary (i.e, lower 1 bit
+should always be zero) as specified by MIPS architecture for SH instruction.\\
+
+When a halfword is written to VGA, only lower 9 bits are conisdered, and
+upper 6 bits are simply ignored. Figure 
+\ref{vgamap} shows how the blocks are selected based on the value
+of the least significant 14 bits of the address.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+
+\hline \textbf{Lower 14 Bits} & \textbf{Selected Block} & \textbf{Function} \\
+
+\hline 0xxxxxxxxxxx00 & Block 0 & Character Memory \\
+\hline 0xxxxxxxxxxx10 & Block 1 & Attribute Memory \\
+\hline 1xxxxxxxxxxx00 & Block 2 & Font Memory 1 \\
+\hline 1xxxxxxxxxxx10 & Block 3 & Font Memory 2 \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{VGA decoding mechanism.}
+\label{vgamap}
+\end{figure}
+
+As you see, bit 0 is always 0, since writes are always 2-byte (half-word) 
+writes. The memory block is selected based on the value of bit 1 and bit 13.
+This means that it is based on whether the address lies in the first half
+or the second half of VGA address range, and whether the address (ignoring
+bit 0) is odd or even. \\
+
+So, to summarize the table, we can say that if the address lies in the
+lower half of the VGA address range, then the address corresponds to
+block 0 or 1 (character and attribute memories). If the address, ignoring
+bit 0, is even, then select block 0. Otherwise (address is odd), select
+block 1. \\
+
+On the other hand, if the address lies in the upper half of the address range,
+then the address corresponds to block 2 or 3 (font memories). If the address,
+ignoring bit 0, is even, then select block 2. Otherwise (address is odd),
+select block 3. \\
+
+Now we know how a memory block is selected, the remaining part is to explain
+how a data unit (inside the selected memory block) is addressed. You can
+simply deduce that the remaining bits of the 14-bit address (the xxxxxxxxxxx)
+are used directly as an index for the memory block. Thus, 00000000000 will
+address the first data unit, where 00000000001 will address the second,
+and so on. \\
+
+If you look closely, you will find that the number of `x' bits is 11,
+which means that we can address up to 2048 ($2^{11}$) for each memory
+block. Every write is a 16-bit (half-word) write (with upper 6 bits
+ignored), thus we are dealing with 2Kx9 units.\\
+
+The reader can notice the similarity between our design and the design
+of VGA programmer's interface of the IBM personal computer (the 0xB8000 text
+buffer). The basic difference is that our memory blocks are 9 bits wide 
+(not 8), and that's the reason why writes are 16-bit writes, not 8-bit.
+
+\subsection{Character Memory}
+
+Our VGA module basically supports a 80x25 text mode. This means that screen
+is divided into 80 columns and 25 rows (2000 cells), with every cell 
+containing an ASCII character. To draw text on screen, the operating system
+just needs to specify the contents of the 2000 cells.\\
+
+Character memory (memory bank 0) consists of 2048 9-bit cells (from 0
+to 2047). Ignoring last 48 cells, cells from 0 to 1999 are used to describe
+text on screen, with every cell corresponding to a character on screen.\\
+
+To set the contents of character in row x (0-24), column y (0-79), you
+need to use the formula: $indx=x*80+y$, then you can then refer to table
+\ref{vgamap} which shows how to access the banks themselves.\\
+
+For instance, to access row 2, column 1:
+
+\begin{enumerate}
+
+\item Calculate indx: $indx=2*80+1=161$.
+\item We know we want to access bank 0, thus lowest 14 bits of the address
+      will be 0xxxxxxxxxxx00 where bit 0 is zero as usual, bit 1 and 13 are 00,
+      (to indicate bank 0), and xxxxxxxxxxx is the index.
+\item Substitute xxxxxxxxxxx with 161, so it becomes 00010100001. Therefore,
+      the lowest 14 bits are: 00001010000100 (0x0284).
+\item The full 32-bit address can be easily deduced by ORing the lowest 14 bits
+      with 0x1E000000, thus the full address is 0x1E000284.
+
+\end{enumerate}
+
+A write to 0x1E000284 will set the contents of cell 161 (which corresponds to
+row 2, column 1). If you write 'B' (0x42 in ASCII) to address 0x1E000284, you
+will see B shown on screen at third row (row 2) and second column (column 1).
+That way you can write any kind of ASCII text you want on screen. Note that
+bit 8 (highest bit) of a cell is always ignored, so only 256 ANSI symbols
+are supported.
+
+\subsection{Attribute Memory}
+
+Bank 1 is used exactly the same way as bank 0, except that it describes
+the colors, instead of the text itself. As we explained above, the screen
+is divided into 2000 cells, organized in 25 rows and 80 columns. Every
+cell has a corresponding 9-bit data cell in memory bank 0 containing ASCII
+character that is drawn on the cell. Also, every cell has another 
+corresponding 9-bit data cell in memory bank 0 describing its color.\\
+
+The format of the 9 bits is described as following:
+
+\begin{itemize}
+
+\item bits 0..3: color code of the ASCII character drawn in the cell 
+                 (foreground).
+\item bits 4..7: color code of the background of the cell.
+\item bit 8: you better set it to zero.
+
+\end{itemize}
+
+As it is clear, there are only 16 colors (coded by numbers from 0 to 15). 
+Color code are described in table \ref{colormap}.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+
+\hline \textbf{Code} & \textbf{Color} &
+       \textbf{Code} & \textbf{Color} &
+       \textbf{Code} & \textbf{Color} &
+       \textbf{Code} & \textbf{Color} \\
+
+
+\hline 0 & \cellcolor{black}\color{white} Black        & 
+       4 & \cellcolor{red}\color{white}   Red          & 
+       8 & \cellcolor{darkgray}\color{white} Dark Gray    & 
+       C & \cellcolor{red!60}\color{white} Light Red    \\
+\hline 1 & \cellcolor{blue}\color{white} Blue         & 
+       5 & \cellcolor{violet}\color{white} Violet       & 
+       9 & \cellcolor{blue!60}\color{white} Light Blue   & 
+       D & \cellcolor{violet!60}\color{white} Light Violet \\
+\hline 2 & \cellcolor{green}\color{white} Green        & 
+       6 & \cellcolor{brown}\color{white} Brown        & 
+       A & \cellcolor{green!60}\color{black} Light Green  & 
+       E & \cellcolor{yellow}\color{black} Yellow       \\
+\hline 3 & \cellcolor{cyan}\color{white} Cyan         & 
+       7 & \cellcolor{gray}\color{white} Gray         & 
+       B & \cellcolor{cyan!60}\color{black} Light Cyan   & 
+       F & \cellcolor{white}\color{black} White        \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{VGA color codes.}
+\label{colormap}
+\end{figure}
+
+To set the color of the cell at row 2, column 1, we follow the same procedure
+we followed when we set the text of the same cell in previous section:
+
+\begin{enumerate}
+
+\item Calculate indx: $indx=2*80+1=161$.
+\item We know we want to access bank 1, thus lowest 14 bits of the address
+      will be 0xxxxxxxxxxx10 where bit 0 is zero as usual, bit 1 and 13 are 01,
+      (to indicate bank 1), and xxxxxxxxxxx is the index.
+\item Substitute xxxxxxxxxxx with 161, so it becomes 00010100001. Therefore,
+      the lowest 14 bits are: 00001010000110 (0x0286).
+\item The full 32-bit address can be easily deduced by ORing the lowest 14 bits
+      with 0x1E000000, thus the full address is 0x1E000286.
+
+\end{enumerate}
+
+So, to set the text of that cell, we write ASCII code (using SH instruction) to
+0x1E000284. To set the color, we write the attribute to 0x1E00286. As we mentioned
+before, bits 0..3 indicate the foregound color, where bits 4..7 indicate background.
+For a white foreground (color code F) and blue background (color code 1), we
+simply write 0x001F.\\ 
+
+We conlude our discussion of character and attribute memory with a small
+example to explain how to print something on screen. In this example, 
+we shall print `Hello World!' at row 0 of screen, with blue background
+and white foreground. `H' will be written at column 0, `e' at column 1,
+`l' at column 2, and so on.\\
+
+We first type the text in character memory. Here we have 12 ASCII characters,
+which will be written into cells from 0 to 11 of character memory. In table
+\ref{hw1}, we  calculate the address of every cell of the 12 cells, and we 
+show the exact value that will be written in that cell using SH 
+(store halfword) instruction.\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \textbf{Row} & \textbf{Column} &
+       \textbf{Memory Address} & \textbf{Text} & \textbf{ASCII code}  \\
+
+\hline 0 & 0  & 0x1E000000 & H & 0x0048 \\
+\hline 0 & 1  & 0x1E000004 & e & 0x0065 \\
+\hline 0 & 2  & 0x1E000008 & l & 0x006C \\
+\hline 0 & 3  & 0x1E00000C & l & 0x006C \\
+\hline 0 & 4  & 0x1E000010 & o & 0x006F \\
+\hline 0 & 5  & 0x1E000014 &   & 0x0020 \\
+\hline 0 & 6  & 0x1E000018 & W & 0x0057 \\
+\hline 0 & 7  & 0x1E00001C & o & 0x006F \\
+\hline 0 & 8  & 0x1E000020 & r & 0x0072 \\
+\hline 0 & 9  & 0x1E000024 & l & 0x006C \\
+\hline 0 & 10 & 0x1E000028 & d & 0x0064 \\
+\hline 0 & 11 & 0x1E00002C & ! & 0x0021 \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Hello world example: text.}
+\label{hw1}
+\end{figure}
+
+Next, we write the attributes of the 12 characters to attribute memory.
+Since we want all characters to have white foreground (F) and blue
+background (1), then color code is 0x1F. Table \ref{hw2} shows
+the actual addresses that will be written.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \textbf{Row} & \textbf{Column} &
+       \textbf{Memory Address} & \textbf{Attributes} & \textbf{Color code}  \\
+
+\hline 0 & 0  & 0x1E000002 & White/Blue & 0x001F \\
+\hline 0 & 1  & 0x1E000006 & White/Blue & 0x001F \\
+\hline 0 & 2  & 0x1E00000A & White/Blue & 0x001F \\
+\hline 0 & 3  & 0x1E00000E & White/Blue & 0x001F \\
+\hline 0 & 4  & 0x1E000012 & White/Blue & 0x001F \\
+\hline 0 & 5  & 0x1E000016 & White/Blue & 0x001F \\
+\hline 0 & 6  & 0x1E00001A & White/Blue & 0x001F \\
+\hline 0 & 7  & 0x1E00001E & White/Blue & 0x001F \\
+\hline 0 & 8  & 0x1E000022 & White/Blue & 0x001F \\
+\hline 0 & 9  & 0x1E000026 & White/Blue & 0x001F \\
+\hline 0 & 10 & 0x1E00002A & White/Blue & 0x001F \\
+\hline 0 & 11 & 0x1E00002E & White/Blue & 0x001F \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Hello world example: colors.}
+\label{hw2}
+\end{figure}
+
+Addresses in tables \ref{hw1} and \ref{hw2} are calculated using the
+procedure explained in the previous section and this section. By writing
+the values to the addresses specified in the tables, `Hello World' is
+printed on screen at row 0, as seen in figure \ref{hw3}.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+
+\hline Row/Col & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & ... & 79 \\
+
+\hline 0 & \cellcolor{blue}\color{white} H & 
+           \cellcolor{blue}\color{white} e & 
+           \cellcolor{blue}\color{white} l & 
+           \cellcolor{blue}\color{white} l & 
+           \cellcolor{blue}\color{white} o & 
+           \cellcolor{blue}\color{white}   & 
+           \cellcolor{blue}\color{white} W & 
+           \cellcolor{blue}\color{white} o & 
+           \cellcolor{blue}\color{white} r & 
+           \cellcolor{blue}\color{white} l & 
+           \cellcolor{blue}\color{white} d & 
+           \cellcolor{blue}\color{white} ! &
+           \cellcolor{black} & 
+           \cellcolor{black} & 
+           \cellcolor{black} \\
+
+\hline 1 & \multicolumn{15}{|c|}{\cellcolor{black}}\\
+\hline 2 & \multicolumn{15}{|c|}{\cellcolor{black}}\\
+\hline 3 & \multicolumn{15}{|c|}{\cellcolor{black}}\\
+\hline 4 & \multicolumn{15}{|c|}{\cellcolor{black}}\\
+\hline ... & \multicolumn{15}{|c|}{\cellcolor{black}}\\
+\hline 24 & \multicolumn{15}{|c|}{\cellcolor{black}}\\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Hello world example: results on screen.}
+\label{hw3}
+\end{figure}
+
+\subsection{Font Memory}
+
+In previous sections we have shown how data stored in memory bank 0 (character
+memory) and memory bank 1 (attribute memory) are used to draw text on screen.
+The only remaining part is to describe the actual pixels inside every cell.\\
+
+Every cell of the 2000 cells consists of 16x9 pixels. The width of the cell
+is 9 pixels and the height of the cell is 16 pixels. Since the screen
+has 25 rows and 80 columns, screen width is 80*9 which is equal to 720 pixels,
+while sreen height is 25*16 = 400. A resolution of 720x400 is the default
+screen resolution of many other systems, including IBM PC (during boot time).\\
+
 
 %------------------------------------------------------------------------------%
 

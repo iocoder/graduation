@@ -3,32 +3,40 @@
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
 \contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.2}
 \contentsline {chapter}{\numberline {3}Architecture}{5}{chapter.3}
-\contentsline {section}{\numberline {3.1}Central Processing Unit}{5}{section.3.1}
-\contentsline {subsection}{\numberline {3.1.1}Introduction}{5}{subsection.3.1.1}
-\contentsline {subsubsection}{\numberline {3.1.1.1}Load and Store Instructions}{6}{subsubsection.3.1.1.1}
-\contentsline {subsubsection}{\numberline {3.1.1.2}ALU Instructions}{7}{subsubsection.3.1.1.2}
-\contentsline {subsubsection}{\numberline {3.1.1.3}Jump and Branch Instructions}{10}{subsubsection.3.1.1.3}
-\contentsline {subsubsection}{\numberline {3.1.1.4}Miscellaneous Instructions}{12}{subsubsection.3.1.1.4}
-\contentsline {subsubsection}{\numberline {3.1.1.5}Control Instructions}{13}{subsubsection.3.1.1.5}
-\contentsline {subsubsection}{\numberline {3.1.1.6}Instruction Encoding Summary}{14}{subsubsection.3.1.1.6}
-\contentsline {subsubsection}{\numberline {3.1.1.7}Addressing Modes}{16}{subsubsection.3.1.1.7}
-\contentsline {subsubsection}{\numberline {3.1.1.8}Programmer-Visible Pipeline Effects}{16}{subsubsection.3.1.1.8}
-\contentsline {subsection}{\numberline {3.1.2}Registers}{17}{subsection.3.1.2}
-\contentsline {subsubsection}{\numberline {3.1.2.1}General-Purpose Registers}{18}{subsubsection.3.1.2.1}
-\contentsline {subsubsection}{\numberline {3.1.2.2}LO and HI Registers}{18}{subsubsection.3.1.2.2}
-\contentsline {subsubsection}{\numberline {3.1.2.3}Control Registers}{19}{subsubsection.3.1.2.3}
-\contentsline {subsection}{\numberline {3.1.3}Memory Management}{24}{subsection.3.1.3}
-\contentsline {subsubsection}{\numberline {3.1.3.1}MIPS Logical Address Space}{26}{subsubsection.3.1.3.1}
-\contentsline {subsubsection}{\numberline {3.1.3.2}Translation Look-aside Buffer (TLB)}{27}{subsubsection.3.1.3.2}
-\contentsline {subsubsection}{\numberline {3.1.3.3}Cache Memory}{32}{subsubsection.3.1.3.3}
-\contentsline {subsection}{\numberline {3.1.4}Exception Handling}{32}{subsection.3.1.4}
-\contentsline {subsubsection}{\numberline {3.1.4.1}Exception Cases}{33}{subsubsection.3.1.4.1}
-\contentsline {subsubsection}{\numberline {3.1.4.2}Exception Vectors}{34}{subsubsection.3.1.4.2}
-\contentsline {subsubsection}{\numberline {3.1.4.3}Exception Protocol}{35}{subsubsection.3.1.4.3}
-\contentsline {subsubsection}{\numberline {3.1.4.4}Precise Exceptions}{36}{subsubsection.3.1.4.4}
-\contentsline {chapter}{\numberline {4}Implementation}{38}{chapter.4}
-\contentsline {chapter}{\numberline {5}Simulation}{40}{chapter.5}
-\contentsline {chapter}{\numberline {6}Evaluation}{42}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{44}{chapter.7}
-\contentsline {section}{\numberline {7.1}Future Work}{44}{section.7.1}
-\contentsline {chapter}{\numberline {A}Instruction Listing}{46}{appendix.A}
+\contentsline {section}{\numberline {3.1}Top-Level Components}{5}{section.3.1}
+\contentsline {section}{\numberline {3.2}Central Processing Unit}{7}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Introduction}{7}{subsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.1.1}Load and Store Instructions}{8}{subsubsection.3.2.1.1}
+\contentsline {subsubsection}{\numberline {3.2.1.2}ALU Instructions}{9}{subsubsection.3.2.1.2}
+\contentsline {subsubsection}{\numberline {3.2.1.3}Jump and Branch Instructions}{12}{subsubsection.3.2.1.3}
+\contentsline {subsubsection}{\numberline {3.2.1.4}Miscellaneous Instructions}{14}{subsubsection.3.2.1.4}
+\contentsline {subsubsection}{\numberline {3.2.1.5}Control Instructions}{15}{subsubsection.3.2.1.5}
+\contentsline {subsubsection}{\numberline {3.2.1.6}Instruction Encoding Summary}{16}{subsubsection.3.2.1.6}
+\contentsline {subsubsection}{\numberline {3.2.1.7}Addressing Modes}{18}{subsubsection.3.2.1.7}
+\contentsline {subsubsection}{\numberline {3.2.1.8}Programmer-Visible Pipeline Effects}{18}{subsubsection.3.2.1.8}
+\contentsline {subsection}{\numberline {3.2.2}Registers}{19}{subsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.2.1}General-Purpose Registers}{20}{subsubsection.3.2.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2.2}LO and HI Registers}{20}{subsubsection.3.2.2.2}
+\contentsline {subsubsection}{\numberline {3.2.2.3}Control Registers}{21}{subsubsection.3.2.2.3}
+\contentsline {subsection}{\numberline {3.2.3}Memory Management}{26}{subsection.3.2.3}
+\contentsline {subsubsection}{\numberline {3.2.3.1}MIPS Logical Address Space}{28}{subsubsection.3.2.3.1}
+\contentsline {subsubsection}{\numberline {3.2.3.2}Translation Look-aside Buffer (TLB)}{29}{subsubsection.3.2.3.2}
+\contentsline {subsubsection}{\numberline {3.2.3.3}Cache Memory}{34}{subsubsection.3.2.3.3}
+\contentsline {subsection}{\numberline {3.2.4}Exception Handling}{34}{subsection.3.2.4}
+\contentsline {subsubsection}{\numberline {3.2.4.1}Exception Cases}{35}{subsubsection.3.2.4.1}
+\contentsline {subsubsection}{\numberline {3.2.4.2}Exception Vectors}{36}{subsubsection.3.2.4.2}
+\contentsline {subsubsection}{\numberline {3.2.4.3}Exception Protocol}{37}{subsubsection.3.2.4.3}
+\contentsline {subsubsection}{\numberline {3.2.4.4}Precise Exceptions}{38}{subsubsection.3.2.4.4}
+\contentsline {section}{\numberline {3.3}System Bus}{38}{section.3.3}
+\contentsline {section}{\numberline {3.4}Bus Decoder}{40}{section.3.4}
+\contentsline {section}{\numberline {3.5}Memory Interface}{40}{section.3.5}
+\contentsline {section}{\numberline {3.6}VGA Interface}{41}{section.3.6}
+\contentsline {subsection}{\numberline {3.6.1}Character Memory}{42}{subsection.3.6.1}
+\contentsline {subsection}{\numberline {3.6.2}Attribute Memory}{43}{subsection.3.6.2}
+\contentsline {subsection}{\numberline {3.6.3}Font Memory}{45}{subsection.3.6.3}
+\contentsline {chapter}{\numberline {4}Implementation}{47}{chapter.4}
+\contentsline {chapter}{\numberline {5}Simulation}{49}{chapter.5}
+\contentsline {chapter}{\numberline {6}Evaluation}{51}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{53}{chapter.7}
+\contentsline {section}{\numberline {7.1}Future Work}{53}{section.7.1}
+\contentsline {chapter}{\numberline {A}Instruction Listing}{55}{appendix.A}
