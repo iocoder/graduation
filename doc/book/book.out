@@ -34,9 +34,14 @@
 \BOOKMARK [2][-]{subsection.3.6.1}{Character Memory}{section.3.6}% 34
 \BOOKMARK [2][-]{subsection.3.6.2}{Attribute Memory}{section.3.6}% 35
 \BOOKMARK [2][-]{subsection.3.6.3}{Font Memory}{section.3.6}% 36
-\BOOKMARK [0][-]{chapter.4}{Implementation}{}% 37
-\BOOKMARK [0][-]{chapter.5}{Simulation}{}% 38
-\BOOKMARK [0][-]{chapter.6}{Evaluation}{}% 39
-\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 40
-\BOOKMARK [1][-]{section.7.1}{Future Work}{chapter.7}% 41
-\BOOKMARK [0][-]{appendix.A}{Instruction Listing}{}% 42
+\BOOKMARK [2][-]{subsection.3.6.4}{Special Registers}{section.3.6}% 37
+\BOOKMARK [1][-]{section.3.7}{Interrupt Controller}{chapter.3}% 38
+\BOOKMARK [1][-]{section.3.8}{Programmable Timer}{chapter.3}% 39
+\BOOKMARK [1][-]{section.3.9}{Keyboard Controller}{chapter.3}% 40
+\BOOKMARK [1][-]{section.3.10}{Firmware}{chapter.3}% 41
+\BOOKMARK [0][-]{chapter.4}{Implementation}{}% 42
+\BOOKMARK [0][-]{chapter.5}{Simulation}{}% 43
+\BOOKMARK [0][-]{chapter.6}{Evaluation}{}% 44
+\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 45
+\BOOKMARK [1][-]{section.7.1}{Future Work}{chapter.7}% 46
+\BOOKMARK [0][-]{appendix.A}{Instruction Listing}{}% 47

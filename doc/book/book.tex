@@ -182,12 +182,12 @@ seen by the programmer), as we've already explained in chapter 1.\\
 
 First, we will show the major \textit{architectural} components of the
 system. Next, we describe every component
-in a separate section. We refer to our machine using the word `system', 
+in a separate section. We refer to our machine using the word `system',
 since it can be seen as a set of interacting components whose behaviour can be
 described using black box model. This chapter is dedicated for getting
 into this black box; in order to explore the architecture (the behaviour
 and the interface) of every component by itself.
- 
+
 \section{Top-Level Components}
 
 Similar to the majority of modern digital computers, our computer consists
@@ -204,15 +204,15 @@ interrupt controller, and a video graphics adapter (VGA) component.\\
 \label{toplevel}
 \end{figure}
 
-Figure \ref{toplevel} shows the architectural components of the system 
-(yet it hides many details). The components are summarized in the 
+Figure \ref{toplevel} shows the architectural components of the system
+(yet it hides many details). The components are summarized in the
 following points:
 
 \begin{itemize}
 
 \item \textbf{Central Processing Unit (CPU)}:
 The CPU is actually the bus master. It has the capability of
-driving the system bus at any time. CPU fetches/writes data from/to 
+driving the system bus at any time. CPU fetches/writes data from/to
 memory and I/O devices through system bus. When CPU needs to access
 a word in memory (or an I/O device), CPU puts the address corresponding
 to the word in memory or the target I/O device on address bus. The device
@@ -241,7 +241,7 @@ This component keeps listening to the address bus to control which device
 should respond to read/write request issued by CPU. The decoder takes
 the most significant bits of the address as input, and controls a number
 of chip select (CS) signals for all I/O devices in the system. A device
-whose CS signal is active is the one that should respond to CPU. 
+whose CS signal is active is the one that should respond to CPU.
 
 \item \textbf{Memory Interface}:
 
@@ -269,7 +269,7 @@ the interrupt controller for more information about the interrupt source.
 
 Used by the operating system to keep track of the time of day. Can be
 programmed to trigger an interrupt every specific interval configured
-by the OS. Details of the architecture of the interval timer will be 
+by the OS. Details of the architecture of the interval timer will be
 seen later in this chapter.
 
 \item \textbf{Keyboard Controller}:
@@ -1625,6 +1625,7 @@ Detailed description for fields in figure \ref{epc_reg}:
 \end{itemize}
 
 \subsection{Memory Management}
+\label{ssec:memman}
 
 Having discussed the instruction set and registers of our CPU, we now
 turn our attention to how the CPU translates memory accesses. When
@@ -2458,7 +2459,7 @@ on this will be seen below.
 
 Address bus is always driven by the processor. No other devices are allowed to
 drive the bus (or contention may happen). Data bus is driven either by the
-processor (if data is to be written to memory) or by other devices (if 
+processor (if data is to be written to memory) or by other devices (if
 data is to be read by the processor). Control bus signals are driven by
 various devices. Control bus supports these signals:
 
@@ -2485,8 +2486,8 @@ the interrupt controller. It changes
 to active level when CPU wants to acknowledge the interrupt signal.
 
 \item \textbf{IRQ\#}: 8 IRQ lines controlled by various I/O devices are fed into
-the interrupt controller. When a device is interested in interrupting the 
-processor for some reason, it activates its own IRQ line. 
+the interrupt controller. When a device is interested in interrupting the
+processor for some reason, it activates its own IRQ line.
 
 \item \textbf{IAK\#}: 8 IAK lines controlled by the interrupt controller and fed
 into various I/O devices. They are used to acknowledge the interrupt requests
@@ -2501,7 +2502,7 @@ changes to active level.
 
 Now the sequence of a read/write cycle should be clear. First, the CPU puts
 the target address on the address bus, sets DTYPE and RW signals, then raises
-MEME to initiate the cycle. Bus decoder responds to MEME event by decoding 
+MEME to initiate the cycle. Bus decoder responds to MEME event by decoding
 the address and driving the corresponding CS signal to the active level.\\
 
 Next, the device whose CS signal has been activated knows it should respond to
@@ -2535,7 +2536,7 @@ dedicated to that device.
 \hline 0x1E000000 & 0x1E003FFF & 16KB & VGA \\
 \hline 0x1E800000 & 0x1E800FFF &  4KB & KBD (Keyboard Controller) \\
 \hline 0x1E801000 & 0x1E801FFF &  4KB & PIT (Programmable Interval Timer) \\
-\hline 0x1E802000 & 0x1E802FFF &  4KB & PIC (Programmable Interrupt 
+\hline 0x1E802000 & 0x1E802FFF &  4KB & PIC (Programmable Interrupt
                                                               Controller) \\
 \hline 0x1F000000 & 0x1FFFFFFF & 16MB & ROM \\
 
@@ -2547,7 +2548,7 @@ dedicated to that device.
 \label{memmap}
 \end{figure}
 
-It is important to note that there is a separate CS signal for RAM and 
+It is important to note that there is a separate CS signal for RAM and
 another separate CS signal for ROM. However, there is only one memory
 interface circuit for interfacing both RAM and ROM chips. The interface
 takes both CS signals as input, and selects whether to work with the
@@ -2570,7 +2571,7 @@ will be explained later in the implementation chapter).\\
 From programmer's point of view, ROM is accessed the same way as RAM.
 If the address specified in LW/SW instruction corresponds to the
 address range of RAM, then RAM chip is activated. Otherwise, if it
-corresponds to the address range of ROM, then ROM chips is activated, 
+corresponds to the address range of ROM, then ROM chips is activated,
 and that's all. The implementation details of the circuit are hidden
 and do not affect the external behaviour seen by the programmer.\\
 
@@ -2585,7 +2586,11 @@ This component provides an interface between our system and any CRT/LCD
 screen with a VGA connector. VGA appears in the address space at the
 range 0x1E00000-0x1E03FFF (16KB). Internally, the chip contains four
 memory blocks of 2Kx9. This means that every block has 2K data units,
-and every unit is 9 bits wide.\\ 
+and every unit is 9 bits wide.\\
+
+It is important to note that all memory addresses mentioned in this section
+are physical addresses, refer to section \ref{ssec:memman} for more information
+on address translation in MIPS architecture.\\
 
 A write to one of the addresses in the range 0x1E00000-0x1E03FFF selects
 a data unit in one (and only one) of the four RAM blocks.
@@ -2594,7 +2599,7 @@ address should be always aligned to 2-byte boundary (i.e, lower 1 bit
 should always be zero) as specified by MIPS architecture for SH instruction.\\
 
 When a halfword is written to VGA, only lower 9 bits are conisdered, and
-upper 6 bits are simply ignored. Figure 
+upper 6 bits are simply ignored. Figure
 \ref{vgamap} shows how the blocks are selected based on the value
 of the least significant 14 bits of the address.
 
@@ -2617,7 +2622,7 @@ of the least significant 14 bits of the address.
 \label{vgamap}
 \end{figure}
 
-As you see, bit 0 is always 0, since writes are always 2-byte (half-word) 
+As you see, bit 0 is always 0, since writes are always 2-byte (half-word)
 writes. The memory block is selected based on the value of bit 1 and bit 13.
 This means that it is based on whether the address lies in the first half
 or the second half of VGA address range, and whether the address (ignoring
@@ -2648,13 +2653,13 @@ ignored), thus we are dealing with 2Kx9 units.\\
 
 The reader can notice the similarity between our design and the design
 of VGA programmer's interface of the IBM personal computer (the 0xB8000 text
-buffer). The basic difference is that our memory blocks are 9 bits wide 
+buffer). The basic difference is that our memory blocks are 9 bits wide
 (not 8), and that's the reason why writes are 16-bit writes, not 8-bit.
 
 \subsection{Character Memory}
 
 Our VGA module basically supports a 80x25 text mode. This means that screen
-is divided into 80 columns and 25 rows (2000 cells), with every cell 
+is divided into 80 columns and 25 rows (2000 cells), with every cell
 containing an ASCII character. To draw text on screen, the operating system
 just needs to specify the contents of the 2000 cells.\\
 
@@ -2694,21 +2699,21 @@ Bank 1 is used exactly the same way as bank 0, except that it describes
 the colors, instead of the text itself. As we explained above, the screen
 is divided into 2000 cells, organized in 25 rows and 80 columns. Every
 cell has a corresponding 9-bit data cell in memory bank 0 containing ASCII
-character that is drawn on the cell. Also, every cell has another 
+character that is drawn on the cell. Also, every cell has another
 corresponding 9-bit data cell in memory bank 0 describing its color.\\
 
 The format of the 9 bits is described as following:
 
 \begin{itemize}
 
-\item bits 0..3: color code of the ASCII character drawn in the cell 
+\item bits 0..3: color code of the ASCII character drawn in the cell
                  (foreground).
 \item bits 4..7: color code of the background of the cell.
 \item bit 8: you better set it to zero.
 
 \end{itemize}
 
-As it is clear, there are only 16 colors (coded by numbers from 0 to 15). 
+As it is clear, there are only 16 colors (coded by numbers from 0 to 15).
 Color code are described in table \ref{colormap}.
 
 \begin{figure}[H]
@@ -2721,21 +2726,21 @@ Color code are described in table \ref{colormap}.
        \textbf{Code} & \textbf{Color} \\
 
 
-\hline 0 & \cellcolor{black}\color{white} Black        & 
-       4 & \cellcolor{red}\color{white}   Red          & 
-       8 & \cellcolor{darkgray}\color{white} Dark Gray    & 
+\hline 0 & \cellcolor{black}\color{white} Black        &
+       4 & \cellcolor{red}\color{white}   Red          &
+       8 & \cellcolor{darkgray}\color{white} Dark Gray    &
        C & \cellcolor{red!60}\color{white} Light Red    \\
-\hline 1 & \cellcolor{blue}\color{white} Blue         & 
-       5 & \cellcolor{violet}\color{white} Violet       & 
-       9 & \cellcolor{blue!60}\color{white} Light Blue   & 
+\hline 1 & \cellcolor{blue}\color{white} Blue         &
+       5 & \cellcolor{violet}\color{white} Violet       &
+       9 & \cellcolor{blue!60}\color{white} Light Blue   &
        D & \cellcolor{violet!60}\color{white} Light Violet \\
-\hline 2 & \cellcolor{green}\color{white} Green        & 
-       6 & \cellcolor{brown}\color{white} Brown        & 
-       A & \cellcolor{green!60}\color{black} Light Green  & 
+\hline 2 & \cellcolor{green}\color{white} Green        &
+       6 & \cellcolor{brown}\color{white} Brown        &
+       A & \cellcolor{green!60}\color{black} Light Green  &
        E & \cellcolor{yellow}\color{black} Yellow       \\
-\hline 3 & \cellcolor{cyan}\color{white} Cyan         & 
-       7 & \cellcolor{gray}\color{white} Gray         & 
-       B & \cellcolor{cyan!60}\color{black} Light Cyan   & 
+\hline 3 & \cellcolor{cyan}\color{white} Cyan         &
+       7 & \cellcolor{gray}\color{white} Gray         &
+       B & \cellcolor{cyan!60}\color{black} Light Cyan   &
        F & \cellcolor{white}\color{black} White        \\
 
 \hline
@@ -2764,20 +2769,20 @@ we followed when we set the text of the same cell in previous section:
 
 So, to set the text of that cell, we write ASCII code (using SH instruction) to
 0x1E000284. To set the color, we write the attribute to 0x1E00286. As we mentioned
-before, bits 0..3 indicate the foregound color, where bits 4..7 indicate background.
+before, bits 0..3 indicate the foreground color, where bits 4..7 indicate background.
 For a white foreground (color code F) and blue background (color code 1), we
-simply write 0x001F.\\ 
+simply write 0x001F.\\
 
 We conlude our discussion of character and attribute memory with a small
-example to explain how to print something on screen. In this example, 
+example to explain how to print something on screen. In this example,
 we shall print `Hello World!' at row 0 of screen, with blue background
 and white foreground. `H' will be written at column 0, `e' at column 1,
 `l' at column 2, and so on.\\
 
 We first type the text in character memory. Here we have 12 ASCII characters,
 which will be written into cells from 0 to 11 of character memory. In table
-\ref{hw1}, we  calculate the address of every cell of the 12 cells, and we 
-show the exact value that will be written in that cell using SH 
+\ref{hw1}, we  calculate the address of every cell of the 12 cells, and we
+show the exact value that will be written in that cell using SH
 (store halfword) instruction.\\
 
 \begin{figure}[H]
@@ -2852,20 +2857,20 @@ printed on screen at row 0, as seen in figure \ref{hw3}.
 
 \hline Row/Col & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & ... & 79 \\
 
-\hline 0 & \cellcolor{blue}\color{white} H & 
-           \cellcolor{blue}\color{white} e & 
-           \cellcolor{blue}\color{white} l & 
-           \cellcolor{blue}\color{white} l & 
-           \cellcolor{blue}\color{white} o & 
-           \cellcolor{blue}\color{white}   & 
-           \cellcolor{blue}\color{white} W & 
-           \cellcolor{blue}\color{white} o & 
-           \cellcolor{blue}\color{white} r & 
-           \cellcolor{blue}\color{white} l & 
-           \cellcolor{blue}\color{white} d & 
+\hline 0 & \cellcolor{blue}\color{white} H &
+           \cellcolor{blue}\color{white} e &
+           \cellcolor{blue}\color{white} l &
+           \cellcolor{blue}\color{white} l &
+           \cellcolor{blue}\color{white} o &
+           \cellcolor{blue}\color{white}   &
+           \cellcolor{blue}\color{white} W &
+           \cellcolor{blue}\color{white} o &
+           \cellcolor{blue}\color{white} r &
+           \cellcolor{blue}\color{white} l &
+           \cellcolor{blue}\color{white} d &
            \cellcolor{blue}\color{white} ! &
-           \cellcolor{black} & 
-           \cellcolor{black} & 
+           \cellcolor{black} &
+           \cellcolor{black} &
            \cellcolor{black} \\
 
 \hline 1 & \multicolumn{15}{|c|}{\cellcolor{black}}\\
@@ -2889,11 +2894,244 @@ In previous sections we have shown how data stored in memory bank 0 (character
 memory) and memory bank 1 (attribute memory) are used to draw text on screen.
 The only remaining part is to describe the actual pixels inside every cell.\\
 
-Every cell of the 2000 cells consists of 16x9 pixels. The width of the cell
-is 9 pixels and the height of the cell is 16 pixels. Since the screen
-has 25 rows and 80 columns, screen width is 80*9 which is equal to 720 pixels,
-while sreen height is 25*16 = 400. A resolution of 720x400 is the default
-screen resolution of many other systems, including IBM PC (during boot time).\\
+Every cell of the 2000 cells (on screen) consists of 16x9 pixels.
+The width of the cell is 9 pixels and the height of the cell is 16 pixels.
+Since the screen has 25 rows and 80 columns of cells, screen width is 80*9
+which is equal to 720 pixels, and sreen height is 25*16 = 400.
+This results in a resolution of 720x400, which is the default screen resolution
+of many other systems, including IBM PC (during boot time).\\
+
+Every ASCII character has a specific shape that is retrieved from bank 2 and
+bank 3 to be drawn on screen. For example, if cell at row 0, column 0 contains
+ASCII character `A', VGA hardware looks for the shape of `A' in bank 2 and bank 3.
+A data cell in VGA memory is 9 bits wide. Since every cell of screen has 16 rows
+and 9 columns of pixels, we can describe the shape of the cell using 16 9-bit
+data cells, with one bit for every pixel.\\
+
+This means that coloring inside data cell is monochrome; a pixel is either 0
+or 1. If the color of the pixel is 0, VGA chooses to draw background color
+described in the `attribute' memory as we explained before. On the other hand,
+if pixel is 1, VGA chooses to draw the foreground color in that pixel.\\
+
+For instance, consider the binary representation of letter `A' in figure
+\ref{shape_a}. The representation consists of 16 rows, with every row having
+9 bits (the size of a data cell). The whole 16x9 bits describe the whole
+16x9 pixels of any cell having `A' in its character memory location,
+as we explained before.
+
+\begin{figure}[H]
+\begin{center}
+\color{black!50!blue!80}
+\bfseries
+\begin{BVerbatim}[showspaces=false,fontsize=\small]
+row 0: 000000000 | 0x0000
+row 1: 000000000 | 0x0000
+row 2: 000010000 | 0x0010
+row 3: 000111000 | 0x0038
+row 4: 001101100 | 0x006C
+row 5: 011000110 | 0x00C6
+row 6: 011000110 | 0x00C6
+row 7: 011111110 | 0x00FE
+row 8: 011000110 | 0x00C6
+row 9: 011000110 | 0x00C6
+row A: 011000110 | 0x00C6
+row B: 011000110 | 0x00C6
+row C: 000000000 | 0x0000
+row D: 000000000 | 0x0000
+row E: 000000000 | 0x0000
+row F: 000000000 | 0x0000
+\end{BVerbatim}
+\end{center}
+\caption{Shape of letter `A' in font memory.}
+\label{shape_a}
+\end{figure}
+
+So if cell 0 of bank 0 contains ASCII code of letter `A' (which is 0x0041),
+and cell 0 of bank 1 contains color code of white foreground and blue
+background (0x001F), VGA retrieves the shape of letter `A' (0x0041 in ASCII)
+from bank 2 and bank 3. The retrieved data are the 16 9-bit words shown
+in figure \ref{shape_a}.\\
+
+Bits with value `0' describe pixels that will have the background color. Bits
+with value `1' describe pixels that will have foreground color. The final
+result is a matrix of 16x9 pixels drawn on screen, with letter `A' drawn
+in white, over a blue background.\\
+
+Bank 2 and 3 are called `font memory', since they are used to describe
+the shapes of characters drawn on screen. Every ASCII character in the
+ASCII character space is described using 16 9-bit words stored in bank 2
+and bank 3. Since we have 256 possible characters (remember, bit 8 of
+bank 0 is always ignored, so we only have 8 bits, from 0 to 7, to describe
+a character), then we need $256*16 = 4096$ words, i.e, we need two banks.\\
+
+The odd rows of a given ASCII character (row 1, 3, 5, ...) are stored in bank
+3, while even rows are stored in bank 2. First 8 words of bank 2 describe
+ASCII code 0, second 8 rows describe ASCII code 1, and so on... The same
+structure is used in bank 3. The OS loads font data on booting, then starts
+filling screen with ASCII characters by filling in bank 0 and 1.\\
+
+\subsection{Special Registers}
+
+As we mentioned before, VGA memory is mapped into 0x1E00000-0x1E03FFF.
+We described how to access any location in the four memory banks which
+all appear in this address region. However, there are several locations
+inside this memory region that are reserved for special purposes. These
+location are called `special registers'.\\
+
+Special registers are written using SH instruction, the same way writes
+to memory banks are performed. The only difference is that writes to
+sepcial register locations are handled using special circuits. Table
+\ref{vgaregs} shows all special registers and their locations.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \textbf{Memory Address} & \textbf{Register Name} & \textbf{Function}  \\
+
+\hline 0x1E001FFA & ROW\_BASE\_REG & Screen scroll location \\
+\hline 0x1E001FFC & CURSOR\_ROW\_REG & Cursor row location \\
+\hline 0x1E001FFE & CURSOR\_COL\_REG & Cursor column location \\
+\hline
+
+\end{tabular}
+\end{center}
+\caption{VGA special registers.}
+\label{vgaregs}
+\end{figure}
+
+It is important to note that all these registers are 8 bits wide, so
+bits 8-15 of the written half-word is always ignored. Now we shall
+summarize the purpose of each register in the following points:
+
+\begin{itemize}
+
+\item \textbf{ROW\_BASE\_REG}:
+Used to scroll up/down the screen. If this register is 0, screen is not
+scrolled, and everything is displayed normally as expected. Otherwise,
+this register shall contain the index of the row that will be displayed
+on the top of the screen. For example, if this register contains 10, then
+first row (the row on the top of screen) is row 10, next row is 11, and so on,
+until we reach row 24. Next rows will be 0, 1, up to 9. This helps when the
+OS needs to scroll up the screen by one row. The OS doesn't need to redraw
+the whole buffer; instead it can just increase this register by 1, and clear
+last row (the row at the bottom of the screen). Valid values for this
+register are 0 to 24.
+
+\item \textbf{CURSOR\_ROW\_REG}:
+This specifies the row number where the blinking cursor appears. Valid
+values are 0 to 24. Any other value will cause the cursor to be hidden.
+
+\item \textbf{CURSOR\_COL\_REG}:
+This specifies the column number where the blinking cursor appears. Valid
+values are 0 to 79. Any other value will cause the cursor to be hidden.
+
+\end{itemize}
+
+\section{Interrupt Controller}
+
+Since the CPU has only one interrupt pin (IRQ signal), we need a device
+that works as an interface between various interrupt sources and the CPU.
+The device has 8 input IRQ\# pins, and outputs only one IRQ signal that
+is fed into the CPU. The 8 input IRQs come from various interrupt sources
+in the system, as shown in table \ref{irqlines}.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|}
+
+\hline \textbf{IRQ Number} & \textbf{Device} \\
+
+\hline 0 & Programmable timer \\
+\hline 1 & Keyboard controller \\
+\hline 2 & N/C \\
+\hline 3 & Reserved \\
+\hline 4 & N/C \\
+\hline 5 & N/C \\
+\hline 6 & N/C \\
+\hline 7 & N/C \\
+
+\hline
+
+\end{tabular}
+\end{center}
+\caption{IRQ lines and their connected devices.}
+\label{irqlines}
+\end{figure}
+
+When a device signals an IRQ on its IRQ line, the interrupt controller
+interrupts the CPU by activating the IRQ line between the controller
+and the CPU. The interrupt controller also enters a `disabled state',
+it doesn't interrupt the CPU anymore until it is enabled again.\\
+
+The interrupt service routine (ISR) will ask the interrupt controller
+for the number of the device which caused the interrupt. It then
+re-enables the interrupt controller so that when the CPU returns
+from the ISR, it can be interrupted again (notice that interrupts
+are disabled during ISR execution, unless re-enabled by the program
+itself).\\
+
+If multiple devices interrupt the CPU at the same time, the controller
+gives priority to the device with lower interrupt number. This means
+that IRQ0 has the highest priority, and IRQ7 has the lowest priority.
+The device with the higher priority is served first, then next device,
+and so on, until no more devices have pending interrupts.\\
+
+Interrupt controller appears to the programmer in memory region
+0x1E802000 - 0x1E802FFF. We note that all memory addresses mentioned in this
+section are physical addresses. Refer to section \ref{ssec:memman} for
+more information on address translation in MIPS architecture. Table
+\ref{picregs} shows memory-mapped registers of interrupt controller.\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \textbf{Memory Address} & \textbf{Access Type} &
+       \textbf{Register Name} & \textbf{Function}  \\
+
+\hline 0x1E802000 & READ & IRQ\_NO & IRQ number \\
+\hline 0x1E802000 & WRITE & PIC\_STATE & Enable/disable the controller \\
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Interrupt controller registers.}
+\label{picregs}
+\end{figure}
+
+It is important to note that all registers are read and written using
+LW and SW instructions, respectively. We summarize the purpose of each
+register in the following points:
+
+\begin{itemize}
+
+\item \textbf{IRQ\_NO}:
+A read-only register that is accessed by reading the word at phsyical
+location 0x1E802000. It returns the IRQ number of the interrupting
+device. It is usually read inside the ISR of the operating system. The OS
+reads this register (instead of polling each device) to know which device
+has interrupted the CPU, then executes the suitable interrupt handler.
+
+\item \textbf{PIC\_STATE}:
+A write-only register that is accessed by writing the word at physical
+location 0x1E802000. If the OS writes 0 to this location, interrupt controller
+is disabled. If the OS writes 1, interrupt controller is enabled again.
+Any other value is invalid and shouldn't be used. The OS usually needs
+to re-enable the interrupt controller after handling an interrupt,
+in order to allow more interrupts to happen if there are any.
+
+\end{itemize}
+
+
+\section{Programmable Timer}
+
+\section{Keyboard Controller}
+
+% 0x1E800000
+
+\section{Firmware}
+
 
 
 %------------------------------------------------------------------------------%
