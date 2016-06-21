@@ -35,6 +35,9 @@
 \contentsline {figure}{\numberline {3.30}{\ignorespaces VGA special registers.}}{47}{figure.3.30}
 \contentsline {figure}{\numberline {3.31}{\ignorespaces IRQ lines and their connected devices.}}{48}{figure.3.31}
 \contentsline {figure}{\numberline {3.32}{\ignorespaces Interrupt controller registers.}}{48}{figure.3.32}
+\contentsline {figure}{\numberline {3.33}{\ignorespaces Programmable timer registers.}}{50}{figure.3.33}
+\contentsline {figure}{\numberline {3.34}{\ignorespaces PS/2 keyboard scan codes}}{51}{figure.3.34}
+\contentsline {figure}{\numberline {3.35}{\ignorespaces Keyboard controller registers}}{51}{figure.3.35}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

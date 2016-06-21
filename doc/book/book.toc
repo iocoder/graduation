@@ -37,11 +37,10 @@
 \contentsline {subsection}{\numberline {3.6.4}Special Registers}{47}{subsection.3.6.4}
 \contentsline {section}{\numberline {3.7}Interrupt Controller}{48}{section.3.7}
 \contentsline {section}{\numberline {3.8}Programmable Timer}{49}{section.3.8}
-\contentsline {section}{\numberline {3.9}Keyboard Controller}{49}{section.3.9}
-\contentsline {section}{\numberline {3.10}Firmware}{49}{section.3.10}
-\contentsline {chapter}{\numberline {4}Implementation}{51}{chapter.4}
-\contentsline {chapter}{\numberline {5}Simulation}{53}{chapter.5}
-\contentsline {chapter}{\numberline {6}Evaluation}{55}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{57}{chapter.7}
-\contentsline {section}{\numberline {7.1}Future Work}{57}{section.7.1}
-\contentsline {chapter}{\numberline {A}Instruction Listing}{59}{appendix.A}
+\contentsline {section}{\numberline {3.9}Keyboard Controller}{50}{section.3.9}
+\contentsline {chapter}{\numberline {4}Implementation}{53}{chapter.4}
+\contentsline {chapter}{\numberline {5}Simulation}{55}{chapter.5}
+\contentsline {chapter}{\numberline {6}Evaluation}{57}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{59}{chapter.7}
+\contentsline {section}{\numberline {7.1}Future Work}{59}{section.7.1}
+\contentsline {chapter}{\numberline {A}Instruction Listing}{61}{appendix.A}

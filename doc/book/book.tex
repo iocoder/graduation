@@ -3123,16 +3123,154 @@ in order to allow more interrupts to happen if there are any.
 
 \end{itemize}
 
-
 \section{Programmable Timer}
+
+The timer module is analogous to programmable interval timer (PIT) of IBM PC.
+It contains a counter register that is incremented (by 1) on every clock
+cycle. The timer contains another register, called threshold, which specifies
+the maximum value of the counter. When the counter reaches threshold,
+it is reset to 0, and an IRQ signal is emitted.\\
+
+Input clock must be 50MHz. If system clock has a frequency greater than
+50MHz, it must be divided before it is fed into the timer. The timer
+is attached to IRQ line 0, the highest priority IRQ line. The timer
+can be used to keep track of the time of day, by programming it
+to signal an interrupt every 1sec, 1msec, or any other value.\\
+
+A multi-tasking OS can use the timer interrupt to trigger the scheduler,
+in order to guarantee that no process will take more than a specific
+quantum of time. If a process times out, the timer will signal an
+interrupt, and the ISR will call the scheduler routine which will
+perform the task switching procedure.\\
+
+The threshold register can be seen as a frequency divider for the input
+frequency (50MHz). For example, if the threshold register is programmed
+with a value of 2, the counter will be reset every 2 clock cycles,
+generating an interrupt every $2*period$ units of time, where $period$
+is the period of the input frequency (period of 50MHz is 20ns). This
+means that the frequency of the interrupt signal is 25MHz.\\
+
+For instance, assume that the OS wants the timer to generate an interrupt
+every 10ms. This means that the period of the interrupt signals is 10ms.
+The value of the threshold register should be 10ms/20ns, where 20ns is the
+period of the 50MHz input clock. In this case, threshold is 500000. This
+simply means that counter will reset every 500000 cycles.\\
+
+Programmable timer appears to the programmer in memory region
+0x1E801000 - 0x1E801FFF. We note that all memory addresses mentioned in this
+section are physical addresses. Refer to section \ref{ssec:memman} for
+more information on address translation in MIPS architecture. Table
+\ref{pitregs} shows memory-mapped registers of interrupt controller.\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \textbf{Memory Address} & \textbf{Access Type} &
+       \textbf{Register Name} & \textbf{Function}  \\
+
+\hline 0x1E801000 & READ & PIT\_COUNTER & The counter \\
+\hline 0x1E801000 & WRITE & PIT\_THRESHOLD & The threshold register \\
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Programmable timer registers.}
+\label{pitregs}
+\end{figure}
+
+It is important to note that all registers are read and written using
+LW and SW instructions, respectively. We summarize the purpose of each
+register in the following points:
+
+\begin{itemize}
+
+\item \textbf{PIT\_COUNTER}:
+A read-only register that is accessed by reading the word at phsyical
+location 0x1E801000. It returns the current value of the internal counter
+of the timer, which resets to zero whenever it reaches the value of the
+threshold.
+
+\item \textbf{PIT\_THRESHOLD}:
+A write-only register that is accessed by writing the word at physical
+location 0x1E801000. Any write to this location will update the value
+of the threshold register which specifies the maximum limit of the
+counter.
+
+\end{itemize}
 
 \section{Keyboard Controller}
 
-% 0x1E800000
+The keyboard controller provides an interface between our system and an
+external PS/2 keyboard that is used as an input device. When the user
+presses down (or up) one of the keys on the keyboard, a specific scan code
+is sent from the PS/2 keyboard to the keyboard controller, which
+immediately activates IRQ1 line to trigger an interrupt.\\
 
-\section{Firmware}
+When the operating system is interrupted, the interrupt service routine
+must query the keyboard controller to retrieve the scan code of the
+key that has been pressed. Every key in the keyboard has a specific
+scan code, as shown by figure \ref{scancodes}.\\
 
+Keyboard controller module contains an internal 16-byte FIFO buffer
+to store up to 16 scan codes, with every scan code stored in one
+byte. So for example, if user presses on Shift key, then immediately
+presses down `H' key, the two scan codes are stored in the buffer
+until the operating system reads them.\\
 
+When a key is pressed up (released), the PS/2 keyboard shall send
+0xF0, followed by the scan code of the released button. When the OS
+reads the buffer, it will find 0xF0 in the head of the buffer,
+and the scan code of the released button in the next byte of the
+buffer.\\
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{scancodes.png}
+\end{center}
+\caption{PS/2 keyboard scan codes}
+\label{scancodes}
+\end{figure}
+
+Keyboard controller appears to the programmer in memory region
+0x1E800000 - 0x1E800FFF. We note that all memory addresses mentioned in this
+section are physical addresses. Refer to section \ref{ssec:memman} for
+more information on address translation in MIPS architecture. Table
+\ref{kbdregs} shows memory-mapped registers of interrupt controller.\\
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline \textbf{Memory Address} & \textbf{Access Type} &
+       \textbf{Register Name} & \textbf{Function}  \\
+
+\hline 0x1E800000 & READ & KBD\_BUFHEAD & Buffer head register \\
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Keyboard controller registers}
+\label{kbdregs}
+\end{figure}
+
+It is important to note that all registers are read using
+LBU instruction. We summarize the purpose of each
+register in the following points:
+
+\begin{itemize}
+
+\item \textbf{KBD\_BUFHEAD}:
+A read-only register that is accessed by reading the byte at phsyical
+location 0x1E800000. It returns the value of the byte at the head of
+the internal buffer. We note that when the buffer head is read,
+it is flushed; next read will cause the keyboard controller to return
+the next byte in the buffer, and so on, until the buffer becomes empty.
+When the buffer is empty, a value of `0' is returned. When ISR executes, the
+OS should keep reading this register until it returns zero, to make sure
+that all values stored in the buffer are read and no scan code is lost.
+
+\end{itemize}
 
 %------------------------------------------------------------------------------%
 
