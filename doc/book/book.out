@@ -42,8 +42,17 @@
 \BOOKMARK [1][-]{section.3.8}{Programmable Timer}{chapter.3}% 42
 \BOOKMARK [1][-]{section.3.9}{Keyboard Controller}{chapter.3}% 43
 \BOOKMARK [0][-]{chapter.4}{Implementation}{}% 44
-\BOOKMARK [0][-]{chapter.5}{Software}{}% 45
-\BOOKMARK [0][-]{chapter.6}{Results}{}% 46
-\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 47
-\BOOKMARK [1][-]{section.7.1}{Future Work}{chapter.7}% 48
-\BOOKMARK [0][-]{appendix.A}{Instruction Listing}{}% 49
+\BOOKMARK [1][-]{section.4.1}{Overview}{chapter.4}% 45
+\BOOKMARK [1][-]{section.4.2}{Central Processing Unit}{chapter.4}% 46
+\BOOKMARK [1][-]{section.4.3}{System Bus}{chapter.4}% 47
+\BOOKMARK [1][-]{section.4.4}{Bus Decoder}{chapter.4}% 48
+\BOOKMARK [1][-]{section.4.5}{Memory Interface}{chapter.4}% 49
+\BOOKMARK [1][-]{section.4.6}{VGA Interface}{chapter.4}% 50
+\BOOKMARK [1][-]{section.4.7}{Interrupt Controller}{chapter.4}% 51
+\BOOKMARK [1][-]{section.4.8}{Programmable Timer}{chapter.4}% 52
+\BOOKMARK [1][-]{section.4.9}{Keyboard Controller}{chapter.4}% 53
+\BOOKMARK [0][-]{chapter.5}{Software}{}% 54
+\BOOKMARK [0][-]{chapter.6}{Results}{}% 55
+\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 56
+\BOOKMARK [1][-]{section.7.1}{Future Work}{chapter.7}% 57
+\BOOKMARK [0][-]{appendix.A}{Instruction Listing}{}% 58

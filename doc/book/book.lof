@@ -41,6 +41,10 @@
 \contentsline {figure}{\numberline {3.34}{\ignorespaces PS/2 keyboard scan codes}}{54}{figure.3.34}
 \contentsline {figure}{\numberline {3.35}{\ignorespaces Keyboard controller registers}}{54}{figure.3.35}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Nexys II board}}{56}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces High-level organization of the system}}{58}{figure.4.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Our extended MIPS pipeline}}{60}{figure.4.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Nexys II memory circuits}}{62}{figure.4.4}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

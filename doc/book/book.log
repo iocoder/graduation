@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  21 JUN 2016 14:42
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  21 JUN 2016 21:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1382,7 +1382,7 @@ LaTeX Font Info:    Try loading font information for T1+clm2js on input line 79
  (/usr/share/texmf-dist/tex/latex/cfr-lm/t1clm2js.fd
 File: t1clm2js.fd 2010/05/25 Fontinst v1.933 font definitions for T1/clm2js.
 )
-<logo.pdf, id=203, 136.51pt x 217.81375pt>
+<logo.pdf, id=240, 136.51pt x 217.81375pt>
 File: logo.pdf Graphic file (type pdf)
  <use logo.pdf>
 Package pdftex.def Info: logo.pdf used on input line 79.
@@ -1451,12 +1451,12 @@ Package microtype Info: Loading generic settings for font family
 \tf@toc=\write6
 \openout6 = `book.toc'.
 
- [6] (./book.lof)
+ [6] (./book.lof [7])
 \tf@lof=\write7
 \openout7 = `book.lof'.
 
- [7]
-[8
+
+[8] [9
 
 ]
 Chapter 1.
@@ -1491,7 +1491,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 168--173
 
  []
 
-<computer.png, id=537, 583.17876pt x 394.47375pt>
+<computer.png, id=594, 583.17876pt x 394.47375pt>
 File: computer.png Graphic file (type png)
  <use computer.png>
 Package pdftex.def Info: computer.png used on input line 182.
@@ -1499,7 +1499,7 @@ Package pdftex.def Info: computer.png used on input line 182.
  [1
 
 ]
-<layers.png, id=544, 404.51125pt x 434.62375pt>
+<layers.png, id=601, 404.51125pt x 434.62375pt>
 File: layers.png Graphic file (type png)
  <use layers.png>
 Package pdftex.def Info: layers.png used on input line 194.
@@ -1536,7 +1536,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 297--302
 
  []
 
-<toplevel.png, id=573, 685.56125pt x 344.28625pt>
+<toplevel.png, id=631, 685.56125pt x 344.28625pt>
 File: toplevel.png Graphic file (type png)
  <use toplevel.png>
 Package pdftex.def Info: toplevel.png used on input line 305.
@@ -1637,7 +1637,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1023--1027
 
  []
 
-<formats.png, id=697, 841.1425pt x 552.0625pt>
+<formats.png, id=755, 841.1425pt x 552.0625pt>
 File: formats.png Graphic file (type png)
  <use formats.png>
 Package pdftex.def Info: formats.png used on input line 1030.
@@ -1647,7 +1647,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1036--1042
 
  []
 
-<encoding1.png, id=699, 878.28125pt x 423.5825pt>
+<encoding1.png, id=757, 878.28125pt x 423.5825pt>
 File: encoding1.png Graphic file (type png)
  <use encoding1.png>
 Package pdftex.def Info: encoding1.png used on input line 1045.
@@ -1657,7 +1657,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1051--1059
 
  []
 
-<encoding2.png, id=709, 875.27pt x 408.52625pt>
+<encoding2.png, id=766, 875.27pt x 408.52625pt>
 File: encoding2.png Graphic file (type png)
  <use encoding2.png>
 Package pdftex.def Info: encoding2.png used on input line 1062.
@@ -1668,7 +1668,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1068--1073
  []
 
 [20 <./encoding1.png> <./encoding2.png>]
-<encoding3.png, id=716, 857.2025pt x 307.1475pt>
+<encoding3.png, id=773, 857.2025pt x 307.1475pt>
 File: encoding3.png Graphic file (type png)
  <use encoding3.png>
 Package pdftex.def Info: encoding3.png used on input line 1076.
@@ -1813,7 +1813,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1805--1813
 
  []
 
-[29] <translation.png, id=777, 347.79938pt x 261.97874pt>
+[29] <translation.png, id=835, 347.79938pt x 261.97874pt>
 File: translation.png Graphic file (type png)
 
 <use translation.png>
@@ -1874,7 +1874,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1973--1980
 
  []
 
-[32] <pagetable1.png, id=799, 451.6875pt x 213.79875pt>
+[32] <pagetable1.png, id=856, 451.6875pt x 213.79875pt>
 File: pagetable1.png Graphic file (type png)
  <use pagetable1.png>
 Package pdftex.def Info: pagetable1.png used on input line 1994.
@@ -1884,7 +1884,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 2000--2011
 
  []
 
-<pagetable2.png, id=801, 839.75705pt x 530.31929pt>
+<pagetable2.png, id=858, 839.75705pt x 530.31929pt>
 File: pagetable2.png Graphic file (type png)
  <use pagetable2.png>
 Package pdftex.def Info: pagetable2.png used on input line 2025.
@@ -2205,12 +2205,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 3325--3330
 
  []
 
-<scancodes.png, id=947, 1017.8025pt x 404.51125pt>
+<scancodes.png, id=1005, 1017.8025pt x 404.51125pt>
 File: scancodes.png Graphic file (type png)
  <use scancodes.png>
 Package pdftex.def Info: scancodes.png used on input line 3333.
 (pdftex.def)             Requested size: 426.79135pt x 169.62198pt.
- [53]
+
+[53]
 Underfull \hbox (badness 10000) in paragraph at lines 3339--3344
 
  []
@@ -2219,48 +2220,114 @@ Underfull \hbox (badness 10000) in paragraph at lines 3339--3344
 
 ]
 Chapter 4.
-[56
+<nexys2.jpg, id=1022, 602.25pt x 549.05125pt>
+File: nexys2.jpg Graphic file (type jpg)
+ <use nexys2.jpg>
+Package pdftex.def Info: nexys2.jpg used on input line 3393.
+(pdftex.def)             Requested size: 341.43437pt x 311.2869pt.
+ [56
 
-] [57
+ <./nexys2.jpg>]
+Underfull \hbox (badness 10000) in paragraph at lines 3416--3421
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3422--3426
+
+ []
+
+[57] <fpga.png, id=1032, 551.81157pt x 587.94656pt>
+File: fpga.png Graphic file (type png)
+ <use fpga.png>
+Package pdftex.def Info: fpga.png used on input line 3468.
+(pdftex.def)             Requested size: 426.79135pt x 454.75674pt.
+ [58 <./fpga.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 3493--3499
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3500--3505
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3506--3510
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3511--3515
+
+ []
+
+<pipeline.png, id=1040, 476.53032pt x 804.75656pt>
+File: pipeline.png Graphic file (type png)
+ <use pipeline.png>
+Package pdftex.def Info: pipeline.png used on input line 3522.
+(pdftex.def)             Requested size: 362.77525pt x 612.67738pt.
+ [59]
+[60 <./pipeline.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 3559--3563
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3564--3569
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3570--3575
+
+ []
+
+<memory.png, id=1052, 721.69624pt x 531.9875pt>
+File: memory.png Graphic file (type png)
+ <use memory.png>
+Package pdftex.def Info: memory.png used on input line 3583.
+(pdftex.def)             Requested size: 362.77525pt x 267.41365pt.
+ [61] [62 <./memory.png>] [63
 
 ]
 Chapter 5.
-[58
+[64
 
-] [59
+] [65
 
 ]
 Chapter 6.
-[60
+[66
 
-] [61
+] [67
 
 ]
 Chapter 7.
-[62
+[68
 
-] [63
+] [69
 
 ]
 Appendix A.
-[64
+[70
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3407.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3407.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3621.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3621.
  (./book.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3407.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3407.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3621.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3621.
 
 Package rerunfilecheck Info: File `book.out' has not changed.
-(rerunfilecheck)             Checksum: BBB8F3348E512321E9644796B3E6218B;3388.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3407.
+(rerunfilecheck)             Checksum: EB9FAE7F5622C8F13924F9FF5CA5D802;3949.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3621.
  ) 
 Here is how much of TeX's memory you used:
- 22856 strings out of 493061
- 406074 string characters out of 6140740
- 526412 words of memory out of 5000000
- 25605 multiletter control sequences out of 15000+600000
+ 22910 strings out of 493061
+ 406691 string characters out of 6140740
+ 526621 words of memory out of 5000000
+ 25634 multiletter control sequences out of 15000+600000
  95144 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  64i,13n,72p,406b,733s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -2277,10 +2344,10 @@ e/texmf-dist/fonts/type1/public/lm/lmss17.pfb></usr/share/texmf-dist/fonts/type
 1/public/lm/lmss8.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb
 ></usr/share/texmf-dist/fonts/type1/public/lm/lmsso12.pfb></usr/share/texmf-dis
 t/fonts/type1/public/lm/lmsy10.pfb>
-Output written on book.pdf (72 pages, 778993 bytes).
+Output written on book.pdf (79 pages, 1178029 bytes).
 PDF statistics:
- 1107 PDF objects out of 1200 (max. 8388607)
- 972 compressed objects within 10 object streams
- 286 named destinations out of 1000 (max. 500000)
- 20945 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 1207 PDF objects out of 1440 (max. 8388607)
+ 1058 compressed objects within 11 object streams
+ 306 named destinations out of 1000 (max. 500000)
+ 21037 words of extra memory for PDF output out of 24883 (max. 10000000)
 

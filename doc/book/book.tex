@@ -3380,6 +3380,220 @@ that all values stored in the buffer are read and no scan code is lost.
 
 \chapter{Implementation}
 
+\section{Overview}
+
+To implement the architecture proposed in the previous chapter, we chose
+Nexys II board (from Digilent) which includes a Spartan-3E FPGA chip.
+Nexys II is a cheap FPGA board that contains many of the components
+we need for our project. Figure \ref{nexys2} shows a photograph
+for the PCB board.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{nexys2.jpg}
+\end{center}
+\caption{Nexys II board}
+\label{nexys2}
+\end{figure}
+
+\newpage
+
+The Nexys II PCB board mainly contains the following components:
+
+\begin{itemize}
+\item A flash ROM containing our FPGA design.
+\item A flash ROM storing our firmware.
+\item A pseudo-static RAM to be used by the software to
+      store runtime code/data.
+\item The FPGA chip itself.
+\item A 50MHz crystal oscillator.
+\item VGA connector.
+\item PS/2 port.
+\item USB controller.
+\item JTAG logic.
+\end{itemize}
+
+We implemented the hardware components (we have described in the architecture
+chapter) in VHDL, and compiled the code using Xilinx tools. The output
+bitfile is stored in a flash ROM on the board. When the board is powered on,
+The FPGA chip is automatically programmed using the bitfile stored on the
+ROM, a process that causes our design to be uploaded to the FPGA chip.\\
+
+As we explained in previous chapter, our design consists of a set of
+modules (components) that interface each other through a shared system bus.
+They also interface the external world (the ROM chip, RAM chip, VGA port,
+PS/2 port, and the oscillator) through the pins of the FPGA chip.\\
+
+As we already mentioned before, our design consists of the following
+components:
+
+\begin{itemize}
+
+\item \textbf{Central Processing Unit (CPU)}: The core
+component of the system, masters the system bus.
+
+\item \textbf{System Bus}: The bus through which all components of the
+system inside the FPGA are connected.
+
+\item \textbf{Bus Decoder}: Controls the Chip Select (CS) signals
+fed into various I/O devices.
+
+\item \textbf{Memory Interface}:
+Interfaces the system bus from one side, and ROM/RAM on-board chips from
+the other side.
+
+\item \textbf{VGA Interface}:
+Interfaces the system bus from one side, and VGA connector from
+the other side.
+
+\item \textbf{Interrupt Controller}:
+Works as an interface between the CPU and various interrupt sources.
+
+\item \textbf{Programmable Interval Timer}:
+Works as a programmable frequency divider controlled by software.
+
+\item \textbf{Keyboard Controller}:
+Interfaces the system bus from one side, and PS/2 port from
+the other side.
+
+\end{itemize}
+
+Figure \ref{fpga} shows the organization of those components inside
+the FPGA chip, and the connections between them and the outer
+world (the chips on the Nexys II board). In next sections, we describe
+the implementation of each of the components.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{fpga.png}
+\end{center}
+\caption{High-level organization of the system}
+\label{fpga}
+\end{figure}
+
+\newpage
+
+\section {Central Processing Unit}
+
+The CPU core is implemented as a 5-stage pipeline, just like the original
+MIPS pipeline, except that the pipeline is extended to implement all the
+instructions of MIPS-I instruction set architecture. The five stages are:
+
+\begin{itemize}
+\item \textbf{Instruction Fetch (IF)}:
+      Responsible for fetching the instructions from instruction cache.
+\item \textbf{Instruction Decode (ID)}: Decodes the fetched instruction
+      and retrieves values of source registers.
+\item \textbf{Execute (EX)}: Executes the instruction.
+\item \textbf{Memory (MEM)}: Any data memory read/write is performed here. This
+      stage interfaces the data cache.
+\item \textbf{Write Back (WB)}: Register write back is performed here.
+\end{itemize}
+
+Figure \ref{pipeline}
+shows the extended pipeline we created to implement MIPS-I instruction
+set architecture. The pipeline also contains a unit for detecting hazards,
+and contains forwarding logic as well. The pipeline works under a frequency
+of 25MHz (obtained by dividing the 50MHz general clock source by 2). This
+was the maximum frequency we could achieve with the Spartan-3E chip.\\
+
+The CPU contains two direct-mapped caches: instruction cache and data cache.
+Instructions fetched by IF stage are actually fetched from the instruction
+cache. Data read/written by MEM stage are actually read from/written into
+data cache. The data cache is write-through cache; any write will cause
+the main memory to be updated immediately.\\
+
+A cache miss in any of the caches will cause the pipeline to stall until
+data is fetched from/written to the main memory. The caches are implemented
+as a separate VHDL module that interfaces the pipeline through an internal
+bus. On the other hand, the caches interface the system bus directly.\\
+
+Translation look-aside buffer interfaces the address bus of the IF and MEM
+stages with the address bus of the caches. TLB itself is a direct-mapped cache
+that stores mappings from virtual page number (VPN) to physical frame numbers
+(PFN). A special circuitry handles TLB-related instructions.\\
+
+To summarize, the CPU consists of three basic components: A 5-stage
+pipeline, a TLB, and a cache. The three components together interface the main
+system bus of the machine.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.85\textwidth]{pipeline.png}
+\end{center}
+\caption{Our extended MIPS pipeline}
+\label{pipeline}
+\end{figure}
+
+\section {System Bus}
+
+As we mentioned in the architecture chapter, system bus consists of three
+sub-buses: address bus, data bus, and control bus. The address bus is
+implemented as 32-bit signal in VHDL, controlled by the CPU and fed into
+other components. Because Spartan-3E FPGA doesn't support tri-state buses
+inside the FPGA chip, data bus is implemented as several buses:
+
+\begin{itemize}
+\item A bus from CPU to other components; used when CPU writes data to
+      memory or I/O devices.
+\item A bus from each I/O device to the CPU (the buses are OR'd before
+      they are fed into the CPU); used when CPU fetches data.
+\end{itemize}
+
+Control bus signals are implemented as normal VHDL signals. Chip Select
+signals (CS) are controlled by bus decoder and fed into other components.
+IRQ\# signals and IAK\# signals interface the interrupt controller with
+interrupt sources (VGA and keyboard). IRQ and IAK signals interface
+the interrupt controller with CPU.
+
+\section {Bus Decoder}
+
+The bus decoder module simply takes address bus as input and produces
+various CS (chip select) signals based on the criteria specified in
+architecture chapter. The bus decoder is implemented in VHDL as a
+combinational circuit that drives the CS of an I/O device to the
+high level if and only if the address lies in its memory region.
+
+\section {Memory Interface}
+
+Nexys II board contains on-board 16MB ROM chip and another 16MB RAM chip.
+The two chips are interfaced to the Spartan-3E FPGA chip through a 16-bit
+data bus, 24-bit address bus, and a set of control signals as shown
+in figure \ref{memory}.\\
+
+The address bus and data bus are shared between the two memory chips.
+On the other hand, the MT-CE and ST-CE signals (used to activate/enable
+the RAM and ROM, respectively) are separated. It is obvious that
+the bus of the memory chips is incompatible with our system bus, therefore
+we needed the memory interface component in our design.\\
+
+The memory interface module interfaces our 32-bit system bus with the
+external bus shown in figure \ref{memory}. Since RAM and ROM chips data
+bus is 16-bit, the memory interface might need to perform two half-word
+reads/writes when a 32-bit memory access is issued by the CPU, thus
+the memory interface is a sequential circuit.\\
+
+The module takes, as input, CS\_ROM and CS\_RAM signals generated by
+bus decoder. If CS\_RAM is activated, the module activates MT-CE
+signal (which enables RAM chip). Otherwise, if CS\_ROM signal is
+activated, the module activates ST-CE signal, which enables ROM chip.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.85\textwidth]{memory.png}
+\end{center}
+\caption{Nexys II memory circuits}
+\label{memory}
+\end{figure}
+
+\section {VGA Interface}
+
+\section {Interrupt Controller}
+
+\section {Programmable Timer}
+
+\section {Keyboard Controller}
+
 %------------------------------------------------------------------------------%
 
 \chapter{Software}
