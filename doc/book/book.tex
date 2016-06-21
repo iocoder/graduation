@@ -138,34 +138,138 @@
 %------------------------------------------------------------------------------%
 
 {\let\clearpage\relax \chapter{Introduction}}
-%Before going into details, we shall define two keywords that will be used
-%throughout the section:
 
-%\begin{itemize}
+The past few years have witnessed great development in the area of
+field programmable gate array (FPGA) devices. The high flexibility and
+performance of FPGAs make them a suitable choice for systems with
+high constraints. The main purpose of our project is to build a simple
+computer system using a cheap FPGA device. \\
 
-%\item \textbf{Architecture}:
-%      The behaviour of the processor as seen by the programmer.
-%      This includes the instruction set, their opcodes and formats,
-%      architectural registers, interrupt/exception protocols, and other
-%      behavioral concerns that will be seen later in the section.
-%      The architecture describes all that can be abstracted from the
-%      implementation of the processor. Other authors may call this an
-%      instruction set architecture (ISA) or macro-architecture.
+\section{Overview}
 
-%\item \textbf{Micro-architecture}:
-%      How the architecture of the processor is implemented
-%      in switching circuits. We use this keyword to refer to our VHDL
-%      implementation for the architecture described in this section. There
-%      may exist several different implementations for the same architecture.
-%      The only restriction on the micro-architecture of a processor is to
-%      behave exactly as described by the architecture, but the implementation
-%      itself doesn't matter. For example, the architecture might guarantee
-%      that the 'effect' of the execution of a set of instructions will be
-%      in order, however, the processor might execute the instructions in an
-%      out of order fashion (OoOE) yet effectively behaves the same as
-%      described by the architecture.
+In this project we shall use FPGA technology to implement a general-purpose
+computer machine based on MIPS-I instruction set architecture. We define the
+term `general-purpose computer' as a computer that should be able to
+perform most common computing tasks, like editing documents, performing
+calculations, and programming.\\
 
-%\end{itemize}
+The system consists of several components, like CPU, memory, input devices,
+and output devices, all connected together to build up a general-purpose
+computer. The hardware part of the machine is implemented using the FPGA
+chip. The software part is a set of programs stored in the memory of
+the system.\\
+
+The CPU is an implementation for MIPS-I instruction set architecture with
+a 5-stage pipeline. CPU, along with other hardware components, is implemented
+in VHDL (VHSIC Hardware Description Language) while software is written
+in MIPS assembly and C programming language. There is also an emulator
+for the machine written in C language for GNU/Linux.\\
+
+Figure \ref{computer} shows the basic conception of the proposed system.
+The system has a CRT/LCD screen used to output information to the user,
+and a keyboard used for input. Power is regulated using an AT-compatible
+power supply. The FPGA board contains an FPGA chip, which is automatically
+configured with our hardware design on start up.\\
+
+The FPGA board also contains other components, including a ROM chip,
+a RAM chip, LEDs, switches, VGA connector, and a PS/2 keyboard connector.
+Our hardware design (that lies inside the FPGA chip) is responsible for
+interfacing all these components. The software part of our machine
+is stored on the ROM chip.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{computer.png}
+\end{center}
+\caption{Overview of the computer system}
+\label{computer}
+\end{figure}
+
+The system actually consists of several layers: hardware, firmware, and
+software. User interacts with applications that runs over the operating
+system. Figure \ref{layers} shows the layered architecture of the system.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.55\textwidth]{layers.png}
+\end{center}
+\caption{System layers}
+\label{layers}
+\end{figure}
+
+When the computer boots up, CPU starts executing firmware instructions that
+are stored on the ROM chip on the board. Firmware initializes the hardware
+components and loads the operating system into RAM. The OS boots up
+the machine and provides a user-friendly interface to the end user.
+
+\section{Scope of Project}
+
+As we mentioned in the overview section, the goal of this project is to build a
+general-purpose computer system based on MIPS architecture
+using FPGA technology. Users shall communicate with the system using
+a command-line interface. Since the machine is `programmable', in the
+sense that end user can write programs, compile, and execute them, the machine
+can be used for any purpose. However, because the resources of the FPGA are
+very limited, the machine doesn't have a graphical user interface.
+
+\section{Overview of Document}
+
+In this document, we describe the architecture and the implementation
+of the proposed computer system in details. First, we shall define two
+keywords that will be used throughout the document:
+
+\begin{itemize}
+
+\item \textbf{Architecture}:
+     The behaviour of the processor as seen by the programmer.
+     This includes the instruction set, their opcodes and formats,
+     architectural registers, interrupt/exception protocols, and other
+     behavioral concerns that will be seen later in the section.
+     The architecture describes all that can be abstracted from the
+     implementation of the processor. Other authors may call this an
+     instruction set architecture (ISA) or macro-architecture.
+
+\item \textbf{Micro-architecture}:
+     How the architecture of the processor is implemented
+     in switching circuits. We use this keyword to refer to our VHDL
+     implementation for the architecture described in this section. There
+     may exist several different implementations for the same architecture.
+     The only restriction on the micro-architecture of a processor is to
+     behave exactly as described by the architecture, but the implementation
+     itself doesn't matter. For example, the architecture might guarantee
+     that the 'effect' of the execution of a set of instructions will be
+     in order, however, the processor might execute the instructions in an
+     out of order fashion (OoOE) yet effectively behaves the same as
+     described by the architecture.
+
+\end{itemize}
+
+We use the word `architecture' to refer to the architecture of the processor
+and the whole system. On the other hand, the word `implementation' is used
+to refer to the micro-architecture of the processor and the whole system.
+Indeed, there are two implementations for the system: one using FPGA,
+and the other is emulator software.\\
+
+The book is organized in chapters, summarized in the following lines:
+
+\begin{itemize}
+
+\item \textbf{Architecture}: Explains the architecture of the whole system,
+and the architecture of system components, including CPU, system bus,
+memory, and I/O devices.
+
+\item \textbf{Implementation}: Describes how the architecture is implemented
+on FPGA using VHDL language.
+
+\item \textbf{Software}: Shows the architecture of the firmware and the
+operating system.
+
+\item \textbf{Results}: Screenshots and sample runs for the system.
+
+\item \textbf{Conclusion}: Brief conclusion for our work and suggestions for
+future work.
+
+\end{itemize}
 
 %------------------------------------------------------------------------------%
 
@@ -3278,11 +3382,11 @@ that all values stored in the buffer are read and no scan code is lost.
 
 %------------------------------------------------------------------------------%
 
-\chapter{Simulation}
+\chapter{Software}
 
 %------------------------------------------------------------------------------%
 
-\chapter{Evaluation}
+\chapter{Results}
 
 %------------------------------------------------------------------------------%
 
