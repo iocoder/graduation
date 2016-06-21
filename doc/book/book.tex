@@ -275,6 +275,9 @@ future work.
 
 \chapter{Related Work}
 
+As far as we know, there is no work that can be related to this project...
+Actually, nobody really understands what we are doing in this project.
+
 %------------------------------------------------------------------------------%
 
 \chapter{Architecture}
@@ -3588,11 +3591,134 @@ activated, the module activates ST-CE signal, which enables ROM chip.
 
 \section {VGA Interface}
 
+One of the great merits of Nexys II board is that it contains a ready-to-use
+VGA connector. The VGA connector is soldered onto the PCB board, and five
+pins are actually connected to the FPGA chips. The five pins are HS
+(horizontal sync.), VS (vertical sync), R (read), G (green), and B (blue).\\
+
+The R, G, and B signals are analog signals that define the color of
+the pixel that is currently being drawn. Because the FPGA chips only
+knows digital, there is a digital-to-analog converter (DAC) circuit between
+the three signals and the FPGA chip. The circuit consists of a set of
+resistors that allow the FPGA chip to work with 8 levels of red (3 bits),
+8 level of green (3 bits), and 4 levels of blue (2 bits). The circuit,
+the connector, and FPGA related pins are all shown in figure \ref{vgaport}.\\
+
+The VGA interface module works as an interface between the system bus
+and the VGA connector (The HS, VS, R, G, and B pins). We have programmer
+doesn't need to know the details of the VGA protocol. All the programmer
+needs to know is the information explained in the architecture chapter,
+mainly the operation of the four memory banks.\\
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{vgaport.png}
+\end{center}
+\caption{VGA connector and DAC circuit}
+\label{vgaport}
+\end{figure}
+
+As shown in figure \ref{vga}, VGA module consists of the following components:
+
+\begin{itemize}
+
+\item \textbf{Graphics Controller}: Works as an interface between
+the four memory banks and system bus. When VGA is accessed by the CPU,
+graphics controller decodes the address and selects the memory bank
+that should respond (refer to architecture chapter for information
+on VGA address decoding).
+
+\item \textbf{Four 2Kx9 RAMs}: The four memory banks that we explained
+in architecture chapter. First two RAMs work as a character memory
+and an attribute memory, where third and forth RAMs work as a font
+memory.
+
+\item \textbf{Sequencer}: Iterates over the four RAMs about 60 times
+per second (60Hz). It is the module that is responsible for converting
+the data stored in RAMs into a series of pixels that is fed
+into the CRT screen in serial.
+
+\item \textbf{CRT Controller}: Controls the timing of the sequencer
+and generates HS and VS signals. The timings specified by this module
+conform to 720x400 resolution.
+
+\item \textbf{Color Palette}: Converts the color code of current pixel
+into RGB value to be converted by DAC into an analog RGB signal.
+
+\end{itemize}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{vga2.png}
+\end{center}
+\caption{VGA module}
+\label{vga}
+\end{figure}
+
 \section {Interrupt Controller}
+
+The interrupt controller is implemented as a circuit that takes
+8 IRQ\# lines as input, and produces one IRQ line as output. The input
+IRQ\# lines come from I/O devices, while the output IRQ line is fed into
+the CPU.\\
+
+The controller also takes one IAK line as input from the processor,
+and produces 8 IAK\# lines that are fed into the I/O devices. This
+implements an interrupt protocol with handshake.
 
 \section {Programmable Timer}
 
+The timer contains two VHDL signals, one works as a counter and the other
+is a register that fetches its value from system bus when a write
+to the timer memory region is performed.\\
+
+The counter is incremented by 1 on each clock cycle of the 50MHz general
+clock signal. When the counter reaches the value of the threshold
+register, it is reset to 0 and IRQ signal is emitted.
+
 \section {Keyboard Controller}
+
+The keyboard controller module provides an interface between an external
+PS/2 keyboard and system bus. The external PS/2 keyboard is connected
+to the FPGA through a PS/2 connector on Nexys II board. The circuit
+of the PS/2 connector and FPGA related pins is shown in figure \ref{ps2port}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{ps2port.png}
+\end{center}
+\caption{PS/2 circuit on Nexys II board}
+\label{ps2port}
+\end{figure}
+
+Two pins, among the pins of the PS/2 connector, are of interest to us: CLK
+pin and DATA pin. The state of CLK and DATA lines is always idle, unless
+a scan code is being sent from the keyboard to FPGA, or a command is sent
+from the FPGA to the keyboard. Our module keeps listening to the CLK line
+until there is activity (the line is no more idle). At this time, the
+keyboard must be sending data which is to be fetched and inserted
+in the buffer.\\
+
+The data is sent from the keyboard to the host over DATA line using a serial
+communication protocol specified by PS/2 protocol (figure \ref{ps2prot}).
+The communication between the host and the keyboard is synchronized
+using CLK line. The PS/2 protocol is implemented inside the module
+in VHDL.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{ps2prot.png}
+\end{center}
+\caption{PS/2 protocol}
+\label{ps2prot}
+\end{figure}
+
+Once a scan code is sent by the keyboard circuitry, the controller stores
+it inside a 16-entry buffer. When system bus selects the keyboard controller
+for a read operation, the controller puts the head of the buffer on
+the data bus, and increases the buffer head pointer by 1. If buffer head
+pointer and buffer tail pointer point to the same location, a value
+of zero is put on data bus, indicating an empty buffer.
 
 %------------------------------------------------------------------------------%
 

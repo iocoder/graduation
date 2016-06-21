@@ -45,6 +45,10 @@
 \contentsline {figure}{\numberline {4.2}{\ignorespaces High-level organization of the system}}{58}{figure.4.2}
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Our extended MIPS pipeline}}{60}{figure.4.3}
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Nexys II memory circuits}}{62}{figure.4.4}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces VGA connector and DAC circuit}}{63}{figure.4.5}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces VGA module}}{64}{figure.4.6}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces PS/2 circuit on Nexys II board}}{65}{figure.4.7}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces PS/2 protocol}}{66}{figure.4.8}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

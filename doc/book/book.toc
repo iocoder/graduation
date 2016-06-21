@@ -48,11 +48,11 @@
 \contentsline {section}{\numberline {4.4}Bus Decoder}{61}{section.4.4}
 \contentsline {section}{\numberline {4.5}Memory Interface}{61}{section.4.5}
 \contentsline {section}{\numberline {4.6}VGA Interface}{62}{section.4.6}
-\contentsline {section}{\numberline {4.7}Interrupt Controller}{62}{section.4.7}
-\contentsline {section}{\numberline {4.8}Programmable Timer}{62}{section.4.8}
-\contentsline {section}{\numberline {4.9}Keyboard Controller}{62}{section.4.9}
-\contentsline {chapter}{\numberline {5}Software}{64}{chapter.5}
-\contentsline {chapter}{\numberline {6}Results}{66}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{68}{chapter.7}
-\contentsline {section}{\numberline {7.1}Future Work}{68}{section.7.1}
-\contentsline {chapter}{\numberline {A}Instruction Listing}{70}{appendix.A}
+\contentsline {section}{\numberline {4.7}Interrupt Controller}{65}{section.4.7}
+\contentsline {section}{\numberline {4.8}Programmable Timer}{65}{section.4.8}
+\contentsline {section}{\numberline {4.9}Keyboard Controller}{65}{section.4.9}
+\contentsline {chapter}{\numberline {5}Software}{68}{chapter.5}
+\contentsline {chapter}{\numberline {6}Results}{70}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{72}{chapter.7}
+\contentsline {section}{\numberline {7.1}Future Work}{72}{section.7.1}
+\contentsline {chapter}{\numberline {A}Instruction Listing}{74}{appendix.A}
