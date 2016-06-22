@@ -52,7 +52,9 @@
 \contentsline {section}{\numberline {4.8}Programmable Timer}{65}{section.4.8}
 \contentsline {section}{\numberline {4.9}Keyboard Controller}{65}{section.4.9}
 \contentsline {chapter}{\numberline {5}Software}{68}{chapter.5}
-\contentsline {chapter}{\numberline {6}Results}{70}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{72}{chapter.7}
-\contentsline {section}{\numberline {7.1}Future Work}{72}{section.7.1}
-\contentsline {chapter}{\numberline {A}Instruction Listing}{74}{appendix.A}
+\contentsline {section}{\numberline {5.1}Firmware}{68}{section.5.1}
+\contentsline {section}{\numberline {5.2}Operating System}{70}{section.5.2}
+\contentsline {chapter}{\numberline {6}Results}{74}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{86}{chapter.7}
+\contentsline {section}{\numberline {7.1}Future Work}{86}{section.7.1}
+\contentsline {chapter}{\numberline {A}Instruction Listing}{88}{appendix.A}

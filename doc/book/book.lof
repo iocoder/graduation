@@ -50,6 +50,18 @@
 \contentsline {figure}{\numberline {4.7}{\ignorespaces PS/2 circuit on Nexys II board}}{65}{figure.4.7}
 \contentsline {figure}{\numberline {4.8}{\ignorespaces PS/2 protocol}}{66}{figure.4.8}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Firmware Class Diagram}}{69}{figure.5.1}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces OS Class Diagram}}{71}{figure.5.2}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Early development}}{75}{figure.6.1}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces CPU and VGA finished}}{76}{figure.6.2}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces 720x400 resolution}}{77}{figure.6.3}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces System went crazy during development}}{78}{figure.6.4}
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Firmware booting, no bootable medium}}{79}{figure.6.5}
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Firmware booting, bootable medium found}}{80}{figure.6.6}
+\contentsline {figure}{\numberline {6.7}{\ignorespaces Firmware booting, Quafios bootloader}}{81}{figure.6.7}
+\contentsline {figure}{\numberline {6.8}{\ignorespaces Firmware on emulator}}{82}{figure.6.8}
+\contentsline {figure}{\numberline {6.9}{\ignorespaces Quafios on emulator}}{83}{figure.6.9}
+\contentsline {figure}{\numberline {6.10}{\ignorespaces Nintendo games on emulator}}{84}{figure.6.10}
 \addvspace {10\p@ }
 \addvspace {10\p@ }

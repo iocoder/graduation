@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  21 JUN 2016 23:39
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Arch Linux) (format=pdflatex 2016.4.9)  22 JUN 2016 11:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1011,53 +1011,67 @@ Package: array 2014/10/28 v2.4c Tabular extension package (FMi)
 \everycr=\toks37
 \minrowclearance=\skip46
 )
+(/usr/share/texmf-dist/tex/latex/rotating/rotating.sty
+Package: rotating 2009/03/28 v2.16a rotated objects in LaTeX
+\c@r@tfl@t=\count125
+\rotFPtop=\skip47
+\rotFPbot=\skip48
+\rot@float@box=\box41
+\rot@mess@toks=\toks38
+)
+(/usr/share/texmf-dist/tex/latex/tools/afterpage.sty
+Package: afterpage 2014/10/28 v1.08 After-Page Package (DPC)
+\AP@output=\toks39
+\AP@partial=\box42
+\AP@footins=\box43
+)
 (/usr/share/texmf-dist/tex/latex/tocloft/tocloft.sty
 Package: tocloft 2013/05/02 v2.3f parameterised ToC, etc., typesetting
 Package tocloft Info: The document has chapter divisions on input line 44.
-\cftparskip=\skip47
-\cftbeforetoctitleskip=\skip48
-\cftaftertoctitleskip=\skip49
-\cftbeforepartskip=\skip50
-\cftpartnumwidth=\skip51
-\cftpartindent=\skip52
-\cftbeforechapskip=\skip53
-\cftchapindent=\skip54
-\cftchapnumwidth=\skip55
-\cftbeforesecskip=\skip56
-\cftsecindent=\skip57
-\cftsecnumwidth=\skip58
-\cftbeforesubsecskip=\skip59
-\cftsubsecindent=\skip60
-\cftsubsecnumwidth=\skip61
-\cftbeforesubsubsecskip=\skip62
-\cftsubsubsecindent=\skip63
-\cftsubsubsecnumwidth=\skip64
-\cftbeforeparaskip=\skip65
-\cftparaindent=\skip66
-\cftparanumwidth=\skip67
-\cftbeforesubparaskip=\skip68
-\cftsubparaindent=\skip69
-\cftsubparanumwidth=\skip70
-\cftbeforeloftitleskip=\skip71
-\cftafterloftitleskip=\skip72
-\cftbeforefigskip=\skip73
-\cftfigindent=\skip74
-\cftfignumwidth=\skip75
-\c@lofdepth=\count125
-\c@lotdepth=\count126
-\cftbeforelottitleskip=\skip76
-\cftafterlottitleskip=\skip77
-\cftbeforetabskip=\skip78
-\cfttabindent=\skip79
-\cfttabnumwidth=\skip80
+\cftparskip=\skip49
+\cftbeforetoctitleskip=\skip50
+\cftaftertoctitleskip=\skip51
+\cftbeforepartskip=\skip52
+\cftpartnumwidth=\skip53
+\cftpartindent=\skip54
+\cftbeforechapskip=\skip55
+\cftchapindent=\skip56
+\cftchapnumwidth=\skip57
+\cftbeforesecskip=\skip58
+\cftsecindent=\skip59
+\cftsecnumwidth=\skip60
+\cftbeforesubsecskip=\skip61
+\cftsubsecindent=\skip62
+\cftsubsecnumwidth=\skip63
+\cftbeforesubsubsecskip=\skip64
+\cftsubsubsecindent=\skip65
+\cftsubsubsecnumwidth=\skip66
+\cftbeforeparaskip=\skip67
+\cftparaindent=\skip68
+\cftparanumwidth=\skip69
+\cftbeforesubparaskip=\skip70
+\cftsubparaindent=\skip71
+\cftsubparanumwidth=\skip72
+\cftbeforeloftitleskip=\skip73
+\cftafterloftitleskip=\skip74
+\cftbeforefigskip=\skip75
+\cftfigindent=\skip76
+\cftfignumwidth=\skip77
+\c@lofdepth=\count126
+\c@lotdepth=\count127
+\cftbeforelottitleskip=\skip78
+\cftafterlottitleskip=\skip79
+\cftbeforetabskip=\skip80
+\cfttabindent=\skip81
+\cfttabnumwidth=\skip82
 )
 (/usr/share/texmf-dist/tex/latex/enumitem/enumitem.sty
 Package: enumitem 2011/09/28 v3.5.2 Customized lists
-\labelindent=\skip81
+\labelindent=\skip83
 \enit@outerparindent=\dimen167
-\enit@toks=\toks38
-\enit@inbox=\box41
-\enitdp@description=\count127
+\enit@toks=\toks40
+\enit@inbox=\box44
+\enitdp@description=\count128
 )
 (/usr/share/texmf-dist/tex/latex/sectsty/sectsty.sty
 Package: sectsty 2002/02/25 v2.0.2 Commands to change all sectional heading sty
@@ -1074,24 +1088,24 @@ File: here_the_logos 2004/09/21 KTH logo Swedish, colour
 
 (/usr/share/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count128
-\calc@Bcount=\count129
+\calc@Acount=\count129
+\calc@Bcount=\count130
 \calc@Adimen=\dimen168
 \calc@Bdimen=\dimen169
-\calc@Askip=\skip82
-\calc@Bskip=\skip83
+\calc@Askip=\skip84
+\calc@Bskip=\skip85
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count130
-\calc@Cskip=\skip84
+\calc@Ccount=\count131
+\calc@Cskip=\skip86
 )
-\titlep@getextwidth=\skip85
-\titlep@gewhitemargin=\skip86
-\titlep@geleftmargin=\skip87
-\titlep@gemarginsep=\skip88
-\titlep@getextheight=\skip89
-\titlep@getopmargin=\skip90
-\tmpl@ngth=\skip91
+\titlep@getextwidth=\skip87
+\titlep@gewhitemargin=\skip88
+\titlep@geleftmargin=\skip89
+\titlep@gemarginsep=\skip90
+\titlep@getextheight=\skip91
+\titlep@getopmargin=\skip92
+\tmpl@ngth=\skip93
 )
 (/usr/share/texmf-dist/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2012/11/06 v6.83m Hypertext links for LaTeX
@@ -1134,7 +1148,7 @@ Package: letltxmacro 2010/09/02 v1.4 Let assignment for LaTeX macros (HO)
 Package: hopatch 2012/05/28 v1.2 Wrapper for package hooks (HO)
 Package: xcolor-patch 2011/01/30 xcolor patch
 Package: atveryend 2011/06/30 v1.8 Hooks at the very end of document (HO)
-Package atveryend Info: \enddocument detected (standard20110627).
+Package atveryend Info: \AP@enddocument detected (standard20110627).
 Package: atbegshi 2011/10/05 v1.16 At begin shipout hook (HO)
 Package: refcount 2011/10/16 v3.4 Data extraction from label references (HO)
 Package: hycolor 2011/01/30 v1.7 Color options for hyperref/bookmark (HO)
@@ -1146,15 +1160,15 @@ Package: auxhook 2011/03/04 v1.3 Hooks for auxiliary files (HO)
 Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
 )
 \@linkdim=\dimen170
-\Hy@linkcounter=\count131
-\Hy@pagecounter=\count132
+\Hy@linkcounter=\count132
+\Hy@pagecounter=\count133
 
 (/usr/share/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2012/11/06 v6.83m Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 )
-\Hy@SavedSpaceFactor=\count133
+\Hy@SavedSpaceFactor=\count134
 
 (/usr/share/texmf-dist/tex/latex/latexconfig/hyperref.cfg
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
@@ -1166,7 +1180,7 @@ Package hyperref Info: Plain pages OFF on input line 4458.
 Package hyperref Info: Backreferencing OFF on input line 4463.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4688.
-\c@Hy@tempcnt=\count134
+\c@Hy@tempcnt=\count135
 
 (/usr/share/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip10
@@ -1174,7 +1188,7 @@ Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 5041.
 \XeTeXLinkMargin=\dimen171
-\Fld@menulength=\count135
+\Fld@menulength=\count136
 \Field@Width=\dimen172
 \Fld@charsize=\dimen173
 Package hyperref Info: Hyper figures OFF on input line 6295.
@@ -1186,30 +1200,30 @@ Package hyperref Info: Link coloring with OCG OFF on input line 6320.
 Package hyperref Info: PDF/A mode OFF on input line 6325.
 LaTeX Info: Redefining \ref on input line 6365.
 LaTeX Info: Redefining \pageref on input line 6369.
-\Hy@abspage=\count136
-\c@Item=\count137
-\c@Hfootnote=\count138
+\Hy@abspage=\count137
+\c@Item=\count138
+\c@Hfootnote=\count139
 )
 
 Package hyperref Message: Driver (autodetected): hpdftex.
 
 (/usr/share/texmf-dist/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2012/11/06 v6.83m Hyperref driver for pdfTeX
-\Fld@listcount=\count139
-\c@bookmark@seq@number=\count140
+\Fld@listcount=\count140
+\c@bookmark@seq@number=\count141
 
 (/usr/share/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
 Package: rerunfilecheck 2011/04/15 v1.7 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 82.
 )
-\Hy@SectionHShift=\skip92
+\Hy@SectionHShift=\skip94
 )
 
 Package hyperref Warning: Option `pdftex' has already been used,
-(hyperref)                setting the option has no effect on input line 61.
+(hyperref)                setting the option has no effect on input line 63.
 
-Package hyperref Info: Option `colorlinks' set `true' on input line 61.
+Package hyperref Info: Option `colorlinks' set `true' on input line 63.
 (/usr/share/texmf-dist/tex/latex/oberdiek/hypcap.sty
 Package: hypcap 2011/02/16 v1.11 Adjusting the anchors of captions (HO)
 )
@@ -1218,62 +1232,62 @@ Package: fancyvrb 2008/02/07
 
 Style option: `fancyvrb' v2.7a, with DG/SPQR fixes, and firstline=lastline fix 
 <2008/02/07> (tvz)
-\FV@CodeLineNo=\count141
+\FV@CodeLineNo=\count142
 \FV@InFile=\read2
-\FV@TabBox=\box42
-\c@FancyVerbLine=\count142
-\FV@StepNumber=\count143
+\FV@TabBox=\box45
+\c@FancyVerbLine=\count143
+\FV@StepNumber=\count144
 \FV@OutFile=\write4
 ) (./book.aux)
 \openout1 = `book.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/lmm/m/it on input line 69.
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 69.
+LaTeX Font Info:    Checking defaults for OML/lmm/m/it on input line 71.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 71.
  (/usr/share/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for OT1/lmr/m/n on input line 69.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 69.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OT1/lmr/m/n on input line 71.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 71.
 (/usr/share/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for OMS/lmsy/m/n on input line 69.
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 69.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OMS/lmsy/m/n on input line 71.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 71.
 
 
 (/usr/share/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for OMX/lmex/m/n on input line 69.
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 69.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OMX/lmex/m/n on input line 71.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 71.
 
 
 (/usr/share/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 69.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 69.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 71.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 71.
 
 (/usr/share/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Try loading font information for T1+clms on input line 69.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 71.
+LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Try loading font information for T1+clms on input line 71.
 
 (/usr/share/texmf-dist/tex/latex/cfr-lm/t1clms.fd
 File: t1clms.fd 2010/05/25 Fontinst v1.933 font definitions for T1/clms.
 )
-LaTeX Info: Redefining \microtypecontext on input line 69.
+LaTeX Info: Redefining \microtypecontext on input line 71.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1292,7 +1306,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
 tim
 )
-\c@lstlisting=\count144
+\c@lstlisting=\count145
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1330,17 +1344,17 @@ tim
 
 (/usr/share/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count145
+\scratchcounter=\count146
 \scratchdimen=\dimen174
-\scratchbox=\box43
-\nofMPsegments=\count146
-\nofMParguments=\count147
-\everyMPshowfont=\toks39
-\MPscratchCnt=\count148
+\scratchbox=\box46
+\nofMPsegments=\count147
+\nofMParguments=\count148
+\everyMPshowfont=\toks41
+\MPscratchCnt=\count149
 \MPscratchDim=\dimen175
-\MPnumerator=\count149
-\makeMPintoPDFobject=\count150
-\everyMPtoPDFconversion=\toks40
+\MPnumerator=\count150
+\makeMPintoPDFobject=\count151
+\everyMPtoPDFconversion=\toks42
 ) (/usr/share/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
 
@@ -1357,8 +1371,8 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 ABD: EveryShipout initializing macros
-\AtBeginShipoutBox=\box44
-Package hyperref Info: Link coloring ON on input line 69.
+\AtBeginShipoutBox=\box47
+Package hyperref Info: Link coloring ON on input line 71.
 
 (/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -1366,26 +1380,26 @@ Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 (/usr/share/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count151
+\c@section@level=\count152
 )
-LaTeX Info: Redefining \ref on input line 69.
-LaTeX Info: Redefining \pageref on input line 69.
-LaTeX Info: Redefining \nameref on input line 69.
+LaTeX Info: Redefining \ref on input line 71.
+LaTeX Info: Redefining \pageref on input line 71.
+LaTeX Info: Redefining \nameref on input line 71.
  (./book.out)
 (./book.out)
 \@outlinefile=\write5
 \openout5 = `book.out'.
 
-\GPT@outputbox=\box45
-LaTeX Font Info:    Try loading font information for T1+clm2js on input line 79
+\GPT@outputbox=\box48
+LaTeX Font Info:    Try loading font information for T1+clm2js on input line 81
 .
  (/usr/share/texmf-dist/tex/latex/cfr-lm/t1clm2js.fd
 File: t1clm2js.fd 2010/05/25 Fontinst v1.933 font definitions for T1/clm2js.
 )
-<logo.pdf, id=240, 136.51pt x 217.81375pt>
+<logo.pdf, id=248, 136.51pt x 217.81375pt>
 File: logo.pdf Graphic file (type pdf)
  <use logo.pdf>
-Package pdftex.def Info: logo.pdf used on input line 79.
+Package pdftex.def Info: logo.pdf used on input line 81.
 (pdftex.def)             Requested size: 71.13188pt x 113.49644pt.
  [1
 
@@ -1398,13 +1412,13 @@ Package pdftex.def Info: logo.pdf used on input line 79.
 
 
 ]
-LaTeX Font Info:    Try loading font information for T1+zi4 on input line 100.
+LaTeX Font Info:    Try loading font information for T1+zi4 on input line 102.
 
 (/usr/share/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2014/06/22 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/bx/n' in size <10.95007> not available
-(Font)              Font shape `T1/zi4/b/n' tried instead on input line 100.
+(Font)              Font shape `T1/zi4/b/n' tried instead on input line 102.
 Package microtype Info: Loading generic settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
@@ -1415,14 +1429,14 @@ Package microtype Info: Character `textendash ' is missing
 Package microtype Info: Character `textemdash ' is missing
 (microtype)             in font `T1/zi4/b/n/10.95007'.
 (microtype)             Ignoring protrusion settings for this character.
-LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 106.
+LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 108.
 
 
 (/usr/share/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
 )
 LaTeX Font Info:    Font shape `TS1/zi4/bx/n' in size <10.95007> not available
-(Font)              Font shape `TS1/zi4/b/n' tried instead on input line 106.
+(Font)              Font shape `TS1/zi4/b/n' tried instead on input line 108.
 Package microtype Info: Loading generic settings for font family
 (microtype)             `zi4' (encoding: TS1).
 (microtype)             For optimal results, create family-specific settings.
@@ -1461,56 +1475,56 @@ Package microtype Info: Loading generic settings for font family
 ]
 Chapter 1.
 
-Overfull \hbox (1.02031pt too wide) in paragraph at lines 142--147
+Overfull \hbox (1.02031pt too wide) in paragraph at lines 144--149
 []\T1/clms/m/n/12 The past few years have wit-nessed great de-vel-op-ment in th
 e area of field pro-grammable
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 142--147
+Underfull \hbox (badness 10000) in paragraph at lines 144--149
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 150--155
+Underfull \hbox (badness 10000) in paragraph at lines 152--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 156--161
+Underfull \hbox (badness 10000) in paragraph at lines 158--163
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 162--167
+Underfull \hbox (badness 10000) in paragraph at lines 164--169
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 168--173
+Underfull \hbox (badness 10000) in paragraph at lines 170--175
 
  []
 
-<computer.png, id=602, 583.17876pt x 394.47375pt>
+<computer.png, id=637, 583.17876pt x 394.47375pt>
 File: computer.png Graphic file (type png)
  <use computer.png>
-Package pdftex.def Info: computer.png used on input line 182.
+Package pdftex.def Info: computer.png used on input line 184.
 (pdftex.def)             Requested size: 384.1096pt x 259.82378pt.
  [1
 
 ]
-<layers.png, id=609, 404.51125pt x 434.62375pt>
+<layers.png, id=644, 404.51125pt x 434.62375pt>
 File: layers.png Graphic file (type png)
  <use layers.png>
-Package pdftex.def Info: layers.png used on input line 194.
+Package pdftex.def Info: layers.png used on input line 196.
 (pdftex.def)             Requested size: 234.73654pt x 252.21458pt.
  [2 <./computer.png> <./layers.png>]
-LaTeX Font Info:    Try loading font information for TS1+clms on input line 223
+LaTeX Font Info:    Try loading font information for TS1+clms on input line 225
 .
  (/usr/share/texmf-dist/tex/latex/cfr-lm/ts1clms.fd
 File: ts1clms.fd 2008/02/13 Fontinst v1.928 font definitions for TS1/clms.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 247--252
+Underfull \hbox (badness 10000) in paragraph at lines 249--254
 
  []
 
@@ -1525,21 +1539,21 @@ Chapter 2.
 ]
 Chapter 3.
 
-Underfull \hbox (badness 10000) in paragraph at lines 285--289
+Underfull \hbox (badness 10000) in paragraph at lines 287--291
 
  []
 
 LaTeX Font Info:    Font shape `T1/clms/m/it' in size <12> not available
-(Font)              Font shape `T1/clms/m/sl' tried instead on input line 290.
+(Font)              Font shape `T1/clms/m/sl' tried instead on input line 292.
 
-Underfull \hbox (badness 10000) in paragraph at lines 300--305
+Underfull \hbox (badness 10000) in paragraph at lines 302--307
 
  []
 
-<toplevel.png, id=639, 685.56125pt x 344.28625pt>
+<toplevel.png, id=673, 685.56125pt x 344.28625pt>
 File: toplevel.png Graphic file (type png)
  <use toplevel.png>
-Package pdftex.def Info: toplevel.png used on input line 308.
+Package pdftex.def Info: toplevel.png used on input line 310.
 (pdftex.def)             Requested size: 384.1096pt x 192.90404pt.
 
 
@@ -1548,671 +1562,671 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [8
 
 ] [9 <./toplevel.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 401--405
+Underfull \hbox (badness 10000) in paragraph at lines 403--407
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 406--411
+Underfull \hbox (badness 10000) in paragraph at lines 408--413
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 431--435
+Underfull \hbox (badness 10000) in paragraph at lines 433--437
 
  []
 
 [10]
-Underfull \hbox (badness 10000) in paragraph at lines 508--510
+Underfull \hbox (badness 10000) in paragraph at lines 510--512
 
  []
 
 [11]
-Underfull \hbox (badness 10000) in paragraph at lines 555--556
+Underfull \hbox (badness 10000) in paragraph at lines 557--558
 
  []
 
 [12]
-Underfull \hbox (badness 10000) in paragraph at lines 614--616
+Underfull \hbox (badness 10000) in paragraph at lines 616--618
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 617--618
+Underfull \hbox (badness 10000) in paragraph at lines 619--620
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 619--624
+Underfull \hbox (badness 10000) in paragraph at lines 621--626
 
  []
 
 [13] [14]
-Underfull \hbox (badness 10000) in paragraph at lines 738--742
+Underfull \hbox (badness 10000) in paragraph at lines 740--744
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 758--759
+Underfull \hbox (badness 10000) in paragraph at lines 760--761
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 788--789
+Underfull \hbox (badness 10000) in paragraph at lines 790--791
 
  []
 
 [15]
-Underfull \hbox (badness 10000) in paragraph at lines 829--830
+Underfull \hbox (badness 10000) in paragraph at lines 831--832
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 831--836
+Underfull \hbox (badness 10000) in paragraph at lines 833--838
 
  []
 
 [16]
-Underfull \hbox (badness 10000) in paragraph at lines 879--880
+Underfull \hbox (badness 10000) in paragraph at lines 881--882
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 922--925
+Underfull \hbox (badness 10000) in paragraph at lines 924--927
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 926--930
+Underfull \hbox (badness 10000) in paragraph at lines 928--932
 
  []
 
 [17]
-Underfull \hbox (badness 10000) in paragraph at lines 964--970
+Underfull \hbox (badness 10000) in paragraph at lines 966--972
 
  []
 
 [18]
-Underfull \hbox (badness 10000) in paragraph at lines 1026--1030
+Underfull \hbox (badness 10000) in paragraph at lines 1028--1032
 
  []
 
-<formats.png, id=763, 841.1425pt x 552.0625pt>
+<formats.png, id=797, 841.1425pt x 552.0625pt>
 File: formats.png Graphic file (type png)
  <use formats.png>
-Package pdftex.def Info: formats.png used on input line 1033.
+Package pdftex.def Info: formats.png used on input line 1035.
 (pdftex.def)             Requested size: 426.79135pt x 280.1161pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1039--1045
+Underfull \hbox (badness 10000) in paragraph at lines 1041--1047
 
  []
 
-<encoding1.png, id=765, 878.28125pt x 423.5825pt>
+<encoding1.png, id=799, 878.28125pt x 423.5825pt>
 File: encoding1.png Graphic file (type png)
  <use encoding1.png>
-Package pdftex.def Info: encoding1.png used on input line 1048.
+Package pdftex.def Info: encoding1.png used on input line 1050.
 (pdftex.def)             Requested size: 426.79135pt x 205.83798pt.
  [19 <./formats.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1054--1062
+Underfull \hbox (badness 10000) in paragraph at lines 1056--1064
 
  []
 
-<encoding2.png, id=774, 875.27pt x 408.52625pt>
+<encoding2.png, id=808, 875.27pt x 408.52625pt>
 File: encoding2.png Graphic file (type png)
  <use encoding2.png>
-Package pdftex.def Info: encoding2.png used on input line 1065.
+Package pdftex.def Info: encoding2.png used on input line 1067.
 (pdftex.def)             Requested size: 426.79135pt x 199.20093pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1071--1076
+Underfull \hbox (badness 10000) in paragraph at lines 1073--1078
 
  []
 
 [20 <./encoding1.png> <./encoding2.png>]
-<encoding3.png, id=781, 857.2025pt x 307.1475pt>
+<encoding3.png, id=815, 857.2025pt x 307.1475pt>
 File: encoding3.png Graphic file (type png)
  <use encoding3.png>
-Package pdftex.def Info: encoding3.png used on input line 1079.
+Package pdftex.def Info: encoding3.png used on input line 1081.
 (pdftex.def)             Requested size: 426.79135pt x 152.9266pt.
  [21 <./encoding3.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1210--1213
+Underfull \hbox (badness 10000) in paragraph at lines 1212--1215
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1214--1218
+Underfull \hbox (badness 10000) in paragraph at lines 1216--1220
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1219--1223
+Underfull \hbox (badness 10000) in paragraph at lines 1221--1225
 
  []
 
 [22]
-Underfull \hbox (badness 10000) in paragraph at lines 1295--1303
+Underfull \hbox (badness 10000) in paragraph at lines 1297--1305
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1313--1319
+Underfull \hbox (badness 10000) in paragraph at lines 1315--1321
 
  []
 
 [23]
-Underfull \hbox (badness 10000) in paragraph at lines 1320--1324
+Underfull \hbox (badness 10000) in paragraph at lines 1322--1326
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1356--1359
+Underfull \hbox (badness 10000) in paragraph at lines 1358--1361
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1362--1363
+Underfull \hbox (badness 10000) in paragraph at lines 1364--1365
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1397--1398
+Underfull \hbox (badness 10000) in paragraph at lines 1399--1400
 
  []
 
 [24]
-Underfull \hbox (badness 10000) in paragraph at lines 1455--1456
+Underfull \hbox (badness 10000) in paragraph at lines 1457--1458
 
  []
 
 [25]
-Underfull \hbox (badness 10000) in paragraph at lines 1498--1499
+Underfull \hbox (badness 10000) in paragraph at lines 1500--1501
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1541--1542
+Underfull \hbox (badness 10000) in paragraph at lines 1543--1544
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1576--1578
+Underfull \hbox (badness 10000) in paragraph at lines 1578--1580
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1579--1586
+Underfull \hbox (badness 10000) in paragraph at lines 1581--1588
 
  []
 
 [26]
-Underfull \hbox (badness 10000) in paragraph at lines 1587--1594
+Underfull \hbox (badness 10000) in paragraph at lines 1589--1596
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1595--1600
+Underfull \hbox (badness 10000) in paragraph at lines 1597--1602
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1601--1605
+Underfull \hbox (badness 10000) in paragraph at lines 1603--1607
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1610--1614
+Underfull \hbox (badness 10000) in paragraph at lines 1612--1616
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1615--1620
+Underfull \hbox (badness 10000) in paragraph at lines 1617--1622
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1621--1625
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1627
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1626--1629
+Underfull \hbox (badness 10000) in paragraph at lines 1628--1631
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1632--1633
+Underfull \hbox (badness 10000) in paragraph at lines 1634--1635
 
  []
 
 [27]
-Underfull \hbox (badness 10000) in paragraph at lines 1683--1684
+Underfull \hbox (badness 10000) in paragraph at lines 1685--1686
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1708--1716
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1718
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1717--1723
+Underfull \hbox (badness 10000) in paragraph at lines 1719--1725
 
  []
 
 [28]
-Underfull \hbox (badness 10000) in paragraph at lines 1737--1745
+Underfull \hbox (badness 10000) in paragraph at lines 1739--1747
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1801--1807
+Underfull \hbox (badness 10000) in paragraph at lines 1803--1809
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1808--1816
+Underfull \hbox (badness 10000) in paragraph at lines 1810--1818
 
  []
 
-[29] <translation.png, id=843, 347.79938pt x 261.97874pt>
+[29] <translation.png, id=877, 347.79938pt x 261.97874pt>
 File: translation.png Graphic file (type png)
 
 <use translation.png>
-Package pdftex.def Info: translation.png used on input line 1819.
+Package pdftex.def Info: translation.png used on input line 1821.
 (pdftex.def)             Requested size: 256.07741pt x 192.89784pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1825--1833
+Underfull \hbox (badness 10000) in paragraph at lines 1827--1835
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1834--1840
+Underfull \hbox (badness 10000) in paragraph at lines 1836--1842
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1841--1848
+Underfull \hbox (badness 10000) in paragraph at lines 1843--1850
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1849--1855
+Underfull \hbox (badness 10000) in paragraph at lines 1851--1857
 
  []
 
 [30 <./translation.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1904--1912
+Underfull \hbox (badness 10000) in paragraph at lines 1906--1914
 
  []
 
 [31]
-Underfull \hbox (badness 10000) in paragraph at lines 1943--1949
+Underfull \hbox (badness 10000) in paragraph at lines 1945--1951
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1950--1956
+Underfull \hbox (badness 10000) in paragraph at lines 1952--1958
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1957--1962
+Underfull \hbox (badness 10000) in paragraph at lines 1959--1964
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1963--1968
+Underfull \hbox (badness 10000) in paragraph at lines 1965--1970
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1969--1975
+Underfull \hbox (badness 10000) in paragraph at lines 1971--1977
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1976--1983
+Underfull \hbox (badness 10000) in paragraph at lines 1978--1985
 
  []
 
-[32] <pagetable1.png, id=864, 451.6875pt x 213.79875pt>
+[32] <pagetable1.png, id=898, 451.6875pt x 213.79875pt>
 File: pagetable1.png Graphic file (type png)
  <use pagetable1.png>
-Package pdftex.def Info: pagetable1.png used on input line 1997.
+Package pdftex.def Info: pagetable1.png used on input line 1999.
 (pdftex.def)             Requested size: 256.07741pt x 121.21735pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 2003--2014
+Underfull \hbox (badness 10000) in paragraph at lines 2005--2016
 
  []
 
-<pagetable2.png, id=866, 839.75705pt x 530.31929pt>
+<pagetable2.png, id=900, 839.75705pt x 530.31929pt>
 File: pagetable2.png Graphic file (type png)
  <use pagetable2.png>
-Package pdftex.def Info: pagetable2.png used on input line 2028.
+Package pdftex.def Info: pagetable2.png used on input line 2030.
 (pdftex.def)             Requested size: 320.0935pt x 202.13841pt.
 
 [33 <./pagetable1.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 2034--2043
+Underfull \hbox (badness 10000) in paragraph at lines 2036--2045
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2044--2050
+Underfull \hbox (badness 10000) in paragraph at lines 2046--2052
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2051--2059
+Underfull \hbox (badness 10000) in paragraph at lines 2053--2061
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2060--2070
+Underfull \hbox (badness 10000) in paragraph at lines 2062--2072
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2071--2079
+Underfull \hbox (badness 10000) in paragraph at lines 2073--2081
 
  []
 
 [34 <./pagetable2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 2080--2089
+Underfull \hbox (badness 10000) in paragraph at lines 2082--2091
 
  []
 
 [35] [36]
-Underfull \hbox (badness 10000) in paragraph at lines 2235--2239
+Underfull \hbox (badness 10000) in paragraph at lines 2237--2241
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2258--2266
+Underfull \hbox (badness 10000) in paragraph at lines 2260--2268
 
  []
 
 [37]
-Underfull \hbox (badness 10000) in paragraph at lines 2316--2322
+Underfull \hbox (badness 10000) in paragraph at lines 2318--2324
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2323--2331
+Underfull \hbox (badness 10000) in paragraph at lines 2325--2333
 
  []
 
 [38]
-Underfull \hbox (badness 10000) in paragraph at lines 2383--2389
+Underfull \hbox (badness 10000) in paragraph at lines 2385--2391
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2390--2395
+Underfull \hbox (badness 10000) in paragraph at lines 2392--2397
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2396--2403
+Underfull \hbox (badness 10000) in paragraph at lines 2398--2405
 
  []
 
 
-Overfull \hbox (12.5122pt too wide) in paragraph at lines 2411--2423
+Overfull \hbox (12.5122pt too wide) in paragraph at lines 2413--2425
  [] 
  []
 
 [39]
-Underfull \hbox (badness 10000) in paragraph at lines 2428--2434
+Underfull \hbox (badness 10000) in paragraph at lines 2430--2436
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2494--2500
+Underfull \hbox (badness 10000) in paragraph at lines 2496--2502
 
  []
 
 [40]
-Underfull \hbox (badness 10000) in paragraph at lines 2501--2513
+Underfull \hbox (badness 10000) in paragraph at lines 2503--2515
 
  []
 
 [41]
-Underfull \hbox (badness 10000) in paragraph at lines 2610--2614
+Underfull \hbox (badness 10000) in paragraph at lines 2612--2616
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2615--2618
+Underfull \hbox (badness 10000) in paragraph at lines 2617--2620
 
  []
 
 [42]
-Underfull \hbox (badness 10000) in paragraph at lines 2621--2626
+Underfull \hbox (badness 10000) in paragraph at lines 2623--2628
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2627--2630
+Underfull \hbox (badness 10000) in paragraph at lines 2629--2632
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2666--2671
+Underfull \hbox (badness 10000) in paragraph at lines 2668--2673
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2672--2677
+Underfull \hbox (badness 10000) in paragraph at lines 2674--2679
 
  []
 
 [43]
-Underfull \hbox (badness 10000) in paragraph at lines 2678--2684
+Underfull \hbox (badness 10000) in paragraph at lines 2680--2686
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2692--2697
+Underfull \hbox (badness 10000) in paragraph at lines 2694--2699
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2698--2701
+Underfull \hbox (badness 10000) in paragraph at lines 2700--2703
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2702--2707
+Underfull \hbox (badness 10000) in paragraph at lines 2704--2709
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2732--2737
+Underfull \hbox (badness 10000) in paragraph at lines 2734--2739
 
  []
 
 [44]
-Underfull \hbox (badness 10000) in paragraph at lines 2738--2743
+Underfull \hbox (badness 10000) in paragraph at lines 2740--2745
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2744--2748
+Underfull \hbox (badness 10000) in paragraph at lines 2746--2750
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2749--2755
+Underfull \hbox (badness 10000) in paragraph at lines 2751--2757
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2756--2760
+Underfull \hbox (badness 10000) in paragraph at lines 2758--2762
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2768--2772
+Underfull \hbox (badness 10000) in paragraph at lines 2770--2774
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2773--2776
+Underfull \hbox (badness 10000) in paragraph at lines 2775--2778
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2777--2780
+Underfull \hbox (badness 10000) in paragraph at lines 2779--2782
 
  []
 
 [45]
-Underfull \hbox (badness 10000) in paragraph at lines 2805--2811
+Underfull \hbox (badness 10000) in paragraph at lines 2807--2813
 
  []
 
 [46]
-Underfull \hbox (badness 10000) in paragraph at lines 2877--2882
+Underfull \hbox (badness 10000) in paragraph at lines 2879--2884
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2883--2888
+Underfull \hbox (badness 10000) in paragraph at lines 2885--2890
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2889--2894
+Underfull \hbox (badness 10000) in paragraph at lines 2891--2896
 
  []
 
 [47]
-Underfull \hbox (badness 10000) in paragraph at lines 3000--3003
+Underfull \hbox (badness 10000) in paragraph at lines 3002--3005
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3004--3010
+Underfull \hbox (badness 10000) in paragraph at lines 3006--3012
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3011--3017
+Underfull \hbox (badness 10000) in paragraph at lines 3013--3019
 
  []
 
 [48]
-Underfull \hbox (badness 10000) in paragraph at lines 3018--3022
+Underfull \hbox (badness 10000) in paragraph at lines 3020--3024
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3056--3061
+Underfull \hbox (badness 10000) in paragraph at lines 3058--3063
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3062--3066
+Underfull \hbox (badness 10000) in paragraph at lines 3064--3068
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3067--3073
+Underfull \hbox (badness 10000) in paragraph at lines 3069--3075
 
  []
 
 [49]
-Underfull \hbox (badness 10000) in paragraph at lines 3074--3079
+Underfull \hbox (badness 10000) in paragraph at lines 3076--3081
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3082--3087
+Underfull \hbox (badness 10000) in paragraph at lines 3084--3089
 
  []
 
 [50]
-Underfull \hbox (badness 10000) in paragraph at lines 3169--3173
+Underfull \hbox (badness 10000) in paragraph at lines 3171--3175
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3174--3180
+Underfull \hbox (badness 10000) in paragraph at lines 3176--3182
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3181--3186
+Underfull \hbox (badness 10000) in paragraph at lines 3183--3188
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3187--3192
+Underfull \hbox (badness 10000) in paragraph at lines 3189--3194
 
  []
 
 
-Overfull \hbox (5.20413pt too wide) in paragraph at lines 3195--3205
+Overfull \hbox (5.20413pt too wide) in paragraph at lines 3197--3207
  [] 
  []
 
 [51]
-Underfull \hbox (badness 10000) in paragraph at lines 3235--3240
+Underfull \hbox (badness 10000) in paragraph at lines 3237--3242
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3241--3246
+Underfull \hbox (badness 10000) in paragraph at lines 3243--3248
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3247--3252
+Underfull \hbox (badness 10000) in paragraph at lines 3249--3254
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3253--3259
+Underfull \hbox (badness 10000) in paragraph at lines 3255--3261
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3260--3265
+Underfull \hbox (badness 10000) in paragraph at lines 3262--3267
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3266--3271
+Underfull \hbox (badness 10000) in paragraph at lines 3268--3273
 
  []
 
 [52]
-Underfull \hbox (badness 10000) in paragraph at lines 3311--3316
+Underfull \hbox (badness 10000) in paragraph at lines 3313--3318
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3317--3321
+Underfull \hbox (badness 10000) in paragraph at lines 3319--3323
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3322--3327
+Underfull \hbox (badness 10000) in paragraph at lines 3324--3329
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3328--3333
+Underfull \hbox (badness 10000) in paragraph at lines 3330--3335
 
  []
 
-<scancodes.png, id=1013, 1017.8025pt x 404.51125pt>
+<scancodes.png, id=1048, 1017.8025pt x 404.51125pt>
 File: scancodes.png Graphic file (type png)
  <use scancodes.png>
-Package pdftex.def Info: scancodes.png used on input line 3336.
+Package pdftex.def Info: scancodes.png used on input line 3338.
 (pdftex.def)             Requested size: 426.79135pt x 169.62198pt.
 
 [53]
-Underfull \hbox (badness 10000) in paragraph at lines 3342--3347
+Underfull \hbox (badness 10000) in paragraph at lines 3344--3349
 
  []
 
@@ -2220,165 +2234,263 @@ Underfull \hbox (badness 10000) in paragraph at lines 3342--3347
 
 ]
 Chapter 4.
-<nexys2.jpg, id=1030, 602.25pt x 549.05125pt>
+<nexys2.jpg, id=1064, 602.25pt x 549.05125pt>
 File: nexys2.jpg Graphic file (type jpg)
  <use nexys2.jpg>
-Package pdftex.def Info: nexys2.jpg used on input line 3396.
+Package pdftex.def Info: nexys2.jpg used on input line 3398.
 (pdftex.def)             Requested size: 341.43437pt x 311.2869pt.
  [56
 
  <./nexys2.jpg>]
-Underfull \hbox (badness 10000) in paragraph at lines 3419--3424
+Underfull \hbox (badness 10000) in paragraph at lines 3421--3426
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3425--3429
+Underfull \hbox (badness 10000) in paragraph at lines 3427--3431
 
  []
 
-[57] <fpga.png, id=1040, 551.81157pt x 587.94656pt>
+[57] <fpga.png, id=1074, 551.81157pt x 587.94656pt>
 File: fpga.png Graphic file (type png)
  <use fpga.png>
-Package pdftex.def Info: fpga.png used on input line 3471.
+Package pdftex.def Info: fpga.png used on input line 3473.
 (pdftex.def)             Requested size: 426.79135pt x 454.75674pt.
  [58 <./fpga.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 3496--3502
+Underfull \hbox (badness 10000) in paragraph at lines 3498--3504
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3503--3508
+Underfull \hbox (badness 10000) in paragraph at lines 3505--3510
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3509--3513
+Underfull \hbox (badness 10000) in paragraph at lines 3511--3515
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3514--3518
+Underfull \hbox (badness 10000) in paragraph at lines 3516--3520
 
  []
 
-<pipeline.png, id=1048, 476.53032pt x 804.75656pt>
+<pipeline.png, id=1082, 476.53032pt x 804.75656pt>
 File: pipeline.png Graphic file (type png)
  <use pipeline.png>
-Package pdftex.def Info: pipeline.png used on input line 3525.
+Package pdftex.def Info: pipeline.png used on input line 3527.
 (pdftex.def)             Requested size: 362.77525pt x 612.67738pt.
  [59]
 [60 <./pipeline.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 3562--3566
+Underfull \hbox (badness 10000) in paragraph at lines 3564--3568
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3567--3572
+Underfull \hbox (badness 10000) in paragraph at lines 3569--3574
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3573--3578
+Underfull \hbox (badness 10000) in paragraph at lines 3575--3580
 
  []
 
-<memory.png, id=1060, 721.69624pt x 531.9875pt>
+<memory.png, id=1094, 721.69624pt x 531.9875pt>
 File: memory.png Graphic file (type png)
  <use memory.png>
-Package pdftex.def Info: memory.png used on input line 3586.
+Package pdftex.def Info: memory.png used on input line 3588.
 (pdftex.def)             Requested size: 362.77525pt x 267.41365pt.
  [61]
-Underfull \hbox (badness 10000) in paragraph at lines 3594--3598
+Underfull \hbox (badness 10000) in paragraph at lines 3596--3600
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3599--3606
+Underfull \hbox (badness 10000) in paragraph at lines 3601--3608
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3607--3612
+Underfull \hbox (badness 10000) in paragraph at lines 3609--3614
 
  []
 
-<vgaport.png, id=1066, 516.93124pt x 611.28375pt>
+<vgaport.png, id=1100, 516.93124pt x 611.28375pt>
 File: vgaport.png Graphic file (type png)
  <use vgaport.png>
-Package pdftex.def Info: vgaport.png used on input line 3615.
+Package pdftex.def Info: vgaport.png used on input line 3617.
 (pdftex.def)             Requested size: 256.07741pt x 302.82423pt.
- [62 <./memory.png>] <vga2.png, id=1072, 344.78813pt x 782.925pt>
+ [62 <./memory.png>] <vga2.png, id=1106, 344.78813pt x 782.925pt>
 File: vga2.png Graphic file (type png)
  <use vga2.png>
-Package pdftex.def Info: vga2.png used on input line 3652.
+Package pdftex.def Info: vga2.png used on input line 3654.
 (pdftex.def)             Requested size: 256.07741pt x 581.49385pt.
  [63 <./vgaport.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 3660--3664
+Underfull \hbox (badness 10000) in paragraph at lines 3662--3666
 
  []
 
 [64 <./vga2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 3671--3674
+Underfull \hbox (badness 10000) in paragraph at lines 3673--3676
 
  []
 
-<ps2port.png, id=1084, 863.225pt x 262.9825pt>
+<ps2port.png, id=1118, 863.225pt x 262.9825pt>
 File: ps2port.png Graphic file (type png)
  <use ps2port.png>
-Package pdftex.def Info: ps2port.png used on input line 3688.
+Package pdftex.def Info: ps2port.png used on input line 3690.
 (pdftex.def)             Requested size: 384.1096pt x 117.0168pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 3694--3701
+Underfull \hbox (badness 10000) in paragraph at lines 3696--3703
 
  []
 
-[65 <./ps2port.png>] <ps2prot.png, id=1090, 410.53375pt x 130.4875pt>
+[65 <./ps2port.png>] <ps2prot.png, id=1124, 410.53375pt x 130.4875pt>
 File: ps2prot.png Graphic file (type png)
 
 <use ps2prot.png>
-Package pdftex.def Info: ps2prot.png used on input line 3710.
+Package pdftex.def Info: ps2prot.png used on input line 3712.
 (pdftex.def)             Requested size: 298.75264pt x 94.9564pt.
  [66 <./ps2prot.png>] [67
 
 ]
 Chapter 5.
-[68
 
-] [69
+Underfull \hbox (badness 10000) in paragraph at lines 3731--3735
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3736--3743
+
+ []
+
+<firmware.png, id=1134, 367.3725pt x 826.58812pt>
+File: firmware.png Graphic file (type png)
+ <use firmware.png>
+Package pdftex.def Info: firmware.png used on input line 3769.
+(pdftex.def)             Requested size: 277.41176pt x 624.21527pt.
+ [68
+
+]
+[69 <./firmware.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 3795--3800
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3801--3806
+
+ []
+
+<os.png, id=1143, 507.39563pt x 1171.37625pt>
+File: os.png Graphic file (type png)
+ <use os.png>
+Package pdftex.def Info: os.png used on input line 3823.
+(pdftex.def)             Requested size: 277.41176pt x 640.45183pt.
+ [70]
+Overfull \vbox (5.39589pt too high) has occurred while \output is active []
+
+
+[71 <./os.png>] [72] [73
 
 ]
 Chapter 6.
-[70
+<res_devel.png, id=1176, 1028.34187pt x 578.16pt>
+File: res_devel.png Graphic file (type png)
+ <use res_devel.png>
+Package pdftex.def Info: res_devel.png used on input line 3866.
+(pdftex.def)             Requested size: 569.05511pt x 319.93864pt.
 
-] [71
+<res_early1.jpg, id=1177, 3613.5pt x 2168.1pt>
+File: res_early1.jpg Graphic file (type jpg)
+ <use res_early1.jpg>
+Package pdftex.def Info: res_early1.jpg used on input line 3873.
+(pdftex.def)             Requested size: 569.05511pt x 341.41139pt.
+
+<res_early2.jpg, id=1178, 3613.5pt x 2168.1pt>
+File: res_early2.jpg Graphic file (type jpg)
+ <use res_early2.jpg>
+Package pdftex.def Info: res_early2.jpg used on input line 3880.
+(pdftex.def)             Requested size: 569.05511pt x 341.41139pt.
+
+<res_crazy.jpg, id=1179, 1927.95282pt x 1626.075pt>
+File: res_crazy.jpg Graphic file (type jpg)
+ <use res_crazy.jpg>
+Package pdftex.def Info: res_crazy.jpg used on input line 3887.
+(pdftex.def)             Requested size: 569.05511pt x 479.9361pt.
+
+<res_bios.jpg, id=1180, 2235.10031pt x 1626.075pt>
+File: res_bios.jpg Graphic file (type jpg)
+ <use res_bios.jpg>
+Package pdftex.def Info: res_bios.jpg used on input line 3894.
+(pdftex.def)             Requested size: 569.05511pt x 413.98613pt.
+
+<res_bios2.jpg, id=1181, 3613.5pt x 2168.1pt>
+File: res_bios2.jpg Graphic file (type jpg)
+ <use res_bios2.jpg>
+Package pdftex.def Info: res_bios2.jpg used on input line 3901.
+(pdftex.def)             Requested size: 569.05511pt x 341.41139pt.
+
+<res_bootloader.jpg, id=1182, 1958.0653pt x 1626.075pt>
+File: res_bootloader.jpg Graphic file (type jpg)
+
+<use res_bootloader.jpg>
+Package pdftex.def Info: res_bootloader.jpg used on input line 3908.
+(pdftex.def)             Requested size: 569.05511pt x 472.56697pt.
+ <res_emu1.png, id=1183, 548.0475pt x 320.69812pt>
+File: res_emu1.png Graphic file (type png)
+
+<use res_emu1.png>
+Package pdftex.def Info: res_emu1.png used on input line 3915.
+(pdftex.def)             Requested size: 569.05511pt x 333.01903pt.
+ <res_emu2.png, id=1184, 548.0475pt x 320.69812pt>
+File: res_emu2.png Graphic file (type png)
+
+<use res_emu2.png>
+Package pdftex.def Info: res_emu2.png used on input line 3922.
+(pdftex.def)             Requested size: 569.05511pt x 333.01903pt.
+ <res_nessim.png, id=1185, 1028.34187pt x 578.16pt>
+File: res_nessim.png Graphic file (type png)
+
+<use res_nessim.png>
+Package pdftex.def Info: res_nessim.png used on input line 3929.
+(pdftex.def)             Requested size: 569.05511pt x 319.93864pt.
+ [74
+
+] [75 <./res_devel.png>] [76 <./res_early1.jpg>]
+[77 <./res_early2.jpg>] [78 <./res_crazy.jpg>] [79 <./res_bios.jpg>] [80 <./res
+_bios2.jpg>] [81 <./res_bootloader.jpg>] [82 <./res_emu1.png>] [83 <./res_emu2.
+png>] [84 <./res_nessim.png>] [85
 
 ]
 Chapter 7.
-[72
+[86
 
-] [73
+] [87
 
 ]
 Appendix A.
-[74
+[88
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3747.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3747.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3950.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3950.
  (./book.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3747.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3747.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3950.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3950.
 
 Package rerunfilecheck Info: File `book.out' has not changed.
-(rerunfilecheck)             Checksum: EB9FAE7F5622C8F13924F9FF5CA5D802;3949.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3747.
+(rerunfilecheck)             Checksum: 7FFB081D8DD534B299BD37F7691BC3DD;4067.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3950.
  ) 
 Here is how much of TeX's memory you used:
- 22942 strings out of 493061
- 407072 string characters out of 6140740
- 526811 words of memory out of 5000000
- 25654 multiletter control sequences out of 15000+600000
+ 23152 strings out of 493061
+ 409938 string characters out of 6140740
+ 528556 words of memory out of 5000000
+ 25804 multiletter control sequences out of 15000+600000
  95144 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  64i,13n,72p,406b,733s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -2395,10 +2507,10 @@ e/texmf-dist/fonts/type1/public/lm/lmss17.pfb></usr/share/texmf-dist/fonts/type
 1/public/lm/lmss8.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb
 ></usr/share/texmf-dist/fonts/type1/public/lm/lmsso12.pfb></usr/share/texmf-dis
 t/fonts/type1/public/lm/lmsy10.pfb>
-Output written on book.pdf (83 pages, 1282951 bytes).
+Output written on book.pdf (97 pages, 5791426 bytes).
 PDF statistics:
- 1242 PDF objects out of 1440 (max. 8388607)
- 1084 compressed objects within 11 object streams
- 314 named destinations out of 1000 (max. 500000)
- 21057 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 1373 PDF objects out of 1440 (max. 8388607)
+ 1186 compressed objects within 12 object streams
+ 355 named destinations out of 1000 (max. 500000)
+ 21133 words of extra memory for PDF output out of 24883 (max. 10000000)
 

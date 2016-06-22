@@ -37,6 +37,8 @@
 \usepackage{tikz}
 \usepackage{colortbl}
 \usepackage{xcolor}
+\usepackage{rotating}
+\usepackage{afterpage}
 
 % table of contents
 \usepackage{tocloft}
@@ -2415,7 +2417,7 @@ associated exceptions.
 
 \hline 0xBFC00180  & kseg1 & 0x1FC00180 & All types of exception, except reset. \\
 
-\hline 0xBFC00000  & kseg1 & 0x1FC00000 & Reset exceptions.\\
+\hline 0xBFC00000  & kseg1 & 0x1FC00000 & Reset exception.\\
 
 \hline
 
@@ -3724,9 +3726,210 @@ of zero is put on data bus, indicating an empty buffer.
 
 \chapter{Software}
 
+\section{Firmware}
+
+In the previous two chapters, we have described the architecture and the
+implementation of the hardware side of the machine. Now we turn our
+attention to system software. Firmware is the software component that
+is fixed in the ROM chip on Nexys II board and executed on start up.\\
+
+The size of the ROM chip is 16MB, and it appears in memory at physical
+addresses 0x1F000000 to 0x1FFFFFFF. MIPS processor starts execution
+at logical address 0xBFC00000 (RESET vector), which maps to physical
+address 0x1FC00000. Our firmware program is located in ROM at
+location 0xC00000, i.e, at 12MB boundary. Thus, the first instruction executed
+by the MIPS processor is actually the first instruction in the firmware
+program.\\
+
+Figure \ref{firmware} shows the UML class diagram of our firmware, which
+consists of the following components:
+
+\begin{itemize}
+
+\item Device Drivers:
+    \begin{itemize}
+    \item Interrupt controller driver.
+    \item Keyboard driver.
+    \item VGA driver.
+    \item Programmable Timer driver.
+    \end{itemize}
+\item PoST (Power-on self-test) routine.
+\item Boot procedure.
+\item Interrupt service routine.
+\item Shell program.
+
+\end{itemize}
+
+Firmware provides an interface that can be used by the operating system
+to access the routines provided by firmware drivers. However, the operating
+system (described in next section) has its own sophisticated device drivers.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{firmware.png}
+\end{center}
+\caption{Firmware Class Diagram}
+\label{firmware}
+\end{figure}
+
+The boot procedure of the firmware performs the following routines:
+
+\begin{enumerate}
+\item Initialize the interrupt controller.
+\item Initialize interrupt service routine operation.
+\item Initialize VGA.
+\item Initialize the programmable timer.
+\item Initialize the keyboard.
+\item Draw logo on screen and print start-up messages.
+\item Perform PoST and obtain RAM size.
+\item Load the boot-loader of the operating system.
+\end{enumerate}
+
+If the firmware fails to find a bootable medium, it drops to shell. If
+bootloader is successfully loaded to RAM, the bootloader takes control
+from firmware, and it starts loading the remaining parts of the operating
+system.
+
+\section{Operating System}
+
+We have chosen to port Quafios operating system to our machine, and use it
+as the default operating system of the computer. Quafios kernel is a
+monolithic kernel written in C and assembly. We have modified the kernel to
+let it work on MIPS architecture, and added the device drivers needed
+for our hardware.\\
+
+Quafios is currently stored inside the ROM chip. It is suggested that
+it is stored on an external medium in the feature, but this needs developing
+hardware components needed to interface the external medium. The part
+of the ROM that contains Quafios is actually an image for a Quafios disk,
+with a formatted \textit{diskfs} file system.\\
+
+The bootloader loads the kernel from location /boot/kernel.bin on the disk
+image stored on the ROM. When kernel is loaded, the bootloader passes
+control to the kernel which performs the following operations:
+
+\begin{enumerate}
+
+\item Initialize the CPU and paging system.
+\item Initialize memory management system.
+\item Load device drivers.
+\item Initialize the filesystem.
+\item Initialize process manager.
+
+\end{enumerate}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{os.png}
+\end{center}
+\caption{OS Class Diagram}
+\label{os}
+\end{figure}
+
+Figure \ref{os} shows the UML class diagram of the operating system. Quafios
+kernel consists of the following components (each component can be
+found under a separate directory inside \textit{<source\_code>/kernel/}):
+
+\begin{itemize}
+
+\item Architecture-dependant code. All MIPS-related code is organized
+      in one location, just like i386-related code, to allow portability.
+\item Memory manager, consists of three components:
+      \begin{itemize}
+      \item pmem: manager for physical memory.
+      \item kmem: manager for kernel memory.
+      \item umem: manager for user memory.
+      \end{itemize}
+\item Filesystem, a UNIX-like virtual filesystem. Various filesystems
+      are supported (called filesystem drivers), including the basic
+      filesystem for Quafios, `diskfs'.
+\item Device manager, with various device drivers that are loaded on
+      start-up, depending on the detected hardware.
+\item Process manager, includes the scheduler, inter-process communication,
+      and process-related routines.
+\end{itemize}
+
+Quafios provides a basic system call interface that lets user programs access
+the routines provided by the kernel, like open(), close(), read(), write(),
+mmap(), etc...
+
 %------------------------------------------------------------------------------%
 
 \chapter{Results}
+
+This chapter includes number of screenshots for our
+computer system, taken in various times through the development of
+this project.
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_devel.png}
+\end{center}
+\caption{Early development}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_early1.jpg}
+\end{center}
+\caption{CPU and VGA finished}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_early2.jpg}
+\end{center}
+\caption{720x400 resolution}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_crazy.jpg}
+\end{center}
+\caption{System went crazy during development}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_bios.jpg}
+\end{center}
+\caption{Firmware booting, no bootable medium}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_bios2.jpg}
+\end{center}
+\caption{Firmware booting, bootable medium found}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_bootloader.jpg}
+\end{center}
+\caption{Firmware booting, Quafios bootloader}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_emu1.png}
+\end{center}
+\caption{Firmware on emulator}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_emu2.png}
+\end{center}
+\caption{Quafios on emulator}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[ht]
+\begin{center}
+\includegraphics[width=20cm]{res_nessim.png}
+\end{center}
+\caption{Nintendo games on emulator}
+\end{sidewaysfigure}
 
 %------------------------------------------------------------------------------%
 
