@@ -39,6 +39,7 @@
 \usepackage{xcolor}
 \usepackage{rotating}
 \usepackage{afterpage}
+\usepackage[final]{pdfpages}
 
 % table of contents
 \usepackage{tocloft}
@@ -86,11 +87,60 @@
 \thispagestyle{plain}
 \chapter{Abstract}
 
+The goal of the project is to build a general-purpose computer system
+using FPGA technology. The system consists of several components
+connected together through a shared bus. The components include a CPU,
+memory, VGA interface, keyboard interface, interrupt controller, and
+a programmable timer. All hardware components are implemented in VHDL.\\
+
+The CPU is an implementation for MIPS-I instruction set architecture.
+It consists of a 5-stage pipeline, instruction cache, data cache, and
+a translation look-aside buffer (TLB). The CPU is connected (through
+system bus) to memory and other I/O devices.\\
+
+VGA interface provides an interface between the system and an external
+VGA-compatible monitor. Similarly, the keyboard interface component
+provides an interface between the system and an external PS/2 keyboard.
+The programmable timer component allows software to keep track
+with the time of day. Finally, the interrupt controller module manages
+various interrupt sources (timer and keyboard controller).\\
+
+We used Digilent Nexys II board, which includes a Xilinx Spartan-3E
+FPGA chip, along with a RAM chip, a ROM chip, VGA connector,
+PS/2 port, and other components. VHDL code is compiled, using Xilinx
+tools, and stored on a dedicated ROM chip on the board. When the board
+is powered up, the FPGA chip is automatically programmed with the
+code in the ROM, and our computer starts up.\\
+
+System software consists of a firmware program and the operating
+system. The firmware program is written in C and MIPS assembly,
+and stored on the ROM chip of Nexys II board. We chose to port
+Quafios operating system to run on our machine as the default OS.
+
 %------------------------------------------------------------------------------%
 
 \newpage
 \thispagestyle{plain}
 \chapter{Acknowledgements}
+
+Firstly, I would like to express my sincere gratitude to my advisor
+Prof. Layla Abou Hadid for her continuous support, motivation, and
+immense knowledge. Her guidance helped me in all the time of working
+on the project and writing of this thesis. \\
+
+Besides my advisor, I'd like to thank the rest of the discussion committee:
+Prof. Nazih ElDreeny,
+Prof. Hussein Hassan Aly, and
+Prof. Iman Elghandour,
+for their insightful comments on my work and the thesis.\\
+
+My sincere thanks also goes to the mother nature for providing me
+with electricity, without which I would have never been able to
+finish this work.\\
+
+Last but not the least, I would like to thank my family: my parents,
+my brother, and my sister for supporting me spiritually throughout working
+on this project and my my life in general.
 
 %------------------------------------------------------------------------------%
 
@@ -211,8 +261,8 @@ general-purpose computer system based on MIPS architecture
 using FPGA technology. Users shall communicate with the system using
 a command-line interface. Since the machine is `programmable', in the
 sense that end user can write programs, compile, and execute them, the machine
-can be used for any purpose. However, because the resources of the FPGA are
-very limited, the machine doesn't have a graphical user interface.
+can perform any computational procedure. However, because the resources of
+the FPGA are very limited, the machine doesn't have a graphical user interface.
 
 \section{Overview of Document}
 
@@ -277,8 +327,17 @@ future work.
 
 \chapter{Related Work}
 
-As far as we know, there is no work that can be related to this project...
-Actually, nobody really understands what we are doing in this project.
+Victor P. Rubio, from New Mexico State University, has presented an
+FPGA implementation of MIPS RISC processor that can be used for
+computer architecture education. There is also a number of cool projects
+online (like github) that implement MIPS microprocessor in VHDL and Verilog.\\
+
+In our project, we implement a general-purpose computer based on
+MIPS architecture, with input and output units, not just the processor
+itself. The computer also interfaces external I/O devices, like
+VGA monitor and keyboard. It can also be used for educational purposes
+in computer architecture
+courses that focus on the design of the whole system, not just the processor.\\
 
 %------------------------------------------------------------------------------%
 
@@ -3858,7 +3917,7 @@ mmap(), etc...
 \chapter{Results}
 
 This chapter includes number of screenshots for our
-computer system, taken in various times through the development of
+computer system, taken in various times throughout the development of
 this project.
 
 \begin{sidewaysfigure}[ht]
@@ -3935,13 +3994,126 @@ this project.
 
 \chapter{Conclusion}
 
+Using Nexys II FPGA board, we have built a general-purpose computer system
+based on MIPS-I instruction set architecture. We implemented a CPU, bus, memory,
+VGA interface, keyboard interface, interrupt controller, and a programmable
+timer. All hardware components are implemented in VHDL. User interacts
+with the system through a PS/2 keyboard and a VGA-compatible monitor. \\
+
+We also wrote firmware for the system and ported Quafios operating system
+to our machine. Software is stored on a ROM chip on Nexys II board,
+and our hardware design is stored on another dedicated ROM chip on
+the board (in a compiled form). When system starts up, FPGA chip
+is programmed with our hardware design, and the CPU starts executing
+firmware from ROM, and Quafios is finally loaded.
+
 \section{Future Work}
+
+We suggest the following modifications to our work:
+
+\begin{itemize}
+
+\item Optimize the design of the CPU so that it can work under frequency
+      of 50MHz instead of 25MHz.
+
+\item Add support for extra hardware interfaces, like SDCard and USB.
+
+\item Implement a C compiler for Quafios to make programming easier.
+
+\item Add support for sound and TCP/IP.
+
+\end{itemize}
 
 %------------------------------------------------------------------------------%
 
-\appendix
-
-\chapter{Instruction Listing}
+% \appendix
+%
+% \chapter{Instruction Listing}
+%
+% This appendix contains a comprehensive description for MIPS-I instructions.
+%
+% \newcommand{\includepdfpage}[1]
+% {
+% \begin{figure}[H]
+% \hspace{-3.5cm}\includegraphics[page=#1,width=22cm]{mips-iv.pdf}
+% \end{figure}
+% }
+%
+% \includepdfpage{38}
+% \includepdfpage{39}
+% \includepdfpage{38}
+% \includepdfpage{39}
+% \includepdfpage{40}
+% \includepdfpage{41}
+% \includepdfpage{42}
+% \includepdfpage{43}
+% \includepdfpage{44}
+% \includepdfpage{46}
+% \includepdfpage{47}
+% \includepdfpage{51}
+% \includepdfpage{53}
+% \includepdfpage{55}
+% \includepdfpage{56}
+% \includepdfpage{60}
+% \includepdfpage{62}
+% \includepdfpage{63}
+% \includepdfpage{70}
+% \includepdfpage{71}
+% \includepdfpage{72}
+% \includepdfpage{86}
+% \includepdfpage{87}
+% \includepdfpage{88}
+% \includepdfpage{89}
+% \includepdfpage{90}
+% \includepdfpage{91}
+% \includepdfpage{101}
+% \includepdfpage{102}
+% \includepdfpage{107}
+% \includepdfpage{108}
+% \includepdfpage{109}
+% \includepdfpage{110}
+% \includepdfpage{111}
+% \includepdfpage{112}
+% \includepdfpage{113}
+% \includepdfpage{114}
+% \includepdfpage{115}
+% \includepdfpage{116}
+% \includepdfpage{117}
+% \includepdfpage{119}
+% \includepdfpage{120}
+% \includepdfpage{123}
+% \includepdfpage{124}
+% \includepdfpage{125}
+% \includepdfpage{126}
+% \includepdfpage{127}
+% \includepdfpage{128}
+% \includepdfpage{129}
+% \includepdfpage{133}
+% \includepdfpage{149}
+% \includepdfpage{150}
+% \includepdfpage{151}
+% \includepdfpage{152}
+% \includepdfpage{153}
+% \includepdfpage{154}
+% \includepdfpage{155}
+% \includepdfpage{156}
+% \includepdfpage{157}
+% \includepdfpage{158}
+% \includepdfpage{159}
+% \includepdfpage{160}
+% \includepdfpage{161}
+% \includepdfpage{162}
+% \includepdfpage{163}
+% \includepdfpage{164}
+% \includepdfpage{165}
+% \includepdfpage{166}
+% \includepdfpage{167}
+% \includepdfpage{168}
+% \includepdfpage{169}
+% \includepdfpage{170}
+% \includepdfpage{175}
+% \includepdfpage{188}
+% \includepdfpage{189}
 
 %------------------------------------------------------------------------------%
 
