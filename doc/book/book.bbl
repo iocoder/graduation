@@ -1,0 +1,46 @@
+\begin{thebibliography}{1}
+
+\bibitem{victor}
+Victor~P. Rubio.
+\newblock {\em A FPGA Implementation of a MIPS RISC Processor for Computer
+  Architecture Education}.
+\newblock New Mexico State University, 2004.
+
+\bibitem{clements}
+Alan Clements.
+\newblock {\em Principles of Computer Hardware}.
+\newblock Oxford University Press, fourth edition, 2006.
+
+\bibitem{mips_isa}
+Charles Price.
+\newblock {\em MIPS IV Instruction Set}.
+\newblock MIPS Technologies, Inc, 1995.
+
+\bibitem{r3000a}
+{\em IDT R30xx Family Software Reference Manual}.
+\newblock Integrated Device Technology, Inc, 1994.
+
+\bibitem{nexys2_rm}
+{\em Digilent Nexys2 Board Reference Manual}.
+\newblock Digilent, Inc, 2011.
+
+\bibitem{comporg}
+John L.~Hennessy David A.~Patterson.
+\newblock {\em Computer Organization and Design - The Hardware/Software
+  Interface}.
+\newblock Morgan Kaufmann, fourth edition, 2012.
+
+\bibitem{morgan_claypool}
+Grigorios~Magklis Antonio~Gonzalez, Fernando~Lattore.
+\newblock {\em Processor Microarchitecture - An Implementation Perspective}.
+\newblock Morgan \& Claypool, 2011.
+
+\bibitem{nexys2_bist}
+{\em Nexys 2 Built In Self Test Manual}.
+\newblock Digilent, Inc, 2009.
+
+\bibitem{nexys2_memcfg}
+{\em OnBoard MemCfg Reference Project}.
+\newblock Digilent, Inc, 2009.
+
+\end{thebibliography}

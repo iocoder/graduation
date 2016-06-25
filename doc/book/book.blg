@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Arch Linux)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: book.aux
+The style file: unsrt.bst
+Database file #1: ref.bib
+Warning--empty author and editor in r3000a
+Warning--empty author and editor in nexys2_rm
+Warning--empty author and editor in nexys2_bist
+Warning--empty author and editor in nexys2_memcfg
+You've used 9 entries,
+            1791 wiz_defined-function locations,
+            482 strings with 4309 characters,
+and the built_in function-call counts, 1266 in all, are:
+= -- 104
+> -- 24
+< -- 0
++ -- 14
+- -- 5
+* -- 45
+:= -- 182
+add.period$ -- 23
+call.type$ -- 9
+change.case$ -- 2
+chr.to.int$ -- 0
+cite$ -- 13
+duplicate$ -- 94
+empty$ -- 172
+format.name$ -- 5
+if$ -- 304
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 14
+newline$ -- 44
+num.names$ -- 5
+pop$ -- 61
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 22
+stack$ -- 0
+substring$ -- 0
+swap$ -- 9
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 4
+while$ -- 5
+width$ -- 10
+write$ -- 86
+(There were 4 warnings)

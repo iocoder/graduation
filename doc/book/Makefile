@@ -1,5 +1,6 @@
 all:
 	pdflatex book.tex
+	bibtex   book
 	pdflatex book.tex
 	pdflatex book.tex
 

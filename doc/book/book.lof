@@ -11,7 +11,7 @@
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Instructions encoded by function field when opcode field = $SPECIAL$}}{20}{figure.3.4}
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Instructions encoded by rt field when opcode = $REGIMM$}}{21}{figure.3.5}
 \contentsline {figure}{\numberline {3.6}{\ignorespaces All possible addressing modes}}{21}{figure.3.6}
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Conventional names/uses of MIPS registers}}{23}{figure.3.7}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Conventional names/uses of MIPS registers \cite {r3000a}}}{23}{figure.3.7}
 \contentsline {figure}{\numberline {3.8}{\ignorespaces Control registers}}{24}{figure.3.8}
 \contentsline {figure}{\numberline {3.9}{\ignorespaces Format of Index register}}{24}{figure.3.9}
 \contentsline {figure}{\numberline {3.10}{\ignorespaces Format of EntryLo register}}{25}{figure.3.10}
