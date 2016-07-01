@@ -7,7 +7,7 @@
     \large Mostafa Abd El-Aziz\\
     \and
     \large Supervisor\\
-    \large Prof. Dr. Layla Abou Hadid\\
+    \large Prof. Dr. Layla Abou Hadeed\\
 }
 \date{\vspace{-5ex}}
 
@@ -40,6 +40,7 @@
 \usepackage{rotating}
 \usepackage{afterpage}
 \usepackage[final]{pdfpages}
+\usepackage{tabularx}
 
 % table of contents
 \usepackage{tocloft}
@@ -66,6 +67,12 @@
 
 % verbatim
 \usepackage{fancyvrb}
+
+\renewcommand*{\cleardoublepage}{\clearpage\if@twoside \ifodd\c@page\else
+\blankpage
+\thispagestyle{empty}
+\newpage
+\if@twocolumn\hbox{}\newpage\fi\fi\fi}
 
 %------------------------------------------------------------------------------%
 
@@ -112,10 +119,11 @@ tools, and stored on a dedicated ROM chip on the board. When the board
 is powered up, the FPGA chip is automatically programmed with the
 code in the ROM, and our computer starts up.\\
 
-System software consists of a firmware program and the operating
-system. The firmware program is written in C and MIPS assembly,
+System software consists of a firmware program and the operating system (OS).
+The firmware program is written in C and MIPS assembly,
 and stored on the ROM chip of Nexys II board. We chose to port
-Quafios operating system to run on our machine as the default OS.
+Quafios (a general-purpose OS written for IBM PC) to run on
+our machine as the default OS.
 
 %------------------------------------------------------------------------------%
 
@@ -124,21 +132,15 @@ Quafios operating system to run on our machine as the default OS.
 \chapter{Acknowledgements}
 
 Firstly, I would like to express my sincere gratitude to my advisor
-Prof. Layla Abou Hadid for her continuous support, motivation, and
+Prof. Layla Abou Hadeed for her continuous support, motivation, and
 immense knowledge. Her guidance helped me in all the time of working
 on the project and writing of this thesis. \\
-
-Besides my advisor, I'd like to thank the rest of the discussion committee:
-Prof. Nazih ElDreeny,
-Prof. Hussein Hassan Aly, and
-Prof. Iman Elghandour,
-for their insightful comments on my work and the thesis.\\
 
 %My sincere thanks also goes to the mother nature for providing me
 %with electricity, without which I would have never been able to
 %finish this work.\\
 
-Last but not the least, I would like to thank my family: my parents,
+I would like also to thank my family: my parents,
 my brother, and my sister for supporting me spiritually throughout working
 on this project and my life in general.
 
@@ -199,7 +201,7 @@ computer system using a cheap FPGA device. \\
 
 \section{Overview}
 
-In this project we shall use FPGA technology to implement a general-purpose
+In this project we use FPGA technology to implement a general-purpose
 computer machine based on MIPS-I instruction set architecture. We define the
 term `general-purpose computer' as a computer that should be able to
 perform most common computing tasks, like editing documents, performing
@@ -238,8 +240,8 @@ is stored on the ROM chip.
 \end{figure}
 
 The system actually consists of several layers: hardware, firmware, and
-software. User interacts with applications that runs over the operating
-system. Figure \ref{layers} shows the layered architecture of the system.
+software. User interacts with applications that runs over the OS.
+Figure \ref{layers} shows the layered architecture of the system.
 
 \begin{figure}[H]
 \begin{center}
@@ -251,14 +253,14 @@ system. Figure \ref{layers} shows the layered architecture of the system.
 
 When the computer boots up, CPU starts executing firmware instructions that
 are stored on the ROM chip on the board. Firmware initializes the hardware
-components and loads the operating system into RAM. The OS boots up
+components and loads the OS into RAM. The OS boots up
 the machine and provides a user-friendly interface to the end user.
 
 \section{Scope of Project}
 
 As we mentioned in the overview section, the goal of this project is to build a
 general-purpose computer system based on MIPS architecture
-using FPGA technology. Users shall communicate with the system using
+using FPGA technology. Users can communicate with the system using
 a command-line interface. Since the machine is `programmable', in the
 sense that end user can write programs, compile, and execute them, the machine
 can perform any computational procedure. However, because the resources of
@@ -267,7 +269,7 @@ the FPGA are very limited, the machine doesn't have a graphical user interface.
 \section{Overview of Document}
 
 In this document, we describe the architecture and the implementation
-of the proposed computer system in details. First, we shall define two
+of the proposed computer system in details. First, we define two
 keywords that will be used throughout the document:
 
 \begin{itemize}
@@ -314,7 +316,7 @@ memory, and I/O devices.
 on FPGA using VHDL language.
 
 \item \textbf{Software}: Shows the architecture of the firmware and the
-operating system.
+OS.
 
 \item \textbf{Results}: Screenshots and sample runs for the system.
 
@@ -329,9 +331,118 @@ future work.
 
 Victor P. Rubio, from New Mexico State University, has presented an
 FPGA implementation of MIPS RISC processor that can be used for
-computer architecture education \cite{victor}.
-There is also a number of cool projects
-online (like github) that implement MIPS microprocessor in VHDL and Verilog.\\
+computer architecture education \cite{victor}. This project targets computer
+architecture courses and presents an FPGA implementation design of a MIPS
+RISC (Reduced Instruction Set Computer) processor in VHDL.\\
+
+The main goal of Rubio's work is to enhance the simulator-based approach
+of computer architecture education by integrating some hardware design
+in labs. The project helps student learn and understand both MIPS
+single-cycle and pipelined implementations described in
+\textit{Computer Organization and Design - The Hardware/Software Interface}
+textbook by David A. Patterson and John L. Hennessy \cite{comporg}.\\
+
+The project features two implementations for the MIPS architecture
+described in the textbook:
+
+\begin{itemize}
+
+\item \textbf{Single-cycle implementation}:
+
+The MIPS single-cycle processor performs the tasks of instruction fetch,
+instruction decode, execution, memory access and
+register write-back all in one clock cycle. The initial task for the project
+is to implement the MIPS single-cycle processor in VHDL.
+
+\item \textbf{Pipelined implementation}:
+
+Once the MIPS single-cycle VHDL implementation was completed, the next task
+was to pipeline the MIPS processor. Pipelining improved both clock speed and
+overall performance, and allowed the processor to work on different steps of
+instructions at the same time. To pipeline the VHDL MIPS single-cycle
+implementation, the datapath was divided into different modules.
+During a single clock cycle, each one of those modules or stages is in use
+at exactly the same time executing on different instructions in parallel.
+
+\end{itemize}
+
+Table \ref{rubio} shows MIPS core instructions which are implemented
+by Rubio's project. The \$r\# operands refer to register operands
+of various instructions. \$r1 is destination register, while
+\$r2 and \$r3 are source registers.
+
+\begin{figure}[H]
+\begin{center}
+
+\footnotesize
+
+\begin{tabularx}{\textwidth}{|c|c|c|c|X|X|}
+
+\hline \textbf{Instruction} &
+       \textbf{Symbol} &
+       \textbf{Format} &
+       \textbf{Example} &
+       \textbf{Meaning} &
+       \textbf{Comments} \\
+
+\hline Add & add & R & add \$r1, \$r2, \$r3 &
+       \$r1 = \$r2 + \$r3 & overflow detected \\
+
+\hline Add Immediate & addi & I & addi \$r1, \$r2, 100 &
+       \$r1 = \$r2 + 100 & plus constant \\
+
+\hline Add Unsigned & addu & R & addu \$r1, \$r2, \$r3 &
+       \$r1 = \$r2 + \$r3 & overflow undetected \\
+
+\hline Subtract & sub & R & sub \$r1, \$r2, \$r3 &
+       \$r1 = \$r2 - \$r3 & overflow detected \\
+
+\hline Subtract Unsigned & subu & R & subu \$r1, \$r2, \$r3 &
+       \$r1 = \$r2 - \$r3 & overflow undetected \\
+
+\hline And & and & R & and \$r1, \$r2, \$r3 &
+       \$r1 = \$r2 \& \$r3 & bitwise logical and \\
+
+\hline Or & or & R & Or \$r1, \$r2, \$r3 &
+       \$r1 = \$r2 | \$r3 & bitwise logical or \\
+
+\hline Shift Left Logical & sll & R & sll \$r1, \$r2, 10 &
+       \$r1 = \$r2 << 10 & shift left by constant \\
+
+\hline Shift Right Logical & srl & R & srl \$r1, \$r2, 10 &
+       \$r1 = \$r2 >> 10 & shift right by constant \\
+
+\hline Set Less Than & slt & R & slt \$r1, \$r2, \$r3 &
+       if (\$r2 < \$r3) \$r1= 1 else 0 & compare less than \\
+
+\hline Load Word & lw & I & lw \$r1, 100(\$r2) &
+       \$r1 = mem(\$r2 + 100) & load word from mem to reg \\
+
+\hline Store Word & sw & I & sw \$r1, 100(\$r2) &
+       mem(\$r2 + 100) = \$r1 & store word from reg to mem \\
+
+\hline Branch on Equal & beq & I & beq \$r1, \$r2, 25 &
+       if (\$r1 = \$r2) goto PC + 4 + 100 & equal test \\
+
+\hline Branch on Not Equal & bne & I & bne \$r1, \$r2, 25 &
+       if (\$r1 != \$r2) goto PC + 4 + 100 & not equal test \\
+
+\hline Jump & j & J & j 100 & goto 400 & jump to target address \\
+
+\hline
+
+\end{tabularx}
+
+\end{center}
+\caption{MIPS core instruction implemented by Rubio}
+\label{rubio}
+\end{figure}
+
+Rubio's implementation doesn't cover the whole instruction set of MIPS-I
+instruction set architecture. It basically implements the basic MIPS
+core illustrated in chapters 5 and 6 of Patterson and Hennessy's textbook
+\cite{comporg}. In contrast, our computer implements the complete MIPS-I
+instruction set, with support for paging, caching, and exceptions.\\
 
 In our project, we implement a general-purpose computer based on
 MIPS architecture, with input and output units, not just the processor
@@ -385,7 +496,7 @@ driving the system bus at any time. CPU fetches/writes data from/to
 memory and I/O devices through system bus. When CPU needs to access
 a word in memory (or an I/O device), CPU puts the address corresponding
 to the word in memory or the target I/O device on address bus. The device
-shall respond to the access request by reading/writing data from/to data
+should respond to the access request by reading/writing data from/to data
 bus.
 
 \item \textbf{System Bus}:
@@ -436,7 +547,7 @@ the interrupt controller for more information about the interrupt source.
 
 \item \textbf{Programmable Interval Timer}:
 
-Used by the operating system to keep track of the time of day. Can be
+Used by the OS to keep track of the time of day. Can be
 programmed to trigger an interrupt every specific interval configured
 by the OS. Details of the architecture of the interval timer will be
 seen later in this chapter.
@@ -450,6 +561,51 @@ a key is pressed down).
 
 \end{itemize}
 
+\section{Design Considerations}
+\label{design_considers}
+
+The proposed design is implemented using a Spartan-3E FPGA chip.
+The FPGA chip has very limited resources, this limitation in resources
+implies that the design must be well-crafted to fit in the device
+and must make the optimal use of all available resources.\\
+
+Limitations include:
+
+\begin{itemize}
+
+\item \textbf{Clock rate}:
+
+      The chip is connected to a 50MHz crystal oscillator.
+      This low frequency requires that the procedures performed by
+      hardware and software must be simple and shouldn't take much time.
+
+\item \textbf{Propagation delays}:
+
+      Various components of the FPGA chip have various time delays.
+      These propagation delays impose timing constraints on the design
+      of various circuits.
+
+\item \textbf{Limited RAM blocks}:
+
+      The RAM blocks on the FPGA chip are limited. This means that
+      there are physical limitations imposed on the buffers and
+      registers of the processor and I/O devices.
+
+\item \textbf{Limited logic components}:
+
+      Lookup tables (LUTs), multiplexors, adders, and various logic
+      elements of the FPGA chip are limited. This implies that
+      we need to minimize the hardware components of our design.
+
+\end{itemize}
+
+All these limitations have led us to various design decisions. The decisions
+are discussed in section \ref{design_decisions}. We will first explain the
+design of the components in the following sections, then summarize up
+the design choices and decisions in the last section. Actually, section
+\ref{design_decisions} answers a very important question, which is
+why the system is designed that way.
+
 \section{Central Processing Unit}
 
 The CPU module implements MIPS-I instruction set architecture along with
@@ -462,7 +618,7 @@ interface.
 
 CPU instruction (also called order, operation) is the basic unit
 of execution. The main task of a processor is to execute a sequence
-of instructions (i.e, program) which shall have effect on the state
+of instructions (i.e, program) which affect the state
 of the processor and devices connected with the processor \cite{clements}.\\
 
 Following Von Neumann's model, the program is stored in memory along
@@ -475,7 +631,7 @@ Every word in memory has an address, that also means that every
 instruction in memory has an address called `instruction address'.
 CPU maintains a register that stores the instruction address of
 next instruction to fetch, called program counter (PC). When an
-instruction is fetched, program counter is increased by 4 (number
+instruction is fetched, PC is increased by 4 (number
 of bytes in word) without touching lower 2 bits (they are
 always zero), a behaviour which implies that:
 
@@ -490,10 +646,33 @@ always zero), a behaviour which implies that:
 
 \end{itemize}
 
-It is important to note that MIPS-I instruction set is a proper
-subset of the instruction set of our processor; meaning that
+At this point, it is important to illustrate the difference between
+a standard instruction set architecture that
+is globally standardized in standard specifications, and what is
+considered as innovation. MIPS instructions presented in this
+section are standard, except control instructions which are of
+our own design.\\
+
+MIPS ISA also defines a set of registers that are standard and
+should be implemented in all MIPS processors. Other registers
+(illustrated in next sub-section under the name `control registers')
+are of our own design. There is a great similarity between
+the design of our control instructions/registers and the design of
+R3000 processor \cite{r3000a}. The
+main reason for this similarity is to make software written for our processor
+easily portable to IDT MIPS-32 processors, and vice-versa.\\
+
+The remaining parts of the processor (MMU, TLB, and cache) are also
+of our own innovation and are not part of the MIPS instruction set.
+The design of ther hardware components (keyboard controller, VGA,
+memory interface, etc...) is independent of the processor and of the
+MIPS instruction set architecture. It is our own design as well. \\
+
+Here we note that MIPS-I instruction set architecture is a proper
+subset of the instruction set architecture of our processor; this means that
 the processor supports additional instructions and registers that
-control the behaviour of the processor as will be seen below.\\
+control the behaviour of the processor as illustrated in this
+sub-section and in the following sub-sections.\\
 
 CPU instructions are divided into the following groups:
 
@@ -506,6 +685,12 @@ CPU instructions are divided into the following groups:
 \item Control
 
 \end{enumerate}
+
+We used information from \textit{MIPS IV Instruction Set} by
+Charles Price \cite{mips_isa} to illustrate the behaviour of
+the instructions in first four groups. Last group (control instructions)
+include instructions that are related to our design and
+are not included within the standard architecture.
 
 \subsubsection{Load and Store Instructions}
 
@@ -600,7 +785,7 @@ according to how they are encoded:
 
 \begin{enumerate}
 
-\item ALU instructions with an immediate operand
+\item ALU instructions with immediate operand
 \item ALU instructions with three operands
 \item Shift instructions
 \item Multiply and divide instructions.
@@ -621,7 +806,7 @@ with immediate operand) is encoded exactly the same way as
 memory instructions. Both groups are included in the same
 encoding class (called I-TYPE) as will be seen later in
 the encoding subsubsection. Just like memory instructions,
-an ALU instruction with an immediate operand shall consist
+an ALU instruction with an immediate operand consists
 of the following fields:
 
 \begin{itemize}
@@ -798,7 +983,7 @@ above, please refer to \cite{mips_isa}.
 \subsubsection{Jump and Branch Instructions}
 
 MIPS-I architecture defines a number of operations that control the path
-of execution. Jump instruction shall unconditionally modify PC register,
+of execution. Jump instruction unconditionally modifies the PC register,
 while branch instructions modify PC register only when the condition
 specified within the instruction word is tautology.\\
 
@@ -853,7 +1038,7 @@ Second group (jump instructions to absolute address) consists of instructions
 similar to instructions of the first group, yet have the ability to jump
 to any memory location, not just locations inside the current 256MB region.
 These instructions are encoded as R-TYPE like most ALU instructions, thus
-the instruction word shall consist of the following fields:
+the instruction word consists of the following fields:
 
 \begin{itemize}
 
@@ -866,8 +1051,8 @@ the instruction word shall consist of the following fields:
 
 \item \textbf{Destination register}: for JALR instruction, this field
                                      contains the address of the register
-                                     where return address shall be stored.
-                                     For JAL instruction, this field should
+                                     where return address will be stored.
+                                     For JR instruction, this field should
                                      be zero.
 
 \item \textbf{Shift amount}: must be zero. (5 bits)
@@ -941,7 +1126,7 @@ The group consists of the following instructions:
                          Comparing Against Zero:}} \\
 
 The fourth group is also encoded as I-TYPE instructions,
-however, the fields shall have special values and meanings:
+however, the fields have special values and meanings:
 
 \begin{itemize}
 
@@ -952,7 +1137,7 @@ however, the fields shall have special values and meanings:
                                 that will be compared against zero. (5 bits)
 
 \item \textbf{Destination register}: used as an extension to the opcode field.
-                                     This field shall contain a unique
+                                     This field contains a unique
                                      identifier for the operation to be
                                      performed. (5 bits)
 
@@ -991,8 +1176,8 @@ to the exception handler. This behaviour is similar to
 software interrupts in x86 architecture.\\
 
 The format of this class of instructions is similar to R-TYPE,
-with the `code' field replacing source register,
-target register, destination register, and shift amount fields:
+with the `code' field replacing source register 1,
+source register 2, destination register, and shift amount fields:
 
 \begin{itemize}
 
@@ -1030,7 +1215,7 @@ purposes to coprocessor 0, thus we allocate coprocessor 0 instructions
 for system control. Coprocessor instructions are specified by system
 designer, not MIPS-I ISA itself.\\
 
-In this document, we shall use the keyword `control instructions' to
+In this document, we will use the keyword `control instructions' to
 refer to this group of instructions. Control instructions are R-TYPE
 instructions with the following fields:
 
@@ -1087,8 +1272,21 @@ above, please refer to \cite{mips_isa}.
 
 As seen above, all instructions are encoded using either R-TYPE, I-TYPE,
 or J-TYPE format. Figure \ref{formats} summarizes the three formats and their
-corresponding fields. Note that field use/meaning depends on the
-encoded instruction itself, not the format.\\
+corresponding fields, which are denoted as follows:
+
+\begin{itemize}
+
+\item \textbf{opcode}: the field where opcode is stored.
+\item \textbf{rs}: source register 1.
+\item \textbf{rt}: source register 2, also called target register.
+\item \textbf{rd}: destination register.
+\item \textbf{sa}: shift amount field.
+\item \textbf{offset}: the offset field of I-TYPE instructions.
+\item \textbf{instr\_index}: the index of jump instructions.
+\item \textbf{function}:
+the field where function code is stored for ALU instructions.
+
+\end{itemize}
 
 \begin{figure}[H]
 \begin{center}
@@ -1231,7 +1429,7 @@ of the running program:
       acquired by the load instruction (addresses the same
       register), a data hazard will occur since ALU must wait
       until MEM unit is done fetching data from memory. This
-      shall delay the execution of the ALU instruction by
+      should delay the execution of the ALU instruction by
       one delay slot (stalls the pipeline for one slot).
 
 \item \textbf{Consequent control instructions}: A control instruction
@@ -1249,7 +1447,7 @@ of the running program:
       therefore they might stall the pipeline.
 
 \item \textbf{Cache misses}:
-      The pipeline shall stall if the instruction to
+      The pipeline will stall if the instruction to
       be fetched or data specified by load instruction is not in cache.
       Furthermore, store instructions would always stall the pipeline
       since the cache system is write-through. This means that an
@@ -1257,7 +1455,7 @@ of the running program:
       miss happens.
 
 \item \textbf{Unaligned memory access}:
-      This class of instructions shall take
+      This class of instructions take
       more than one CPU clock cycles because atomic access to unaligned
       word is not possible.
 
@@ -1280,8 +1478,8 @@ LO and HI registers.\\
 
 In addition to registers defined by MIPS standard, our processor
 contains special registers that control the behaviour of the processor,
-called `control registers'. Surprisingly, control registers are
-accessible through control instructions.\\
+called `control registers'. Control registers are
+accessed using control instructions.\\
 
 \subsubsection{General-Purpose Registers}
 
@@ -1365,10 +1563,10 @@ parallel 32-bit registers) then moved to the GPRs in two steps.\\
 
 The intermediate registers are called LO and HI registers. Each
 one of them is 32-bit wide, so you can see them as one 64-bit
-register which is can be accessed in halfs. LO
+register which can be accessed in halfs. LO
 and HI can be read using MFLO and MFHI instructions, each of which
 copies the value of LO or HI register into a general-purpose register.
-The HI and LO registers can also altered by MTLO and MTHI instructions.
+The HI and LO registers can also be altered by MTLO and MTHI instructions.
 
 \subsubsection{Control Registers}
 
@@ -1446,8 +1644,8 @@ Detailed description for fields in figure \ref{index_reg}:
 
 \begin{itemize}
 
-\item \textbf{Index}: Before the operating system reads
-      or modifies a TLB entry, it shall first write the
+\item \textbf{Index}: Before the OS attempts to read
+      or modify a TLB entry, it should first write the
       index for the target TLB entry in this field using
       MTC0 instruction. After then, the OS issues a TLB
       read or TLB write using TLBR or TLBWI instruction.
@@ -1627,7 +1825,7 @@ Detailed description for fields in figure \ref{status_reg}:
 
 \item \textbf{IEc}: Interrupt enable/disable flag. When software
       writes 1 to this field, interrupts are enabled. When software
-      writes to this field, interrupts are disabled and do not trigger
+      writes 0 to this field, interrupts are disabled and do not trigger
       any exception. This field is reset to 0 by hardware on two events:
 
       \begin{enumerate}
@@ -1793,6 +1991,8 @@ Detailed description for fields in figure \ref{epc_reg}:
 
 \end{itemize}
 
+\newpage
+
 \subsection{Memory Management}
 \label{ssec:memman}
 
@@ -1845,7 +2045,7 @@ and physical address. We define both terms as follows:
 an instruction from the prespective of the running program. This simply
 means that a program doesn't see memory as it is in reality. The
 running program doesn't need to know the real address of the memory
-item it is currently addressing, but the operating system must
+item it is currently addressing, but the OS must
 provide the mapping between the logical address of a memory item
 and its real location in memory. This mapping is used by translation
 circuitry that translates logical address to the real location
@@ -1910,7 +2110,7 @@ informs the CPU of the mapping. \\
 
 It's important to note that some authors use terms like
 `virtual address' and `program address' to refer to logical addresses.
-We shall use the term `logical address' throughout the document to
+We will use the term `logical address' throughout the document to
 prevent confusion with other terms and techniques, like `virtual memory',
 which shouldn't be confused with `logical address space', or equivalently,
 `logical memory'.\\
@@ -1918,7 +2118,7 @@ which shouldn't be confused with `logical address space', or equivalently,
 \subsubsection{MIPS Logical Address Space}
 
 Since a logical address is 32 bits (as seen earlier), every process
-shall has a logical address space of 4GB. This 4GB address space
+has a logical address space of 4GB. This 4GB address space
 is divided into four regions, each region is translated differently
 as will be seen below. The four regions are:
 
@@ -1935,7 +2135,7 @@ as will be seen below. The four regions are:
       mapping provided by the OS, but rather they are translated
       by stripping off the most significant bit. Thus, this
       region simply maps to the physical region:
-      0x00000000 - 0x1FFFFFFF. Operating system kernel can
+      0x00000000 - 0x1FFFFFFF. OS kernel can
       be simply put inside the lower 512MB zone of the
       main memory, and consequently it will appear inside kseg0.
       This implies that the kernel doesn't need to setup
@@ -1945,7 +2145,11 @@ as will be seen below. The four regions are:
 
 \item \textbf{kseg1} 0xA0000000 - 0xBFFFFFFF (512MB):
       just like kseg0, addresses in this region also translate
-      to the lower 512MB of physical address space. The only
+      to the lower 512MB of physical address space.
+      Addresses in kseg1 are translated
+      by stripping off the most three significant bits. Thus, this
+      region simply maps to the physical region:
+      0x00000000 - 0x1FFFFFFF. The only
       difference between kseg0 and kseg1 is that memory access
       of any address in kseg1 will skip the cache, so it is
       always uncached, while kseg0 is always cached. Access
@@ -1957,14 +2161,29 @@ as will be seen below. The four regions are:
 
 \item \textbf{kseg2} 0xC0000000 - 0xFFFFFFFF (1GB):
       any address in this region is simply translated
-      using the mapping provided by the operating system,
+      using the mapping provided by the OS,
       this area is usually used to contain OS data structures
       which are maintained by the kernel.
 
 \end{enumerate}
 
+Figure \ref{mapping} shows the arrangement of the four segments
+inside the logical address space and their mapping to physical address space.
+kseg0 and kseg1 are statically mapped to lower 512MB of physical
+address space (yellow arrows in figure \ref{mapping}), while
+kseg2 and kuseg can be dynamically mapped to various blocks
+of the whole physical address space (blue arrows).\\
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{mapping.png}
+\end{center}
+\caption{Mapping between logical and physical address spaces}
+\label{mapping}
+\end{figure}
+
 We conclude that addresses in kuseg and kseg2 are translated
-the same way, using the mapping provided by the operating system,
+the same way, using the mapping provided by the OS,
 while addresses in kseg0 and kseg1 are translated by mapping them
 directly to the lower 512MB zone of physical memory. The only
 difference between kseg0 and kseg1 is that the former is cached
@@ -2002,7 +2221,7 @@ or alter the mapping.
 
 \subsubsection{Translation Look-aside Buffer (TLB)}
 
-Now we show how the operating system provides the CPU with a certain
+Now we show how the OS provides the CPU with a certain
 mapping for current process. Since there are 3GB of the address
 space (kuseg and kseg2 regions, see above) that can be dynamically
 mapped to physical memory, we need a data structure that describes
@@ -2020,11 +2239,11 @@ Since a physical address is 32 bits, we need an array of 4Gx4B which
 is a 16GB data structure for every process. This is certainly
 unfeasible and we would need to think for another solution.
 Instead of mapping each logical address to a certain physical address,
-we can map every block of logical address to a block of physical addresses.\\
+we can map every block of logical addresses to a block of physical addresses.\\
 
 Using this technique, we just need an array with n elements, where
 n is number of blocks of the logical address space which is also
-equal to number of block of the address space. We call this scheme
+equal to number of blocks of the physical address space. We call this scheme
 \textbf{`Paging'}, where a physical address is called a `frame'
 and logical address block is called a `page'. \\
 
@@ -2062,7 +2281,7 @@ Figure \ref{pagetable1} illustrates this translation process.
 \label{pagetable1}
 \end{figure}
 
-A page table of 4MB fo every process is still big, since when
+A page table of 4MB for every process is still big, since when
 number of processes increase, a big portion of main memory will
 just be used to store page tables. Furthermore, a process
 won't usually need to map the whole 4GB address space. It can leave
@@ -2116,8 +2335,8 @@ of the page directory that controls the current process. When
 a logical address is generated by core processor, the translation
 circuitry looks up the page directory then the corresponding 2nd-level
 page table to get frame number, as shown in the figure above.
-On a process switch, the CPU is given the page directory of
-next process.\\
+On a process switch, the CPU is given the base physical address of
+the page directory of next process.\\
 
 This translation scheme requires two memory access for each translation,
 which is too much since memory access takes much time, so we need
@@ -2128,7 +2347,7 @@ look-aside buffer'}, or simply TLB. When a logical address is generated
 by core processor, TLB is queried for that logical address. If
 the entry of this address is found inside TLB, the physical
 address is returned immediately. If a TLB miss happens, the processor
-shall access main memory to get page entry.\\
+will access main memory to get page entry.\\
 
 The type of TLB described above is called \textbf{`hardware-managed TLB'},
 where TLB is totally isolated from the OS and is managed by
@@ -2179,7 +2398,7 @@ Fields are:
 
 \item \textbf{PFN}: the 20-bit physical frame number this VPN maps to.
 
-\item \textbf{V}: valid bit. If this bit is set to 1, this is entry
+\item \textbf{V}: valid bit. If this bit is set to 1, this entry
       is valid and can be used for translation. If this bit is set to
       0, this entry is not valid and won't be used for translation.
 
@@ -2202,10 +2421,10 @@ entry, the steps are:
       EntryLo register, and the upper 32 bits of the TLB entry to be copied
       into EntryHi register.
 
-\item The operating system reads EntryLo register using MFC0 instruction.
+\item The OS reads EntryLo register using MFC0 instruction.
       Result is the lower 32 bits of the target TLB entry.
 
-\item The operating system reads EntryHi register using MFC0 instruction.
+\item The OS reads EntryHi register using MFC0 instruction.
       Result is the upper 32 bits of the target TLB entry.
 
 \end{enumerate}
@@ -2217,10 +2436,10 @@ A similar sequence could be used for writing a TLB entry
 \item The OS writes the index (0->63) of the TLB entry to be written into
       Index register using MTC0 instruction.
 
-\item The operating system writes the lower 32 bits of the target TLB
+\item The OS writes the lower 32 bits of the target TLB
       entry into EntryLo register using MTC0 instruction.
 
-\item The operating system writes the upper 32 bits of the target TLB
+\item The OS writes the upper 32 bits of the target TLB
       entry into EntryHi register using MTC0 instruction.
 
 \item TLBWI instruction is executed. The instruction causes EntryLo register
@@ -2230,7 +2449,7 @@ A similar sequence could be used for writing a TLB entry
 
 \end{enumerate}
 
-Now since the operating system has full access to TLB, paging can be
+Now since the OS has full access to TLB, paging can be
 implemented easily. Whenever a logical address is generated by
 the processor, the following steps happen:
 
@@ -2268,12 +2487,12 @@ as follows:
 \item The OS reads the value of BadVaddr register using MFC0 instruction.
 
 \item The OS then queries page tables to know the mapping of the address
-      in BadVaddr register. If there is no mapping, the operating system
+      in BadVaddr register. If there is no mapping, the OS
       may decide to stop the program or send an error signal for instance.
-      If there is mapping, the operating system reads the physical
+      If there is mapping, the OS reads the physical
       frame number that this logical address maps to.
 
-\item The operating system calculates the index of the TLB entry which
+\item The OS gets the index of the TLB entry which
       should be modified to solve the miss. The index is actually
       equal to bits 12 to 17 (inclusive) of the logical address as
       explained above.
@@ -2296,7 +2515,7 @@ as follows:
 
 After logical address is translated into physical address, physical
 address is used to access RAM. However, because memory access
-takes long time (i.e, has high penalty), a cache is put
+takes long time (i.e, has high penalty), a caching sub-system is put
 between TLB and RAM to fasten memory access time.\\
 
 Since the pipeline of our processor might be fetching an instruction
@@ -2322,8 +2541,8 @@ of looking up data in the cache is completely transparent from software.
 Bits 2 to 11 (inclusive) of the physical address are used as index.
 The tag of the entry at the calculated index is compared to the
 higher 20 bits of the physical address. If valid bit is 1 and
-comparison matches, data field of the entry is return to core processor.
-If valid bit or 0 or comparison doesn't match, the CPU initiates
+comparison matches, data field of the entry is returned to core processor.
+If valid bit is 0 or comparison doesn't match, the CPU initiates
 a memory cycle to bring data from RAM and updates the cache automatically.\\
 
 Cache is write-through; any store instruction will cause data to
@@ -2353,7 +2572,7 @@ The same mechanism is used to handle all exceptions, which include:
       and disk I/O events.
 
 \item \textbf{System calls}: system calls are special calls that
-      transfers the control to the operating system to execute
+      transfers the control to the OS to execute
       some kernel-level subroutine then return back to user
       program and continue execution normally. System calls
       are handled by the processor as an exception trigger:
@@ -2361,10 +2580,10 @@ The same mechanism is used to handle all exceptions, which include:
       an exception happens.
 
 \item \textbf{Page faults}: page faults need to be reported to
-      operating system whenever they happen to fully support
+      the OS whenever they happen to fully support
       paging. When a page fault happens, the running program is
       interrupted and exception handler is called. Exception
-      handler shall handle the fault then return back to the
+      handler should handle the fault then return back to the
       running program.
 
 \item \textbf{Program errors}: division erros, invalid opcodes,
@@ -2375,7 +2594,7 @@ The same mechanism is used to handle all exceptions, which include:
 
 \end{itemize}
 
-Processor provide a mechanism to return from exception and resume
+Processor provides a mechanism to return from exception and resume
 execution of the interrupted process. It's the responsibility
 of the OS to store the context of the interrupted process
 at beginning of exception handling, so that when the exception
@@ -2386,7 +2605,7 @@ It's the responsibility of the processor to inform software with
 what kind of exception has actually happened, at which
 instruction the exception has happened, and any extra parameters
 needed. For example, if a program error has happened, the processor
-shall inform software of which instruction has caused the error.
+will inform software of which instruction has caused the error.
 If a page fault happens, the processor should inform software
 of which instruction caused the fault, and of the logical
 address that couldn't be translated.\\
@@ -2403,9 +2622,13 @@ to raise an exception:
 
 \begin{itemize}
 
-\item \textbf{Interrupt}: Only if IEc flag of SR register is 1,
-      if IRQ signal arrives to the processor, the processor
-      sets ExcCode field of Cause register to 0, copies the
+\item \textbf{Interrupt}:
+      An IRQ (interrupt request) signal is a hardware signal sent to the
+      processor (by an I/O device) to temporarily stop the running program
+      and allow a special program (the interrupt handler) to run instead.
+      Only if IEc flag of SR register is 1,
+      if IRQ signal arrives to the processor,
+      the processor sets ExcCode field of Cause register to 0, copies the
       address of instruction that is currently being executed
       into EPC register, then calls exception handler. We note
       that there is only one IRQ signal that is fed to the processor.
@@ -2444,7 +2667,7 @@ exceptions.
 
 Exception vector is the address where the exception handler is expected
 to reside. When exception happens, the processor performs a far
-jump to exception vector, starting from there the execution of
+jump to exception vector, where the CPU starts the execution of
 the exception handler. Actually, one distinct exception vector
 could be assigned to every type of exception. In this case,
 there is an exception handler for every type of exception.\\
@@ -2457,14 +2680,14 @@ architectures.\\
 
 Dynamic vectors are set up by software. They could be stored inside
 one or more registers in the processor or could be stored in a table.
-The table will contains vectors for all possible exception types.
-Examples for architecture using dynamic vector mechanism include
+The table will contain vectors for all possible exception types.
+Examples for architecture that use dynamic vector mechanism include
 x86 and Zilog Z80. In some architectures, like 68K and PDP-11,
 the interrupting I/O device itself provides the processor
 with the interrupt vector when an interrupt is handled.\\
 
 Since MIPS processors use static hard-wired exception vectors, our
-processor jumps to predefined addresses when exceptions happens.
+processor jumps to predefined addresses when exceptions happen.
 Figure \ref{vectors} lists those predefined addresses and their
 associated exceptions.
 
@@ -2569,7 +2792,7 @@ knows well that all instructions before the instruction referred
 to by EPC have finished their execution successfully, and have
 already committed their results. The OS also knows that
 all instructions after EPC has never been executed and didn't
-effect the processor state. These two points is what we mean
+affect the processor state. These two points is what we mean
 by saying that the saved processor state corresponds with
 the sequential model of execution.\\
 
@@ -2584,10 +2807,10 @@ the following:
       This wouldn't be the case on imprecise exceptions.
 
 \item \textbf{Exceptions are seen in instruction sequence}:
-       as described above, precise exceptions guarantees that
+       as described above, precise exceptions guarantee that
        all instructions before EPC has finished their execution
        successfully. If several exceptions at several stages happen
-       at the same time, the processor choose the earlier instruction
+       at the same time, the processor chooses the earlier instruction
        of them to be put in EPC. When an exception happens
        at some stage of the pipeline, exception handler is not
        called until all instructions in the following stages finish
@@ -2595,8 +2818,11 @@ the following:
 
 \item \textbf{Subsequent instructions nullified}:
       all the stages before the stage that caused the exception
-      are nullified and any change that happened by instructions
-      in these stages is undone. This guarantees that all instructions
+      are nullified. No change can be happened to the state of the processor
+      by the instructions in these stages because changes are not committed
+      unless the instruction has completed its execution successfully with
+      no excetions in the instruction or in previous instructions.
+      This guarantees that all instructions
       after EPC can be restarted safely after exception handler returns.
 
 \end{itemize}
@@ -2643,8 +2869,8 @@ inactive level to active level, a memory access cycle starts.
 \item \textbf{RW}: read/write signal, driven by CPU. When inactive, CPU wishes to
 read something from memory. When active, CPU wishes to write.
 
-\item \textbf{DTYPE}: specify whether the CPU wants to read/write a single byte,
-a half-word, or a word.
+\item \textbf{DTYPE}: specifies whether the CPU wants to read/write a single
+byte, a half-word, or a word.
 
 \item \textbf{IRQ}: IRQ signal controlled by interrupt controller. It is fed
 into the processor and changes to active level when interrupt happens. The CPU
@@ -2690,9 +2916,9 @@ It should be clear by now that all I/O registers are mapped in the same
 address space where memory is mapped. Therefore all I/O registers are
 `memory-mapped registers' and no isolated I/O address space is supported.\\
 
-Figure \ref{memmap} shows the memory map of our system. The decoder shall activate
-the CS of a given device if and only if the address lies in the address range
-dedicated to that device.
+Figure \ref{memmap} shows the memory map of our system. The decoder will
+activate the CS of a given device if and only if the address lies in the
+address range dedicated to that device.
 
 \begin{figure}[H]
 \begin{center}
@@ -2829,7 +3055,7 @@ buffer). The basic difference is that our memory blocks are 9 bits wide
 
 Our VGA module basically supports a 80x25 text mode. This means that screen
 is divided into 80 columns and 25 rows (2000 cells), with every cell
-containing an ASCII character. To draw text on screen, the operating system
+containing an ASCII character. To draw text on screen, the OS
 just needs to specify the contents of the 2000 cells.\\
 
 Character memory (memory bank 0) consists of 2048 9-bit cells (from 0
@@ -2869,7 +3095,7 @@ the colors, instead of the text itself. As we explained above, the screen
 is divided into 2000 cells, organized in 25 rows and 80 columns. Every
 cell has a corresponding 9-bit data cell in memory bank 0 containing ASCII
 character that is drawn on the cell. Also, every cell has another
-corresponding 9-bit data cell in memory bank 0 describing its color.\\
+corresponding 9-bit data cell in memory bank 1 describing its color.\\
 
 The format of the 9 bits is described as following:
 
@@ -2944,7 +3170,7 @@ simply write 0x001F.\\
 
 We conlude our discussion of character and attribute memory with a small
 example to explain how to print something on screen. In this example,
-we shall print `Hello World!' at row 0 of screen, with blue background
+we will print `Hello World!' at row 0 of screen, with blue background
 and white foreground. `H' will be written at column 0, `e' at column 1,
 `l' at column 2, and so on.\\
 
@@ -3066,7 +3292,7 @@ The only remaining part is to describe the actual pixels inside every cell.\\
 Every cell of the 2000 cells (on screen) consists of 16x9 pixels.
 The width of the cell is 9 pixels and the height of the cell is 16 pixels.
 Since the screen has 25 rows and 80 columns of cells, screen width is 80*9
-which is equal to 720 pixels, and sreen height is 25*16 = 400.
+which is equal to 720 pixels, and screen height is 25*16 = 400.
 This results in a resolution of 720x400, which is the default screen resolution
 of many other systems, including IBM PC (during boot time).\\
 
@@ -3170,7 +3396,7 @@ sepcial register locations are handled using special circuits. Table
 \end{figure}
 
 It is important to note that all these registers are 8 bits wide, so
-bits 8-15 of the written half-word is always ignored. Now we shall
+bits 8-15 of the written half-word is always ignored. Now we
 summarize the purpose of each register in the following points:
 
 \begin{itemize}
@@ -3178,7 +3404,7 @@ summarize the purpose of each register in the following points:
 \item \textbf{ROW\_BASE\_REG}:
 Used to scroll up/down the screen. If this register is 0, screen is not
 scrolled, and everything is displayed normally as expected. Otherwise,
-this register shall contain the index of the row that will be displayed
+this register contains the index of the row that will be displayed
 on the top of the screen. For example, if this register contains 10, then
 first row (the row on the top of screen) is row 10, next row is 11, and so on,
 until we reach row 24. Next rows will be 0, 1, up to 9. This helps when the
@@ -3278,7 +3504,7 @@ register in the following points:
 \item \textbf{IRQ\_NO}:
 A read-only register that is accessed by reading the word at phsyical
 location 0x1E802000. It returns the IRQ number of the interrupting
-device. It is usually read inside the ISR of the operating system. The OS
+device. It is usually read inside the ISR of the OS. The OS
 reads this register (instead of polling each device) to know which device
 has interrupted the CPU, then executes the suitable interrupt handler.
 
@@ -3376,7 +3602,7 @@ presses down (or up) one of the keys on the keyboard, a specific scan code
 is sent from the PS/2 keyboard to the keyboard controller, which
 immediately activates IRQ1 line to trigger an interrupt.\\
 
-When the operating system is interrupted, the interrupt service routine
+When the OS is interrupted, the interrupt service routine
 must query the keyboard controller to retrieve the scan code of the
 key that has been pressed. Every key in the keyboard has a specific
 scan code, as shown by figure \ref{scancodes}.\\
@@ -3385,9 +3611,9 @@ Keyboard controller module contains an internal 16-byte FIFO buffer
 to store up to 16 scan codes, with every scan code stored in one
 byte. So for example, if user presses on Shift key, then immediately
 presses down `H' key, the two scan codes are stored in the buffer
-until the operating system reads them.\\
+until the OS reads them.\\
 
-When a key is pressed up (released), the PS/2 keyboard shall send
+When a key is pressed up (released), the PS/2 keyboard will send
 0xF0, followed by the scan code of the released button. When the OS
 reads the buffer, it will find 0xF0 in the head of the buffer,
 and the scan code of the released button in the next byte of the
@@ -3438,6 +3664,101 @@ the next byte in the buffer, and so on, until the buffer becomes empty.
 When the buffer is empty, a value of `0' is returned. When ISR executes, the
 OS should keep reading this register until it returns zero, to make sure
 that all values stored in the buffer are read and no scan code is lost.
+
+\end{itemize}
+
+\section{Design Decisions}
+\label{design_decisions}
+
+In section \ref{design_considers}, we have shown various considerations
+and factors that affected our design, including the low clock rate,
+the limited FPGA memory, the limitations in logic components, and
+the timing constraints. These limitations affected the design of
+various components that were explained in previous sections.\\
+
+In the following lines, we show how those physical limitations affected
+the design of various components of our system, and why we chose to design
+them that way:
+
+\begin{itemize}
+
+\item \textbf{The choice of MIPS architecture}:
+
+We have chosen the MIPS architecture as the architecture of our system
+for various reasons.
+The main reason is that MIPS architecture is RISC (reduced instruction set
+architecture), which means it is very
+suitable for a hardware system with limited physical resources, like
+our FPGA.
+
+Many of the functionality of the RISC processor can be moved
+to software, which allows us to implement other components (memory interface
+and I/O interfaces) on the same FPGA chip. Other reasons for choosing
+MIPS architecture include the fact that MIPS is widely used in
+computer architecture education in universities, so this project
+can be used as educational material.
+
+\item \textbf{The design of the cache}:
+
+We have decided to design the instruction cache and the data cache
+using the direct-mapped scheme to reduce the logic needed to find
+the cache cell that relates to the query invoked by the processor.
+Multi-way caches require more logic (for comparison operations);
+this needs more space on the FPGA chip and leads to slower execution time.
+
+A write-back cache would need more logic to verify whether the cache
+cell is dirty or not, and would need more time to handle
+cache misses. Therefore, we have chosen the write-through scheme,
+in which memory is updated once the data in the cache is modified.
+
+\item \textbf{The design of the TLB}:
+
+Address translation should be performed in a very short time. If the
+TLB is slow, the execution time of the instructions that need
+address translation will be very large, and pipeline stalls
+may occur. Direct-mapped TLB allowed us to design a TLB which
+is fast enough, and doesn't consume much of the space of the FPGA chip.
+
+Also, many of the functionalities of TLB are moved to software in
+order to reduce the size of the logic consumed by the TLB component;
+thus our TLB is `software-controlled' as we have explained earlier.
+
+\item \textbf{The design of the interrupt system}:
+
+The processor could have more than one IRQ line, but this complexity
+would increase exception handling time since the processor needs
+to handle priority and collisions between multiple IRQ signals.
+
+Therefore, we chose to separate the interrupt handling functionality
+from the processor. The processor just has one IRQ pin (and one IAK pin),
+while the handling of IRQ\# signals is performed by a separate component,
+which is the interrupt controller.
+
+\newpage
+\item \textbf{Precise exceptions}:
+
+If the exceptions were imprecise, software would be very complex.
+The effort made by MIPS pipeline to ensure that exceptions are precise
+is less than the effort that would be made by software to handle
+imprecise exception. ISR needs to be very minimal, therefore
+we have chosen to implement precise exceptions in our MIPS pipeline.
+
+\item \textbf{Memory-mapped I/O}:
+
+All MIPS instructions assume one address space. An isolated I/O
+address space would require much more logic components, and would
+need more instructions to be implemented to make use of the isolated
+address space. The choice of memory-mapped I/O simplified the design
+of system bus and let us avoid un-needed complexity.
+
+\item \textbf{VGA design}:
+
+Since the size of the RAM blocks on the FPGA chip is very limited,
+we couldn't implement a VGA interface that supports graphics mode.
+Graphics mode needs very large frame buffers to store information
+about every pixel on the screen. The design of the framebuffer as
+four memory banks of 2Kx9 bits has allowed us to reach a resolution
+of 720x400 in 16-color text mode.
 
 \end{itemize}
 
@@ -3581,8 +3902,8 @@ that stores mappings from virtual page number (VPN) to physical frame numbers
 (PFN). A special circuitry handles TLB-related instructions.\\
 
 To summarize, the CPU consists of three basic components: A 5-stage
-pipeline, a TLB, and a cache. The three components together interface the main
-system bus of the machine.
+pipeline, a TLB, and a caching sub-system. The three components together
+interface the main system bus of the machine.
 
 \begin{figure}[H]
 \begin{center}
@@ -3658,7 +3979,7 @@ activated, the module activates ST-CE signal, which enables ROM chip.
 One of the great merits of Nexys II board is that it contains a ready-to-use
 VGA connector. The VGA connector is soldered onto the PCB board, and five
 pins are actually connected to the FPGA chips. The five pins are HS
-(horizontal sync.), VS (vertical sync), R (read), G (green), and B (blue).\\
+(horizontal sync.), VS (vertical sync), R (red), G (green), and B (blue).\\
 
 The R, G, and B signals are analog signals that define the color of
 the pixel that is currently being drawn. Because the FPGA chips only
@@ -3669,8 +3990,8 @@ resistors that allow the FPGA chip to work with 8 levels of red (3 bits),
 the connector, and FPGA related pins are all shown in figure \ref{vgaport}.\\
 
 The VGA interface module works as an interface between the system bus
-and the VGA connector (The HS, VS, R, G, and B pins). We have programmer
-doesn't need to know the details of the VGA protocol. All the programmer
+and the VGA connector (The HS, VS, R, G, and B pins). The running program
+doesn't need to know the details of the VGA hardware. All the programmer
 needs to know is the information explained in the architecture chapter,
 mainly the operation of the four memory banks.\\
 
@@ -3784,6 +4105,102 @@ the data bus, and increases the buffer head pointer by 1. If buffer head
 pointer and buffer tail pointer point to the same location, a value
 of zero is put on data bus, indicating an empty buffer.
 
+\section{Emulator}
+
+An important part of this project is to build an emulator for the proposed MIPS
+machine. It is important to write the emulator while working on VHDL code
+so that we make sure that we understand the
+instruction set correctly, and to make any needed modifications to the design
+before sketching it on the FPGA device. \\
+
+In this section, we describe the design of the emulator, and show how
+its components interact
+with each other to properly simulate the proposed machine. Pre-compiled
+firmware (or the OS) is loaded to a simulated ROM in host machine's RAM,
+and executed by the
+simulated CPU.\\
+
+Figure \ref{emucomps} shows the structural design for the emulator,
+which consists of:
+\begin{itemize}
+\item Clock pulse generator (clock.c)
+\item Central Processing Unit (cpu.c)
+\item Memory Interface, ROM, and RAM (mem.c)
+\item VGA Interface (vga.c)
+\item Keyboard Interface (kbd.c)
+\item Other I/O interfaces (pit.c, pic.c, etc...)
+\end{itemize}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{emulator.png}
+\end{center}
+\caption{Emulator components.}
+\label{emucomps}
+\end{figure}
+
+\begin{enumerate}
+
+\item \textbf{Clock Pulse Generator (clock.c)}:
+
+The function of this module is to provide synchronization between other
+components. It generates clock pulses (i.e, calls cpu\_clk() and kbd\_clk()
+frequently in a loop) and listens to
+external events from SDL (Simple DirectMedia Layer),
+like button press and exit events.\\
+
+\item \textbf{Central Processing Unit (cpu.c)}:
+
+This module is responsible for fetching instructions from memory and
+executing them. It
+simulates the CPU module of the real machine. The CPU implements
+MIPS-1 instruction set
+architecture. The source code in cpu.c is organized such that it is very
+similar to the VHDL
+code of the processor, this implies that cpu.c implements the pipeline as
+it is.\\
+
+\item \textbf{Memory Interface (mem.c)}:
+
+This module provides an interface between CPU and other components in the
+system (ROM, RAM, Keyboard, and VGA). ROM and RAM are two arrays in host
+memory, allocated when the program starts.
+MEMREAD and MEMWRITE signals of the processor are translated into
+mem\_read() and mem\_write() calls.
+
+These functions in turn translate the request into read/write
+from/to ROM or RAM arrays in memory, or translate the request into calls to
+keyboard and VGA modules. Table \ref{memmap} shows the memory map implemented
+by mem.c. Address passed to mem\_read()
+and mem\_write() is checked to know which module is repsponsible to handle
+the request.\\
+
+\newpage
+
+\item \textbf{VGA Interface (vga.c)}:
+
+This module simulates the video graphics interface of the real machine.
+The real interface allows software to print text on screen.
+It supports resolution of 720x400 and screen is divided into 80 columns and
+25 rows. Every character is plotted in 9x16 pixel square.
+
+The VGA appears to software as a memory buffer (in 0x1E000000 to 0x1E003FFF
+region). A half-word write to 0x1E000000 sets the ASCII code of character
+at row 0, col 0. Half-word write to 0x1E000002 sets its attribute.
+Half-word write to 0x1E000004 sets the ASCII code of character at row 0,
+col 1, and so on.
+
+The code in vga.c catches memory writes to VGA buffer, and draws appropriate
+content on SDL screen.\\
+
+\item \textbf{Keyboard Interface (kbd.c)}:
+
+This module catches keypresses on SDL screen, and translates them into
+scan codes, then sends the scan codes to software (just like the real
+PS/2 keyboard and PS/2 interface do).
+
+\end{enumerate}
+
 %------------------------------------------------------------------------------%
 
 \chapter{Software}
@@ -3798,10 +4215,10 @@ is fixed in the ROM chip on Nexys II board and executed on start up.\\
 The size of the ROM chip is 16MB, and it appears in memory at physical
 addresses 0x1F000000 to 0x1FFFFFFF. MIPS processor starts execution
 at logical address 0xBFC00000 (RESET vector), which maps to physical
-address 0x1FC00000. Our firmware program is located in ROM at
-location 0xC00000, i.e, at 12MB boundary. Thus, the first instruction executed
-by the MIPS processor is actually the first instruction in the firmware
-program.\\
+address 0x1FC00000. The starting address of our firmware program
+inside the ROM is 0xC00000, i.e, at 12MB boundary. Thus, the first
+instruction executed by the MIPS processor is actually the
+first instruction in the firmware program.\\
 
 Figure \ref{firmware} shows the UML class diagram of our firmware, which
 consists of the following components:
@@ -3822,9 +4239,9 @@ consists of the following components:
 
 \end{itemize}
 
-Firmware provides an interface that can be used by the operating system
-to access the routines provided by firmware drivers. However, the operating
-system (described in next section) has its own sophisticated device drivers.
+Firmware provides an interface that can be used by the OS
+to access the routines provided by firmware drivers. However, the OS
+(described in next section) has its own sophisticated device drivers.
 
 \begin{figure}[H]
 \begin{center}
@@ -3844,24 +4261,25 @@ The boot procedure of the firmware performs the following routines:
 \item Initialize the keyboard.
 \item Draw logo on screen and print start-up messages.
 \item Perform PoST and obtain RAM size.
-\item Load the boot-loader of the operating system.
+\item Load the boot-loader of the OS.
 \end{enumerate}
 
 If the firmware fails to find a bootable medium, it drops to shell. If
 bootloader is successfully loaded to RAM, the bootloader takes control
-from firmware, and it starts loading the remaining parts of the operating
-system.
+from firmware, and it starts loading the remaining parts of the OS.
 
 \section{Operating System}
 
-We have chosen to port Quafios operating system to our machine, and use it
-as the default operating system of the computer. Quafios kernel is a
+We have chosen to port Quafios to our machine, and use it
+as the default OS of the computer. Quafios is a general-purpose OS that
+was mainly written for IBM PC. Quafios is free software and is licensed under
+GNU General Public License (GPL) v3. Quafios kernel is a
 monolithic kernel written in C and assembly. We have modified the kernel to
 let it work on MIPS architecture, and added the device drivers needed
 for our hardware.\\
 
 Quafios is currently stored inside the ROM chip. It is suggested that
-it is stored on an external medium in the feature, but this needs developing
+it is stored on an external medium in the future, but this needs developing
 hardware components needed to interface the external medium. The part
 of the ROM that contains Quafios is actually an image for a Quafios disk,
 with a formatted \textit{diskfs} file system.\\
@@ -3880,15 +4298,7 @@ control to the kernel which performs the following operations:
 
 \end{enumerate}
 
-\begin{figure}[H]
-\begin{center}
-\includegraphics[width=0.65\textwidth]{os.png}
-\end{center}
-\caption{OS Class Diagram}
-\label{os}
-\end{figure}
-
-Figure \ref{os} shows the UML class diagram of the operating system. Quafios
+Figure \ref{os} shows the UML class diagram of the OS. Quafios
 kernel consists of the following components (each component can be
 found under a separate directory inside \textit{<source\_code>/kernel/}):
 
@@ -3914,6 +4324,14 @@ found under a separate directory inside \textit{<source\_code>/kernel/}):
 Quafios provides a basic system call interface that lets user programs access
 the routines provided by the kernel, like open(), close(), read(), write(),
 mmap(), etc...
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{os.png}
+\end{center}
+\caption{OS Class Diagram}
+\label{os}
+\end{figure}
 
 %------------------------------------------------------------------------------%
 
@@ -4003,7 +4421,7 @@ VGA interface, keyboard interface, interrupt controller, and a programmable
 timer. All hardware components are implemented in VHDL. User interacts
 with the system through a PS/2 keyboard and a VGA-compatible monitor. \\
 
-We also wrote firmware for the system and ported Quafios operating system
+We also wrote firmware for the system and ported Quafios OS
 to our machine. Software is stored on a ROM chip on Nexys II board,
 and our hardware design is stored on another dedicated ROM chip on
 the board (in a compiled form). When system starts up, FPGA chip

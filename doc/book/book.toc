@@ -4,56 +4,59 @@
 \contentsline {section}{\numberline {1.1}Overview}{1}{section.1.1}
 \contentsline {section}{\numberline {1.2}Scope of Project}{3}{section.1.2}
 \contentsline {section}{\numberline {1.3}Overview of Document}{3}{section.1.3}
-\contentsline {chapter}{\numberline {2}Related Work}{6}{chapter.2}
-\contentsline {chapter}{\numberline {3}Architecture}{8}{chapter.3}
-\contentsline {section}{\numberline {3.1}Top-Level Components}{8}{section.3.1}
-\contentsline {section}{\numberline {3.2}Central Processing Unit}{10}{section.3.2}
-\contentsline {subsection}{\numberline {3.2.1}Introduction}{10}{subsection.3.2.1}
-\contentsline {subsubsection}{\numberline {3.2.1.1}Load and Store Instructions}{11}{subsubsection.3.2.1.1}
-\contentsline {subsubsection}{\numberline {3.2.1.2}ALU Instructions}{12}{subsubsection.3.2.1.2}
-\contentsline {subsubsection}{\numberline {3.2.1.3}Jump and Branch Instructions}{15}{subsubsection.3.2.1.3}
-\contentsline {subsubsection}{\numberline {3.2.1.4}Miscellaneous Instructions}{17}{subsubsection.3.2.1.4}
-\contentsline {subsubsection}{\numberline {3.2.1.5}Control Instructions}{18}{subsubsection.3.2.1.5}
-\contentsline {subsubsection}{\numberline {3.2.1.6}Instruction Encoding Summary}{19}{subsubsection.3.2.1.6}
-\contentsline {subsubsection}{\numberline {3.2.1.7}Addressing Modes}{21}{subsubsection.3.2.1.7}
-\contentsline {subsubsection}{\numberline {3.2.1.8}Programmer-Visible Pipeline Effects}{21}{subsubsection.3.2.1.8}
-\contentsline {subsection}{\numberline {3.2.2}Registers}{22}{subsection.3.2.2}
-\contentsline {subsubsection}{\numberline {3.2.2.1}General-Purpose Registers}{23}{subsubsection.3.2.2.1}
-\contentsline {subsubsection}{\numberline {3.2.2.2}LO and HI Registers}{23}{subsubsection.3.2.2.2}
-\contentsline {subsubsection}{\numberline {3.2.2.3}Control Registers}{24}{subsubsection.3.2.2.3}
-\contentsline {subsection}{\numberline {3.2.3}Memory Management}{29}{subsection.3.2.3}
-\contentsline {subsubsection}{\numberline {3.2.3.1}MIPS Logical Address Space}{31}{subsubsection.3.2.3.1}
-\contentsline {subsubsection}{\numberline {3.2.3.2}Translation Look-aside Buffer (TLB)}{32}{subsubsection.3.2.3.2}
-\contentsline {subsubsection}{\numberline {3.2.3.3}Cache Memory}{37}{subsubsection.3.2.3.3}
-\contentsline {subsection}{\numberline {3.2.4}Exception Handling}{37}{subsection.3.2.4}
-\contentsline {subsubsection}{\numberline {3.2.4.1}Exception Cases}{38}{subsubsection.3.2.4.1}
-\contentsline {subsubsection}{\numberline {3.2.4.2}Exception Vectors}{39}{subsubsection.3.2.4.2}
-\contentsline {subsubsection}{\numberline {3.2.4.3}Exception Protocol}{40}{subsubsection.3.2.4.3}
-\contentsline {subsubsection}{\numberline {3.2.4.4}Precise Exceptions}{41}{subsubsection.3.2.4.4}
-\contentsline {section}{\numberline {3.3}System Bus}{41}{section.3.3}
-\contentsline {section}{\numberline {3.4}Bus Decoder}{43}{section.3.4}
-\contentsline {section}{\numberline {3.5}Memory Interface}{43}{section.3.5}
-\contentsline {section}{\numberline {3.6}VGA Interface}{44}{section.3.6}
-\contentsline {subsection}{\numberline {3.6.1}Character Memory}{45}{subsection.3.6.1}
-\contentsline {subsection}{\numberline {3.6.2}Attribute Memory}{46}{subsection.3.6.2}
-\contentsline {subsection}{\numberline {3.6.3}Font Memory}{48}{subsection.3.6.3}
-\contentsline {subsection}{\numberline {3.6.4}Special Registers}{50}{subsection.3.6.4}
-\contentsline {section}{\numberline {3.7}Interrupt Controller}{51}{section.3.7}
-\contentsline {section}{\numberline {3.8}Programmable Timer}{52}{section.3.8}
-\contentsline {section}{\numberline {3.9}Keyboard Controller}{53}{section.3.9}
-\contentsline {chapter}{\numberline {4}Implementation}{56}{chapter.4}
-\contentsline {section}{\numberline {4.1}Overview}{56}{section.4.1}
-\contentsline {section}{\numberline {4.2}Central Processing Unit}{59}{section.4.2}
-\contentsline {section}{\numberline {4.3}System Bus}{61}{section.4.3}
-\contentsline {section}{\numberline {4.4}Bus Decoder}{61}{section.4.4}
-\contentsline {section}{\numberline {4.5}Memory Interface}{61}{section.4.5}
-\contentsline {section}{\numberline {4.6}VGA Interface}{62}{section.4.6}
-\contentsline {section}{\numberline {4.7}Interrupt Controller}{65}{section.4.7}
-\contentsline {section}{\numberline {4.8}Programmable Timer}{65}{section.4.8}
-\contentsline {section}{\numberline {4.9}Keyboard Controller}{65}{section.4.9}
-\contentsline {chapter}{\numberline {5}Software}{68}{chapter.5}
-\contentsline {section}{\numberline {5.1}Firmware}{68}{section.5.1}
-\contentsline {section}{\numberline {5.2}Operating System}{70}{section.5.2}
-\contentsline {chapter}{\numberline {6}Results}{74}{chapter.6}
-\contentsline {chapter}{\numberline {7}Conclusion}{86}{chapter.7}
-\contentsline {section}{\numberline {7.1}Future Work}{86}{section.7.1}
+\contentsline {chapter}{\numberline {2}Related Work}{5}{chapter.2}
+\contentsline {chapter}{\numberline {3}Architecture}{7}{chapter.3}
+\contentsline {section}{\numberline {3.1}Top-Level Components}{7}{section.3.1}
+\contentsline {section}{\numberline {3.2}Design Considerations}{9}{section.3.2}
+\contentsline {section}{\numberline {3.3}Central Processing Unit}{10}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Introduction}{10}{subsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.1.1}Load and Store Instructions}{11}{subsubsection.3.3.1.1}
+\contentsline {subsubsection}{\numberline {3.3.1.2}ALU Instructions}{12}{subsubsection.3.3.1.2}
+\contentsline {subsubsection}{\numberline {3.3.1.3}Jump and Branch Instructions}{15}{subsubsection.3.3.1.3}
+\contentsline {subsubsection}{\numberline {3.3.1.4}Miscellaneous Instructions}{18}{subsubsection.3.3.1.4}
+\contentsline {subsubsection}{\numberline {3.3.1.5}Control Instructions}{18}{subsubsection.3.3.1.5}
+\contentsline {subsubsection}{\numberline {3.3.1.6}Instruction Encoding Summary}{19}{subsubsection.3.3.1.6}
+\contentsline {subsubsection}{\numberline {3.3.1.7}Addressing Modes}{22}{subsubsection.3.3.1.7}
+\contentsline {subsubsection}{\numberline {3.3.1.8}Programmer-Visible Pipeline Effects}{22}{subsubsection.3.3.1.8}
+\contentsline {subsection}{\numberline {3.3.2}Registers}{23}{subsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.2.1}General-Purpose Registers}{23}{subsubsection.3.3.2.1}
+\contentsline {subsubsection}{\numberline {3.3.2.2}LO and HI Registers}{24}{subsubsection.3.3.2.2}
+\contentsline {subsubsection}{\numberline {3.3.2.3}Control Registers}{24}{subsubsection.3.3.2.3}
+\contentsline {subsection}{\numberline {3.3.3}Memory Management}{30}{subsection.3.3.3}
+\contentsline {subsubsection}{\numberline {3.3.3.1}MIPS Logical Address Space}{32}{subsubsection.3.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.3.2}Translation Look-aside Buffer (TLB)}{34}{subsubsection.3.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.3.3}Cache Memory}{38}{subsubsection.3.3.3.3}
+\contentsline {subsection}{\numberline {3.3.4}Exception Handling}{39}{subsection.3.3.4}
+\contentsline {subsubsection}{\numberline {3.3.4.1}Exception Cases}{40}{subsubsection.3.3.4.1}
+\contentsline {subsubsection}{\numberline {3.3.4.2}Exception Vectors}{41}{subsubsection.3.3.4.2}
+\contentsline {subsubsection}{\numberline {3.3.4.3}Exception Protocol}{42}{subsubsection.3.3.4.3}
+\contentsline {subsubsection}{\numberline {3.3.4.4}Precise Exceptions}{42}{subsubsection.3.3.4.4}
+\contentsline {section}{\numberline {3.4}System Bus}{43}{section.3.4}
+\contentsline {section}{\numberline {3.5}Bus Decoder}{44}{section.3.5}
+\contentsline {section}{\numberline {3.6}Memory Interface}{45}{section.3.6}
+\contentsline {section}{\numberline {3.7}VGA Interface}{46}{section.3.7}
+\contentsline {subsection}{\numberline {3.7.1}Character Memory}{47}{subsection.3.7.1}
+\contentsline {subsection}{\numberline {3.7.2}Attribute Memory}{48}{subsection.3.7.2}
+\contentsline {subsection}{\numberline {3.7.3}Font Memory}{50}{subsection.3.7.3}
+\contentsline {subsection}{\numberline {3.7.4}Special Registers}{51}{subsection.3.7.4}
+\contentsline {section}{\numberline {3.8}Interrupt Controller}{52}{section.3.8}
+\contentsline {section}{\numberline {3.9}Programmable Timer}{54}{section.3.9}
+\contentsline {section}{\numberline {3.10}Keyboard Controller}{55}{section.3.10}
+\contentsline {section}{\numberline {3.11}Design Decisions}{56}{section.3.11}
+\contentsline {chapter}{\numberline {4}Implementation}{59}{chapter.4}
+\contentsline {section}{\numberline {4.1}Overview}{59}{section.4.1}
+\contentsline {section}{\numberline {4.2}Central Processing Unit}{62}{section.4.2}
+\contentsline {section}{\numberline {4.3}System Bus}{64}{section.4.3}
+\contentsline {section}{\numberline {4.4}Bus Decoder}{64}{section.4.4}
+\contentsline {section}{\numberline {4.5}Memory Interface}{64}{section.4.5}
+\contentsline {section}{\numberline {4.6}VGA Interface}{65}{section.4.6}
+\contentsline {section}{\numberline {4.7}Interrupt Controller}{68}{section.4.7}
+\contentsline {section}{\numberline {4.8}Programmable Timer}{68}{section.4.8}
+\contentsline {section}{\numberline {4.9}Keyboard Controller}{68}{section.4.9}
+\contentsline {section}{\numberline {4.10}Emulator}{69}{section.4.10}
+\contentsline {chapter}{\numberline {5}Software}{72}{chapter.5}
+\contentsline {section}{\numberline {5.1}Firmware}{72}{section.5.1}
+\contentsline {section}{\numberline {5.2}Operating System}{74}{section.5.2}
+\contentsline {chapter}{\numberline {6}Results}{77}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{88}{chapter.7}
+\contentsline {section}{\numberline {7.1}Future Work}{88}{section.7.1}

@@ -1,10 +1,20 @@
 \begin{thebibliography}{1}
 
+\bibitem{r3000a}
+{\em IDT R30xx Family Software Reference Manual}.
+\newblock Integrated Device Technology, Inc, 1994.
+
 \bibitem{victor}
 Victor~P. Rubio.
 \newblock {\em A FPGA Implementation of a MIPS RISC Processor for Computer
   Architecture Education}.
 \newblock New Mexico State University, 2004.
+
+\bibitem{comporg}
+John L.~Hennessy David A.~Patterson.
+\newblock {\em Computer Organization and Design - The Hardware/Software
+  Interface}.
+\newblock Morgan Kaufmann, fourth edition, 2012.
 
 \bibitem{clements}
 Alan Clements.
@@ -16,19 +26,9 @@ Charles Price.
 \newblock {\em MIPS IV Instruction Set}.
 \newblock MIPS Technologies, Inc, 1995.
 
-\bibitem{r3000a}
-{\em IDT R30xx Family Software Reference Manual}.
-\newblock Integrated Device Technology, Inc, 1994.
-
 \bibitem{nexys2_rm}
 {\em Digilent Nexys2 Board Reference Manual}.
 \newblock Digilent, Inc, 2011.
-
-\bibitem{comporg}
-John L.~Hennessy David A.~Patterson.
-\newblock {\em Computer Organization and Design - The Hardware/Software
-  Interface}.
-\newblock Morgan Kaufmann, fourth edition, 2012.
 
 \bibitem{morgan_claypool}
 Grigorios~Magklis Antonio~Gonzalez, Fernando~Lattore.

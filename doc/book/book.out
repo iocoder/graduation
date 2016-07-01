@@ -7,53 +7,56 @@
 \BOOKMARK [0][-]{chapter.2}{Related Work}{}% 7
 \BOOKMARK [0][-]{chapter.3}{Architecture}{}% 8
 \BOOKMARK [1][-]{section.3.1}{Top-Level Components}{chapter.3}% 9
-\BOOKMARK [1][-]{section.3.2}{Central Processing Unit}{chapter.3}% 10
-\BOOKMARK [2][-]{subsection.3.2.1}{Introduction}{section.3.2}% 11
-\BOOKMARK [3][-]{subsubsection.3.2.1.1}{Load and Store Instructions}{subsection.3.2.1}% 12
-\BOOKMARK [3][-]{subsubsection.3.2.1.2}{ALU Instructions}{subsection.3.2.1}% 13
-\BOOKMARK [3][-]{subsubsection.3.2.1.3}{Jump and Branch Instructions}{subsection.3.2.1}% 14
-\BOOKMARK [3][-]{subsubsection.3.2.1.4}{Miscellaneous Instructions}{subsection.3.2.1}% 15
-\BOOKMARK [3][-]{subsubsection.3.2.1.5}{Control Instructions}{subsection.3.2.1}% 16
-\BOOKMARK [3][-]{subsubsection.3.2.1.6}{Instruction Encoding Summary}{subsection.3.2.1}% 17
-\BOOKMARK [3][-]{subsubsection.3.2.1.7}{Addressing Modes}{subsection.3.2.1}% 18
-\BOOKMARK [3][-]{subsubsection.3.2.1.8}{Programmer-Visible Pipeline Effects}{subsection.3.2.1}% 19
-\BOOKMARK [2][-]{subsection.3.2.2}{Registers}{section.3.2}% 20
-\BOOKMARK [3][-]{subsubsection.3.2.2.1}{General-Purpose Registers}{subsection.3.2.2}% 21
-\BOOKMARK [3][-]{subsubsection.3.2.2.2}{LO and HI Registers}{subsection.3.2.2}% 22
-\BOOKMARK [3][-]{subsubsection.3.2.2.3}{Control Registers}{subsection.3.2.2}% 23
-\BOOKMARK [2][-]{subsection.3.2.3}{Memory Management}{section.3.2}% 24
-\BOOKMARK [3][-]{subsubsection.3.2.3.1}{MIPS Logical Address Space}{subsection.3.2.3}% 25
-\BOOKMARK [3][-]{subsubsection.3.2.3.2}{Translation Look-aside Buffer \(TLB\)}{subsection.3.2.3}% 26
-\BOOKMARK [3][-]{subsubsection.3.2.3.3}{Cache Memory}{subsection.3.2.3}% 27
-\BOOKMARK [2][-]{subsection.3.2.4}{Exception Handling}{section.3.2}% 28
-\BOOKMARK [3][-]{subsubsection.3.2.4.1}{Exception Cases}{subsection.3.2.4}% 29
-\BOOKMARK [3][-]{subsubsection.3.2.4.2}{Exception Vectors}{subsection.3.2.4}% 30
-\BOOKMARK [3][-]{subsubsection.3.2.4.3}{Exception Protocol}{subsection.3.2.4}% 31
-\BOOKMARK [3][-]{subsubsection.3.2.4.4}{Precise Exceptions}{subsection.3.2.4}% 32
-\BOOKMARK [1][-]{section.3.3}{System Bus}{chapter.3}% 33
-\BOOKMARK [1][-]{section.3.4}{Bus Decoder}{chapter.3}% 34
-\BOOKMARK [1][-]{section.3.5}{Memory Interface}{chapter.3}% 35
-\BOOKMARK [1][-]{section.3.6}{VGA Interface}{chapter.3}% 36
-\BOOKMARK [2][-]{subsection.3.6.1}{Character Memory}{section.3.6}% 37
-\BOOKMARK [2][-]{subsection.3.6.2}{Attribute Memory}{section.3.6}% 38
-\BOOKMARK [2][-]{subsection.3.6.3}{Font Memory}{section.3.6}% 39
-\BOOKMARK [2][-]{subsection.3.6.4}{Special Registers}{section.3.6}% 40
-\BOOKMARK [1][-]{section.3.7}{Interrupt Controller}{chapter.3}% 41
-\BOOKMARK [1][-]{section.3.8}{Programmable Timer}{chapter.3}% 42
-\BOOKMARK [1][-]{section.3.9}{Keyboard Controller}{chapter.3}% 43
-\BOOKMARK [0][-]{chapter.4}{Implementation}{}% 44
-\BOOKMARK [1][-]{section.4.1}{Overview}{chapter.4}% 45
-\BOOKMARK [1][-]{section.4.2}{Central Processing Unit}{chapter.4}% 46
-\BOOKMARK [1][-]{section.4.3}{System Bus}{chapter.4}% 47
-\BOOKMARK [1][-]{section.4.4}{Bus Decoder}{chapter.4}% 48
-\BOOKMARK [1][-]{section.4.5}{Memory Interface}{chapter.4}% 49
-\BOOKMARK [1][-]{section.4.6}{VGA Interface}{chapter.4}% 50
-\BOOKMARK [1][-]{section.4.7}{Interrupt Controller}{chapter.4}% 51
-\BOOKMARK [1][-]{section.4.8}{Programmable Timer}{chapter.4}% 52
-\BOOKMARK [1][-]{section.4.9}{Keyboard Controller}{chapter.4}% 53
-\BOOKMARK [0][-]{chapter.5}{Software}{}% 54
-\BOOKMARK [1][-]{section.5.1}{Firmware}{chapter.5}% 55
-\BOOKMARK [1][-]{section.5.2}{Operating System}{chapter.5}% 56
-\BOOKMARK [0][-]{chapter.6}{Results}{}% 57
-\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 58
-\BOOKMARK [1][-]{section.7.1}{Future Work}{chapter.7}% 59
+\BOOKMARK [1][-]{section.3.2}{Design Considerations}{chapter.3}% 10
+\BOOKMARK [1][-]{section.3.3}{Central Processing Unit}{chapter.3}% 11
+\BOOKMARK [2][-]{subsection.3.3.1}{Introduction}{section.3.3}% 12
+\BOOKMARK [3][-]{subsubsection.3.3.1.1}{Load and Store Instructions}{subsection.3.3.1}% 13
+\BOOKMARK [3][-]{subsubsection.3.3.1.2}{ALU Instructions}{subsection.3.3.1}% 14
+\BOOKMARK [3][-]{subsubsection.3.3.1.3}{Jump and Branch Instructions}{subsection.3.3.1}% 15
+\BOOKMARK [3][-]{subsubsection.3.3.1.4}{Miscellaneous Instructions}{subsection.3.3.1}% 16
+\BOOKMARK [3][-]{subsubsection.3.3.1.5}{Control Instructions}{subsection.3.3.1}% 17
+\BOOKMARK [3][-]{subsubsection.3.3.1.6}{Instruction Encoding Summary}{subsection.3.3.1}% 18
+\BOOKMARK [3][-]{subsubsection.3.3.1.7}{Addressing Modes}{subsection.3.3.1}% 19
+\BOOKMARK [3][-]{subsubsection.3.3.1.8}{Programmer-Visible Pipeline Effects}{subsection.3.3.1}% 20
+\BOOKMARK [2][-]{subsection.3.3.2}{Registers}{section.3.3}% 21
+\BOOKMARK [3][-]{subsubsection.3.3.2.1}{General-Purpose Registers}{subsection.3.3.2}% 22
+\BOOKMARK [3][-]{subsubsection.3.3.2.2}{LO and HI Registers}{subsection.3.3.2}% 23
+\BOOKMARK [3][-]{subsubsection.3.3.2.3}{Control Registers}{subsection.3.3.2}% 24
+\BOOKMARK [2][-]{subsection.3.3.3}{Memory Management}{section.3.3}% 25
+\BOOKMARK [3][-]{subsubsection.3.3.3.1}{MIPS Logical Address Space}{subsection.3.3.3}% 26
+\BOOKMARK [3][-]{subsubsection.3.3.3.2}{Translation Look-aside Buffer \(TLB\)}{subsection.3.3.3}% 27
+\BOOKMARK [3][-]{subsubsection.3.3.3.3}{Cache Memory}{subsection.3.3.3}% 28
+\BOOKMARK [2][-]{subsection.3.3.4}{Exception Handling}{section.3.3}% 29
+\BOOKMARK [3][-]{subsubsection.3.3.4.1}{Exception Cases}{subsection.3.3.4}% 30
+\BOOKMARK [3][-]{subsubsection.3.3.4.2}{Exception Vectors}{subsection.3.3.4}% 31
+\BOOKMARK [3][-]{subsubsection.3.3.4.3}{Exception Protocol}{subsection.3.3.4}% 32
+\BOOKMARK [3][-]{subsubsection.3.3.4.4}{Precise Exceptions}{subsection.3.3.4}% 33
+\BOOKMARK [1][-]{section.3.4}{System Bus}{chapter.3}% 34
+\BOOKMARK [1][-]{section.3.5}{Bus Decoder}{chapter.3}% 35
+\BOOKMARK [1][-]{section.3.6}{Memory Interface}{chapter.3}% 36
+\BOOKMARK [1][-]{section.3.7}{VGA Interface}{chapter.3}% 37
+\BOOKMARK [2][-]{subsection.3.7.1}{Character Memory}{section.3.7}% 38
+\BOOKMARK [2][-]{subsection.3.7.2}{Attribute Memory}{section.3.7}% 39
+\BOOKMARK [2][-]{subsection.3.7.3}{Font Memory}{section.3.7}% 40
+\BOOKMARK [2][-]{subsection.3.7.4}{Special Registers}{section.3.7}% 41
+\BOOKMARK [1][-]{section.3.8}{Interrupt Controller}{chapter.3}% 42
+\BOOKMARK [1][-]{section.3.9}{Programmable Timer}{chapter.3}% 43
+\BOOKMARK [1][-]{section.3.10}{Keyboard Controller}{chapter.3}% 44
+\BOOKMARK [1][-]{section.3.11}{Design Decisions}{chapter.3}% 45
+\BOOKMARK [0][-]{chapter.4}{Implementation}{}% 46
+\BOOKMARK [1][-]{section.4.1}{Overview}{chapter.4}% 47
+\BOOKMARK [1][-]{section.4.2}{Central Processing Unit}{chapter.4}% 48
+\BOOKMARK [1][-]{section.4.3}{System Bus}{chapter.4}% 49
+\BOOKMARK [1][-]{section.4.4}{Bus Decoder}{chapter.4}% 50
+\BOOKMARK [1][-]{section.4.5}{Memory Interface}{chapter.4}% 51
+\BOOKMARK [1][-]{section.4.6}{VGA Interface}{chapter.4}% 52
+\BOOKMARK [1][-]{section.4.7}{Interrupt Controller}{chapter.4}% 53
+\BOOKMARK [1][-]{section.4.8}{Programmable Timer}{chapter.4}% 54
+\BOOKMARK [1][-]{section.4.9}{Keyboard Controller}{chapter.4}% 55
+\BOOKMARK [1][-]{section.4.10}{Emulator}{chapter.4}% 56
+\BOOKMARK [0][-]{chapter.5}{Software}{}% 57
+\BOOKMARK [1][-]{section.5.1}{Firmware}{chapter.5}% 58
+\BOOKMARK [1][-]{section.5.2}{Operating System}{chapter.5}% 59
+\BOOKMARK [0][-]{chapter.6}{Results}{}% 60
+\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 61
+\BOOKMARK [1][-]{section.7.1}{Future Work}{chapter.7}% 62
