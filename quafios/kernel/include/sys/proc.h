@@ -80,6 +80,7 @@ typedef struct proc_s {
 
     /* kernel stack */
     uint8_t *kstack;
+    uint32_t phy_stack_bot;
 
     /* when a syscall is called: */
     void *context;

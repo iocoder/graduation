@@ -12,7 +12,7 @@ DEPS          = $(ALLHFILES) Makefile \
 SDIRS         = $(shell cd $(CSD) && find . -type d 2>/dev/null)
 
 %.o:%.c $(DEPS)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(QCC) $(QCFLAGS) -c -o $@ $<
 
 lib/$(OBJECT_NAME).a: $(OBJ)
 	mkdir -p lib

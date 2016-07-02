@@ -34,6 +34,8 @@
 
 uint8_t kernel_stack[KERNEL_STACK_SIZE] __attribute__ ((aligned(16)));
 
+uint32_t cur_stack_top = (uint32_t) &kernel_stack[KERNEL_STACK_SIZE];
+
 #else
 
 typedef int dummy;

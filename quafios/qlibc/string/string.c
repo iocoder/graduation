@@ -115,3 +115,10 @@ char *strtok(char *str, const char *delimiters) {
     /* done. */
     return curToken;
 }
+
+void *memset(void *ptr, int value, size_t num) {
+    int i;
+    for (i = 0; i < num; i++)
+        ((unsigned char *) ptr)[i] = value;
+    return ptr;
+}

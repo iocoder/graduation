@@ -15,10 +15,10 @@ DEPS          = $(ALLHFILES) Makefile \
 		$(LIBC_LIB)
 
 %.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) -D BUILD_FOR_QUAFIOS -c -o $@ $<
+	$(QCC) $(QCFLAGS) -D BUILD_FOR_QUAFIOS -c -o $@ $<
 
 $(OBJECT_NAME): $(OBJ)
-	$(CC) $(LFLAGS) -o $@ $^ $(LIBS)
+	$(QCC) $(QCFLAGS) $(QLFLAGS) -o $@ $^ $(LIBS)
 
 install-exec-local:
 	$(INSTALL) -D $(OBJECT_NAME) $(OBJECT_PREFIX)/$(OBJECT_NAME)

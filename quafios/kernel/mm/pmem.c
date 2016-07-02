@@ -70,9 +70,13 @@ uint32_t to_phys(uint32_t addr) {
 uint8_t pmem_readb(void *p_addr) {
     /* p_addr: physical memory address which is to be accessed. */
 
+    return *((uint8_t *)(((uint32_t) p_addr) | 0x80000000));
+
+#if 0
     /* p_addr = p_page (page base) + p_off (offset to that base). */
     uint32_t p_page = ((uint32_t) p_addr) & PAGE_BASE_MASK;
     uint32_t p_off  = ((uint32_t) p_addr) & (PAGE_SIZE-1);
+
 
     if (!physical_page) {
         physical_page = kmalloc(PAGE_SIZE);
@@ -83,7 +87,7 @@ uint8_t pmem_readb(void *p_addr) {
         arch_set_page(NULL, physical_page, cur_physical_page=p_page);
 
     return physical_page[p_off];
-
+#endif
 }
 
 uint16_t pmem_readw(void *p_addr) {

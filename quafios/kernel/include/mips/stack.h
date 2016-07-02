@@ -45,7 +45,7 @@ typedef struct {
 
 /* Stack: */
 #define USER_STACK_SIZE         0x1000000 /* 16MB       */
-#define KERNEL_STACK_SIZE       8*1024    /* 8KB Stack. */
+#define KERNEL_STACK_SIZE       4*1024    /* 4KB Stack. */
 extern uint8_t kernel_stack[];
 
 #define stack_switch()  printk("stack.h: stack_switch() stub!")

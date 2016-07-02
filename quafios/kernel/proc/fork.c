@@ -78,6 +78,7 @@ int32_t fork() {
         kfree(newproc);
         return -1; /* error. */
     }
+    initproc->phy_stack_bot = arch_vmpage_getAddr(NULL, newproc->kstack);
 
     /* initialize kernel stack...
      * this invokes page faults to allocate memory for
@@ -131,6 +132,14 @@ int32_t fork() {
     /* add to scheduler's queue: */
     linkedlist_addlast((linkedlist*)&q_ready, (linknode*)&(newproc->sched));
 
-    /* return to the parent. */
-    return newproc->pid;
+    /* call the scheduler */
+    scheduler();
+
+    /* return */
+    if (curproc == newproc) {
+        return 0;
+    } else {
+        return newproc->pid;
+    }
+
 }

@@ -1,8 +1,8 @@
 /*
  *        +----------------------------------------------------------+
  *        | +------------------------------------------------------+ |
- *        | |  Quafios C Standard Library.                         | |
- *        | |  -> API: syscall() routine.                          | |
+ *        | |  Quafios Kernel 2.0.1.                               | |
+ *        | |  -> i386 - ISR - system call handler.                | |
  *        | +------------------------------------------------------+ |
  *        +----------------------------------------------------------+
  *
@@ -26,30 +26,30 @@
  *
  */
 
-#include <api/syscall.h>
+/* System Call Handler is actually the interface between running applications
+ * and kernel. Applications do invoke system calls via interrupt gate 0x80.
+ */
 
-uint32_t svc_entry;
+#ifdef ARCH_MIPS
 
-void syscall_init() {
-    __asm__("move %0, $gp":"=r"(svc_entry));
-}
+#include <arch/type.h>
+#include <arch/irq.h>
+#include <sys/error.h>
+#include <sys/mm.h>
+#include <sys/device.h>
+#include <sys/scheduler.h>
+#include <sys/semaphore.h>
 
-int syscall(int number, ...) {
+int syscall(int32_t number, ...);
 
-    int *arg = &number;
-    int ret;
+void svc(uint32_t *regs) {
 
-    __asm__("move $s0, %0"::"r"(arg[0]));
-    __asm__("move $s1, %0"::"r"(arg[1]));
-    __asm__("move $s2, %0"::"r"(arg[2]));
-    __asm__("move $s3, %0"::"r"(arg[3]));
-    __asm__("move $s4, %0"::"r"(arg[4]));
-    __asm__("move $s5, %0"::"r"(arg[5]));
-    __asm__("move $s6, $ra");
-    __asm__("jal  %0"::"r"(svc_entry));
-    __asm__("move $ra, $s6");
-    __asm__("move %0, $s0":"=r"(ret));
+    /* a system call signal recieved...
+     * please refer to include/syscall.h...
+     */
 
-    return ret;
+    regs[16]=syscall(regs[16],regs[17],regs[18],regs[19],regs[20],regs[21]);
 
 }
+
+#endif

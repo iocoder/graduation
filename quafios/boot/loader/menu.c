@@ -193,6 +193,7 @@ void show_menu() {
         print_menu_option(first_line+i, "", 0);
     print_menu_footer(first_line+i++);
     print_footer(first_line+i+1);
+    loadquaf();
     while(1) {
         char but = getc();
         switch (but) {

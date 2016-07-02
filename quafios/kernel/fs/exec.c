@@ -134,6 +134,7 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
     Elf32_Word filesz;
     Elf32_Word memsz;
     char *shebang = (char *) &header;
+    int flag = 0;
 
     /* Open the executable file:  */
     /* -------------------------- */
@@ -183,7 +184,7 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
         header.e_ident[EI_CLASS] != ELFCLASS32  ||
         header.e_ident[EI_DATA ] != ELFDATA2LSB || /* Only support LSB. */
         header.e_type != ET_EXEC || /* Only load executable files. */
-        header.e_machine != EM_386) {
+        header.e_machine != EM_MIPS) {
             /* We only support Intel 386 32-bit programs. */
             file_close(file);
             printk("execve(): Invalid ELF file %s\n", &header);
@@ -274,9 +275,17 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
         file_seek(file, newpos, NULL, SEEK_SET);
         file_read(file, (char *) vaddr, filesz, &done);
 
+        if (filesz && !flag) {
+            unsigned int pg;
+            for (pg = vaddr; pg < vaddr+filesz; pg+=0x1000) {
+                fill_tlb2(pg>>12,arch_vmpage_getAddr(NULL,pg)>>12,1);
+            }
+            flag = 1;
+        }
+
         /* update heap start: */
         if (vaddr + memsz > curproc->umem.heap_start)
-                curproc->umem.heap_start = vaddr + memsz;
+            curproc->umem.heap_start = vaddr + memsz;
     }
 
     /* update heap parameters: */

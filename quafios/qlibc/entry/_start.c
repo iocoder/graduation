@@ -30,8 +30,11 @@
 #include <errno.h>
 #include <stdlib.h>
 
-void _start(int argc, char *argv[], char *envp[]) {
+void __start(int argc, char *argv[], char *envp[]) {
     int ret;
+
+    /* initialize syscall interface */
+    syscall_init();
 
     /* initialize errors... */
     error_init();

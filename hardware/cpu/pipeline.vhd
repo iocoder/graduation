@@ -104,8 +104,10 @@ signal   exception      : STD_LOGIC := '0';
 signal   if_pc          : STD_LOGIC_VECTOR (31 downto 0) := x"BFBFFFFC";
 signal   if_pc4         : STD_LOGIC_VECTOR (31 downto 0) := x"BFC00000";
 signal   if_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+signal   if_badvaddr    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   if_exphndl     : STD_LOGIC := '0';
 signal   if_exception   : STD_LOGIC := '0';
+signal   if_exception2  : STD_LOGIC := '0';
 
 -- ID
 signal   id_instr       : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
@@ -235,8 +237,7 @@ signal   wb_is_mtc0     : STD_LOGIC := '0';
 signal   wb_exception   : STD_LOGIC := '0';
 
 -- TLB
-signal   instr_vaddr    : STD_LOGIC_VECTOR (31 downto 0);
-signal   instr_paddr    : STD_LOGIC_VECTOR (31 downto 0);
+signal   instr_paddr    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   instr_miss     : boolean := false;
 signal   data_vaddr     : STD_LOGIC_VECTOR (31 downto 0);
 signal   data_paddr     : STD_LOGIC_VECTOR (31 downto 0);
@@ -268,13 +269,14 @@ signal   EPC            : STD_LOGIC_VECTOR (31 downto 0) := x"00000000"; -- 14
 signal   CAUSE_tmp      : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   EPC_tmp        : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
-signal   if_badvaddr    : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 signal   mem_badvaddr   : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
 
 signal   got_rising     : std_logic := '0';
 signal   got_falling    : std_logic := '0';
 
 signal   int_busy       : boolean := false;
+signal   int_busy2      : boolean := false;
+signal   exp_busy       : boolean := false;
 signal   iSTALL         : STD_LOGIC;
 
 
@@ -287,7 +289,13 @@ begin
 --                                    TLB has translated address and cache
 --                                    has moved to phase 1
 
-iSTALL <= '1' when STALL='1' or ex_busy = 1 or int_busy or mem_busy else '0';
+iSTALL <= '1' when STALL='1' or
+                   ex_busy = 1 or
+                   int_busy or
+                   int_busy2 or
+                   mem_busy or
+                   exp_busy
+              else '0';
 
 --------------------------------------------------------------------------------
 --                                TLB                                         --
@@ -318,7 +326,7 @@ begin
         end if;
         -- instrution access
         -- data access
-        data_entry := tlb(conv_integer(data_vaddr(17 downto 12)));
+        data_entry := tlb(conv_integer(data_vaddr(16 downto 12)&"0"));
         if (data_vaddr(31) = '0' or data_vaddr(30) = '1') then
             -- 0x00000000-0x7FFFFFFF
             -- 0xC0000000-0xFFFFFFFF
@@ -355,15 +363,26 @@ begin
     end if;
 
     if (CLK = '0' and CLK'event) then
-        if (got_falling /= got_rising or int_busy) then
+        if (got_falling /= got_rising or int_busy or
+            int_busy2 or exp_busy) then
             -- if exception conditions are satisfied, next cycle is
             -- an exception fetch, and all stages before and including the
             -- exception-source stage shall be flushed.
-            if (mem_exception='1') then
+            if ((mem_exception='1' or if_exception2='1') and not exp_busy) then
+                exp_busy <= true;
+            elsif (mem_exception='1') then
+                exp_busy <= false;
                 CAUSE    <= x"00000004"; -- TLB miss
                 EPC      <= alu_add(mem_pc4,x"FFFFFFFC");
+            elsif (if_exception2='1') then
+                exp_busy <= false;
+                CAUSE    <= x"00000004"; -- TLB miss
+                EPC      <= alu_add(if_pc4,x"FFFFFFFC");
             elsif (int_busy) then
                 int_busy <= false;
+                int_busy2 <= true;
+            elsif (int_busy2) then
+                int_busy2 <= false;
                 -- store EPC and CAUSE
                 if (id_is_jr='1' or id_is_jalr='1' or
                     is_branchregimm(id_opcode) or
@@ -411,7 +430,7 @@ begin
         handle_exception := false;
 
         if (if_exphndl= '0' and
-            if_exception='1' and
+            (if_exception='1' or if_exception2='1') and
             id_instr=x"00000000" and
             ex_instr=x"00000000" and
             mem_instr=x"00000000") then
@@ -436,7 +455,7 @@ begin
         if (handle_exception) then
             if_pc        <= x"BFC00180";
             if_exphndl   <= '1';
-        elsif (if_exception='1') then
+        elsif (if_exception='1' or if_exception2='1') then
             -- Don't Move (Phantogram)
         else
             -- normal operation
@@ -459,10 +478,48 @@ end process;
 -- add 4 to pc
 if_pc4 <= alu_add(if_pc, x"00000004");
 
+process(if_pc)
+
+variable instr_vaddr      : std_logic_vector(31 downto 0) := x"00000000";
+variable instr_entry      : std_logic_vector(40 downto 0);
+
+begin
+
+    instr_vaddr := if_pc;
+    instr_entry := tlb(conv_integer(instr_vaddr(16 downto 12)&"1"));
+
+    -- solve instr_vaddr
+    if (instr_vaddr(31) = '0' or instr_vaddr(30) = '1') then
+        -- 0x00000000-0x7FFFFFFF
+        -- 0xC0000000-0xFFFFFFFF
+        if (instr_entry(39 downto 20) = instr_vaddr(31 downto 12) and
+            instr_entry(40) = '1') then
+            instr_miss <=false;
+            instr_paddr<=instr_entry(19 downto 0)&instr_vaddr(11 downto 0);
+            if_exception2 <= '0';
+        else
+            instr_miss <=true;
+--             if_exception2 <= '1';
+            if_badvaddr <= instr_vaddr;
+        end if;
+    elsif (instr_vaddr(29) = '0') then
+        -- 0x80000000-0x9FFFFFFF
+        instr_paddr <= "000" & instr_vaddr(28 downto 0);
+        instr_miss  <= false;
+        if_exception2 <= '0';
+    else
+        -- 0xA0000000-0xBFFFFFFF
+        instr_paddr <= "000" & instr_vaddr(28 downto 0);
+        instr_miss  <= false;
+        if_exception2 <= '0';
+    end if;
+
+end process;
+
 -- interface iMEM component
 iMEME    <= '1';
 iRW      <= '0';
-iADDR    <= if_pc;
+iADDR    <= instr_paddr;
 iDTYPE   <= "100";
 if_instr <= iDin;
 iDout    <= x"00000000";
@@ -484,6 +541,7 @@ begin
             -- don't move
             id_next_instr := id_instr;
         elsif (if_exception='1' or
+               if_exception2='1' or
                ex_exception='1' or
                mem_exception = '1') then
             -- flush ID
@@ -580,6 +638,8 @@ begin
             -- set badvaddr
             if (mem_exception='1') then
                 BadVaddr <= mem_badvaddr;
+            elsif (if_exception2='1') then
+                BadVaddr <= if_badvaddr;
             end if;
         elsif (id_is_rfe='1' and
                ex_instr=x"00000000" and

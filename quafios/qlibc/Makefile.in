@@ -404,7 +404,7 @@ uninstall-am: uninstall-local
 
 
 %.o:%.c $(DEPS)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(QCC) $(QCFLAGS) -c -o $@ $<
 
 lib/$(OBJECT_NAME).a: $(OBJ)
 	mkdir -p lib

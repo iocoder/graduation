@@ -265,7 +265,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = boot kernel nes tools
+SUBDIRS = boot kernel qlibc init rash coreutils edit calc nes tools
 REMOVE_EMPTY_DIR = @SUBDIRS=;\
 	IFS=$$'\n'; \
 	v=$$(find $(1)/ -type d | tac);\
@@ -652,7 +652,7 @@ setup:
 diskimg:
 	make install prefix=`pwd`/disk
 	mkdir -p `pwd`/iso
-	dd if=/dev/zero of=disk.img bs=512K count=1 &> /dev/null
+	dd if=/dev/zero of=disk.img bs=1024K count=1 &> /dev/null
 	echo -e "o\nn\np\n1\n63\n\na\nw\n" | fdisk disk.img > /dev/null
 	tools/mkdiskfs disk disk.img $(shell uuidgen) 32256
 

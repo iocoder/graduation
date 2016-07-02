@@ -72,7 +72,12 @@ void set_tlb(uint32_t index, uint32_t virt, uint32_t phys, uint32_t v) {
 }
 
 void fill_tlb(uint32_t virt, uint32_t phys, uint32_t v) {
-    set_tlb(virt&63, virt, phys, v);
+    set_tlb(((virt&31)<<1)|0, virt, phys, v);
+}
+
+void fill_tlb2(uint32_t virt, uint32_t phys, uint32_t v) {
+    /*printk("%x %x %d\n", virt, phys, v);*/
+    set_tlb(((virt&31)<<1)|1, virt, phys, v);
 }
 
 void get_tlb(uint32_t index, uint32_t *virt, uint32_t *phys, uint32_t *v) {
@@ -88,8 +93,8 @@ void get_tlb(uint32_t index, uint32_t *virt, uint32_t *phys, uint32_t *v) {
 
 void flush_tlb() {
     int i;
-    for (i = 0; i < 64; i++)
-        set_tlb(i, 0, 0, 0);
+    for (i = 0; i < 32; i++)
+        set_tlb(i<<1, 0, 0, 0);
 }
 
 /****************************************************************************/
@@ -184,7 +189,41 @@ void arch_vmpage_copy(umem_t *msrc, uint32_t src,
                       umem_t *mdest, uint32_t dest,
                       uint8_t *buf1, uint8_t *buf2) {
 
-    printk("page.c: arch_vmpage_copy() stub!\n");
+    arch_umem_t arch_umem;
+    uint32_t entry;
+    uint32_t pde, *pagetbl, pe;
+    uint8_t *psrc;
+    uint8_t *pdst;
+    int i;
+
+    /* source is not allocated/present? */
+    if (!(getPageEntry(msrc, src) & PAGE_ENTRY_P))
+        return;
+
+    /* dest is not allocated/present? */
+    entry = getPageEntry(mdest, dest);
+    if (!(entry & PAGE_ENTRY_P)) {
+        if (!entry)
+            return; /* not mapped!! */
+
+        arch_umem = get_arch_umem_t(mdest);
+        pde = (dest >> 22) & 0x3FF; /* page dir entry */
+        if (!(arch_umem.page_dir[pde] & PAGE_ENTRY_P))
+            return;
+        pagetbl = (uint32_t*)(arch_umem.page_dir[pde]&PAGE_BASE_MASK);
+        pe = (dest >> 12) & 0x3FF; /* page entry; */
+
+        pagetbl[pe] |= ppalloc();
+        pagetbl[pe] |= PAGE_ENTRY_P;
+        pagetbl[pe] &= ~PAGE_ENTRY_AF;
+    }
+
+    /* copy from src to dest */
+    psrc = (uint8_t *)(0x80000000 | arch_vmpage_getAddr(msrc,src));
+    pdst = (uint8_t *)(0x80000000 | arch_vmpage_getAddr(mdest,dest));
+    for (i = 0; i < PAGE_SIZE; i++) {
+        pdst[i] = psrc[i];
+    }
 
 }
 
@@ -266,6 +305,7 @@ uint32_t arch_vmpage_map(umem_t *umem, uint32_t vaddr, uint32_t user) {
      */
     arch_umem_t arch_umem;
     uint32_t pde, *pagetbl, pe, i;
+
     if (arch_vmpage_isMapped(umem, vaddr))
         return EBUSY;
     arch_umem = get_arch_umem_t(umem);
@@ -535,7 +575,8 @@ void tlb_miss() {
         panic(NULL, "Page fault!\n");
     }
 
-    /*printk("vaddr: %x %x %x %x\n", vaddr, pagetbl, pagetbl[pe], get_epc());*/
+    /*printk("vaddr: %x %x %x %x %x\n",
+           vaddr, pagetbl, pagetbl[pe], get_epc(), &tmp);*/
 
     /* allocate memory:  */
     /* ----------------- */

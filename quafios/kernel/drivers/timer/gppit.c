@@ -78,7 +78,7 @@ uint32_t gppit_probe(device_t *dev, void *config) {
     pitreg = (uint32_t *) dev->resources.list[0].data.mem.base;
 
     /* enable interrupt every 10ms */
-    *pitreg = 500000; /* 50MHz / 500000 = 100Hz */
+    /**pitreg = 500000; /* 50MHz / 500000 = 100Hz */
 
     /* register the driver at IRQ center */
     reserve = kmalloc(sizeof(irq_reserve_t));

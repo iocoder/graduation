@@ -15,13 +15,13 @@ DEPS          = $(ALLHFILES) Makefile \
 		$(LIBC_LIB)
 
 %.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(QCC) $(QCFLAGS) -c -o $@ $<
 
 edit: $(OBJ)
-	$(CC) $(LFLAGS) -o $@ $^ $(LIBS)
+	$(QCC) $(QCFLAGS) $(QLFLAGS) -o $@ $^ $(LIBS)
 
 view: $(OBJ)
-	$(CC) $(LFLAGS) -o $@ $^ $(LIBS)
+	$(QCC) $(QCFLAGS) $(QLFLAGS) -o $@ $^ $(LIBS)
 
 install-exec-local:
 	$(INSTALL) -D edit $(OBJECT_PREFIX)/edit

@@ -47,7 +47,26 @@ isr_init:
 isr:
 .set noat
 .set noreorder
+    /* move from user mode to kernel mode? */
+    srl   $k1, $sp, 31
+    bne   $k1, $0, user_mode
+    nop
+
+kern_mode:
+    lui   $k1, %hi(cur_stack_top)
+    addiu $k1, %lo(cur_stack_top)
+    lw    $k1, 0($k1)
+    sw    $sp, -4($k1)
+    move  $sp, $k1
+    j     go_ahead
+    nop
+
+user_mode:
+    sw    $sp, -4($sp)
+
+go_ahead:
     /* re-align stack */
+    addi  $sp, -4
     addi  $sp, -4*40
     /* push registers */
     sw    $0,  4* 0($sp)
@@ -146,6 +165,116 @@ return:
     lw    $k0, 4*32($sp)
     /* reset stack pointer */
     addi  $sp, 4*40
+    lw    $sp, 0($sp)
     /* jmp to EPC */
     jr    $k0
     rfe
+
+.global svc_entry
+svc_entry:
+.set noat
+.set noreorder
+    /* move from user mode to kernel mode? */
+    srl   $k1, $sp, 31
+    bne   $k1, $0, svc_user_mode
+    nop
+
+svc_kern_mode:
+    lui   $k1, %hi(cur_stack_top)
+    addiu $k1, %lo(cur_stack_top)
+    lw    $k1, 0($k1)
+    sw    $sp, -4($k1)
+    move  $sp, $k1
+    j     svc_go_ahead
+    nop
+
+svc_user_mode:
+    sw    $sp, -4($sp)
+
+svc_go_ahead:
+    /* re-align stack */
+    addi  $sp, -4
+    addi  $sp, -4*40
+    /* push registers */
+    sw    $0,  4* 0($sp)
+    sw    $1,  4* 1($sp)
+    sw    $2,  4* 2($sp)
+    sw    $3,  4* 3($sp)
+    sw    $4,  4* 4($sp)
+    sw    $5,  4* 5($sp)
+    sw    $6,  4* 6($sp)
+    sw    $7,  4* 7($sp)
+    sw    $8,  4* 8($sp)
+    sw    $9,  4* 9($sp)
+    sw    $10, 4*10($sp)
+    sw    $11, 4*11($sp)
+    sw    $12, 4*12($sp)
+    sw    $13, 4*13($sp)
+    sw    $14, 4*14($sp)
+    sw    $15, 4*15($sp)
+    sw    $16, 4*16($sp)
+    sw    $17, 4*17($sp)
+    sw    $18, 4*18($sp)
+    sw    $19, 4*19($sp)
+    sw    $20, 4*20($sp)
+    sw    $21, 4*21($sp)
+    sw    $22, 4*22($sp)
+    sw    $23, 4*23($sp)
+    sw    $24, 4*24($sp)
+    sw    $25, 4*25($sp)
+    sw    $26, 4*26($sp)
+    sw    $27, 4*27($sp)
+    sw    $28, 4*28($sp)
+    sw    $29, 4*29($sp)
+    sw    $30, 4*30($sp)
+    sw    $31, 4*31($sp)
+    /* store cop0 regs */
+    mfc0  $a0, $14
+    sw    $a0, 4*32($sp)
+    /* store pointer to regs */
+    move  $a0, $sp
+    addi  $sp, -4*32
+    /* jump to svc routine */
+    jal   svc
+    nop
+    /* pop registers */
+    addi  $sp, 4*32
+    lw    $0,  4* 0($sp)
+    lw    $1,  4* 1($sp)
+    lw    $2,  4* 2($sp)
+    lw    $3,  4* 3($sp)
+    lw    $4,  4* 4($sp)
+    lw    $5,  4* 5($sp)
+    lw    $6,  4* 6($sp)
+    lw    $7,  4* 7($sp)
+    lw    $8,  4* 8($sp)
+    lw    $9,  4* 9($sp)
+    lw    $10, 4*10($sp)
+    lw    $11, 4*11($sp)
+    lw    $12, 4*12($sp)
+    lw    $13, 4*13($sp)
+    lw    $14, 4*14($sp)
+    lw    $15, 4*15($sp)
+    lw    $16, 4*16($sp)
+    lw    $17, 4*17($sp)
+    lw    $18, 4*18($sp)
+    lw    $19, 4*19($sp)
+    lw    $20, 4*20($sp)
+    lw    $21, 4*21($sp)
+    lw    $22, 4*22($sp)
+    lw    $23, 4*23($sp)
+    lw    $24, 4*24($sp)
+    lw    $25, 4*25($sp)
+    lw    $26, 4*26($sp)
+    lw    $27, 4*27($sp)
+    lw    $28, 4*28($sp)
+    lw    $29, 4*29($sp)
+    lw    $30, 4*30($sp)
+    lw    $31, 4*31($sp)
+    lw    $k0, 4*32($sp)
+    /* reset stack pointer */
+    addi  $sp, 4*40
+    lw    $sp, 0($sp)
+    /* return */
+    jr    $ra
+    nop

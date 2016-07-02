@@ -62,6 +62,18 @@ void print_badvaddr() {
     printk("BadVaddr: %x\n", reg);
 }
 
+void print_stp() {
+    int reg;
+    __asm__("move %0, $sp;":"=r"(reg));
+    printk("SP: %x\n", reg);
+}
+
+
+void print_s8() {
+    int reg;
+    __asm__("lw %0, 24($s8);":"=r"(reg));
+    printk("s8: %x\n", reg);
+}
 
 void panic(Regs *regs, const char *fmt, ...) {
     printk("KERNEL PANIC! %s\n", fmt);
@@ -69,6 +81,7 @@ void panic(Regs *regs, const char *fmt, ...) {
     print_status();
     print_epc();
     print_badvaddr();
+    print_stp();
     idle();
 }
 

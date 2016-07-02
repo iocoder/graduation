@@ -18,7 +18,7 @@ prog: upload
 	sleep 1
 	./upload erase
 	./upload ../firmware/firmware.bin 0xC00000 0x8000
-	./upload ../quafios/disk.img 0x000000 0x80000
+	./upload ../quafios/disk.img 0x000000 0x100000
 
 clean:
 	rm -f upload

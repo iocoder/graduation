@@ -41,6 +41,12 @@ AC_CONFIG_FILES([Makefile
                  quafios/Makefile
                  quafios/boot/Makefile
                  quafios/kernel/Makefile
+                 quafios/qlibc/Makefile
+                 quafios/init/Makefile
+                 quafios/rash/Makefile
+                 quafios/coreutils/Makefile
+                 quafios/edit/Makefile
+                 quafios/calc/Makefile
                  quafios/nes/Makefile
                  quafios/tools/Makefile
                  hardware/Makefile

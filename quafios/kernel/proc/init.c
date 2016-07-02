@@ -38,7 +38,7 @@ void proc_init() {
 
     /* Process Manager Initialization */
     int32_t i, err = 0;
-    char *initpath = "/bin/init";
+    char *initpath = "/bin/rash";
     int32_t bootdisk;
 
     /* (I) Initialize linked lists:  */
@@ -70,6 +70,7 @@ void proc_init() {
 
     /* Kernel-mode stack: */
     initproc->kstack = kernel_stack;
+    initproc->phy_stack_bot = (uint32_t) kernel_stack;
 
     /* User memory: */
     umem_init(&(initproc->umem));
@@ -109,7 +110,7 @@ void proc_init() {
 
     /* (IV) Enable multitasking:  */
     /* -------------------------- */
-    /*scheduler_enabled = 1; /* start multitasking! */
+    scheduler_enabled = 1; /* start multitasking! */
 
     /* (V) Open console streams:  */
     /* -------------------------- */

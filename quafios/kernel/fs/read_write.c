@@ -190,7 +190,11 @@ void file_seek(file_t *file, pos_t offset, pos_t *result, int32_t whence) {
 /*                                seek()                                   */
 /***************************************************************************/
 
-int32_t seek(int32_t fd, pos_t offset, pos_t *result, int32_t whence) {
+int32_t seek(int32_t fd, uint32_t off_low, uint32_t off_high,
+             pos_t *result, int32_t whence) {
+
+    /* reconstruct position */
+    pos_t offset = ((uint64_t)off_high<<32) | off_low;
 
     /* fd must be a valid open descriptor: */
     if (fd < 0 || fd >= FD_MAX || curproc->file[fd] == NULL)
