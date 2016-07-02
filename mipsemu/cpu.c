@@ -376,11 +376,11 @@ void cache_write(int which, unsigned int addr, unsigned int data, int size) {
 }
 
 /* TLB miss? */
-int tlb_miss(unsigned int virt) {
+int tlb_miss(int which, unsigned int virt) {
     int indx;
     if (!((virt&0xC0000000) == 0x80000000)) {
         virt >>= 12;
-        indx = virt & (TLB_ENTRIES-1);
+        indx = ((virt & ((TLB_ENTRIES/2)-1))<<1)|(!which);
         return !tlb[indx].valid || tlb[indx].virt != virt;
     }
     return 0;
@@ -393,7 +393,7 @@ unsigned int tlb_read(int which, unsigned int addr, int size) {
         addr &= 0x1FFFFFFF;
     } else {
         virt = addr >> 12;
-        indx = virt & (TLB_ENTRIES-1);
+        indx = ((virt & (TLB_ENTRIES/2-1))<<1)|(!which);
         addr = (tlb[indx].phy<<12)|(addr&0xFFF);
     }
     return cache_read(which, addr, size);
@@ -413,7 +413,7 @@ void tlb_write(int which, unsigned int addr, unsigned int data, int size) {
         addr &= 0x1FFFFFFF;
     } else {
         virt = addr >> 12;
-        indx = virt & (TLB_ENTRIES-1);
+        indx = ((virt & (TLB_ENTRIES/2-1))<<1)|(!which);
         addr = (tlb[indx].phy<<12)|(addr&0xFFF);
     }
     cache_write(which, addr, data, size);
@@ -914,11 +914,11 @@ int cpu_clk() {
         }
     } else if (ex_exception ||
                ((ex_ctrlsig[MEM_READ]||ex_ctrlsig[MEM_WRITE])&&
-                tlb_miss(ex_alu_output))) {
+                tlb_miss(1, ex_alu_output))) {
         /* introduce a bubble in MEM */
         mem_instr   = 0;
         if ((ex_ctrlsig[MEM_READ]||ex_ctrlsig[MEM_WRITE])&&
-                tlb_miss(ex_alu_output)) {
+                tlb_miss(1, ex_alu_output)) {
             mem_exception = 1;
             mem_badvaddr  = ex_alu_output;
             mem_pc4       = ex_pc4;

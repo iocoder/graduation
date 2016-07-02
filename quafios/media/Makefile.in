@@ -399,10 +399,6 @@ uninstall-am: uninstall-local
 
 
 install-exec-local:
-	mkdir -p $(USR_DIR)/share
-	cp -r $(CSD)/fonts $(USR_DIR)/share/
-	cp -r $(CSD)/icons $(USR_DIR)/share/
-	cp -r $(CSD)/wallpapers $(USR_DIR)/share/
 	mkdir -p $(HOME_DIR)
 	cp $(CSD)/home/* $(HOME_DIR)/
 

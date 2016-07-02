@@ -244,6 +244,23 @@ void print_fmt(char *fmt, ...) {
     }
 }
 
+int get_cursor(char *x, char *y) {
+    *x = col;
+    *y = row;
+}
+
+int set_attr_at_off(char x, char y, char attr) {
+    write_to_vga(y*160+x*2+1, attr);
+}
+
+int set_char_at_off(char x, char y, char c) {
+    write_to_vga(y*160+x*2+0, c);
+}
+
+int set_cursor(char x, char y) {
+    move_cursor(y, x);
+}
+
 __asm__(".section .rodata         ");
 __asm__("font:                    ");
 __asm__(".incbin \"font8x16.fon\" ");

@@ -100,7 +100,11 @@ chunk_t *merge(chunk_t *chunk) {
 }
 
 void *malloc(size_t size) {
-    chunk_t *chunk = find_chunk(size);
+    chunk_t *chunk;
+    if (size % 4) {
+        size = (size + 3) & (~3);
+    }
+    chunk = find_chunk(size);
     if (!chunk) {
         /* add chunk */
         chunk = add_chunk(size);

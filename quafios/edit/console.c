@@ -422,6 +422,7 @@ void console_status(char *str) {
 }
 
 void console_init() {
+
     int i, j = 0;
 
     for (; j < 1; j++) {

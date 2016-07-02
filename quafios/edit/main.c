@@ -50,7 +50,11 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    if (!strcmp(&argv[0][strlen(argv[0])-4], "view")) {
+
+    console_init();
+    command_mode();
+
+    /*if (!strcmp(&argv[0][strlen(argv[0])-4], "view")) {
         extern int fileModified;
         if (fileModified) {
             printf("can't read %s\n", filename);
@@ -59,9 +63,10 @@ int main(int argc, char *argv[]) {
         console_init();
         view_mode();
     } else {
+        printf("Console initalization!\n");
         console_init();
         command_mode();
-    }
+    }*/
 
     console_black();
     return 0;

@@ -7,10 +7,10 @@ AFILES         = $(shell find $(CSD)/lib/     -name "*.a" 2>/dev/null)
 SFILES         = $(shell find $(CSD)/         -name "*.s" 2>/dev/null)
 
 install-exec-local:
-	mkdir -p $(USR_DIR)/share
-	cp -r $(CSD)/fonts $(USR_DIR)/share/
-	cp -r $(CSD)/icons $(USR_DIR)/share/
-	cp -r $(CSD)/wallpapers $(USR_DIR)/share/
+	##mkdir -p $(USR_DIR)/share
+	##cp -r $(CSD)/fonts $(USR_DIR)/share/
+	##cp -r $(CSD)/icons $(USR_DIR)/share/
+	##cp -r $(CSD)/wallpapers $(USR_DIR)/share/
 	mkdir -p $(HOME_DIR)
 	cp $(CSD)/home/* $(HOME_DIR)/
 

@@ -31,7 +31,7 @@
 bios_t bios __attribute__((section(".bss")));
 
 void bios_init() {
-    int i;
+    int i,sp;
     char *ptr;
     /* get ptr to BIOS structure */
     __asm__("or %0, $0, $gp":"=r"(ptr));

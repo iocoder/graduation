@@ -38,7 +38,7 @@ void proc_init() {
 
     /* Process Manager Initialization */
     int32_t i, err = 0;
-    char *initpath = "/bin/rash";
+    char *initpath = "/bin/edit";
     int32_t bootdisk;
 
     /* (I) Initialize linked lists:  */

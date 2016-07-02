@@ -9,19 +9,23 @@ bios_t bios;
 
 void bios_init() {
     /* VGA routines */
-    bios.vga.write_to_vga = write_to_vga;
-    bios.vga.write_char   = write_char;
-    bios.vga.write_font   = write_font;
-    bios.vga.clear_screen = clear_screen;
-    bios.vga.move_cursor  = move_cursor;
-    bios.vga.hide_cursor  = hide_cursor;
-    bios.vga.show_cursor  = show_cursor;
-    bios.vga.print_char   = print_char;
-    bios.vga.print_int    = print_int;
-    bios.vga.print_hex    = print_hex;
-    bios.vga.print_str    = print_str;
-    bios.vga.print_hf     = print_hf;
-    bios.vga.print_fmt    = print_fmt;
+    bios.vga.write_to_vga    = write_to_vga;
+    bios.vga.write_char      = write_char;
+    bios.vga.write_font      = write_font;
+    bios.vga.clear_screen    = clear_screen;
+    bios.vga.move_cursor     = move_cursor;
+    bios.vga.hide_cursor     = hide_cursor;
+    bios.vga.show_cursor     = show_cursor;
+    bios.vga.print_char      = print_char;
+    bios.vga.print_int       = print_int;
+    bios.vga.print_hex       = print_hex;
+    bios.vga.print_str       = print_str;
+    bios.vga.print_hf        = print_hf;
+    bios.vga.print_fmt       = print_fmt;
+    bios.vga.get_cursor      = get_cursor;
+    bios.vga.set_attr_at_off = set_attr_at_off;
+    bios.vga.set_char_at_off = set_char_at_off;
+    bios.vga.set_cursor      = set_cursor;
 
     /* KBD routines */
     bios.kbd.getc         = getc;

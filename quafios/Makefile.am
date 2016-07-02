@@ -1,4 +1,4 @@
-SUBDIRS = boot kernel qlibc init rash coreutils edit calc nes tools
+SUBDIRS = boot kernel qlibc init rash coreutils edit calc media nes tools
 
 export ROOT_DIR=$(prefix)
 export BOOT_DIR=$(prefix)/boot

@@ -35,7 +35,7 @@ bootinfo_t *bootinfo = (bootinfo_t *) 0x8000C000;
 void bootinfo_init() {
 
     uint32_t cont = 0;
-
+    
     /* read memory layout: */
     bootinfo->mem_ents = 1;
     bootinfo->mem_ent[0].base         = 0;
@@ -66,5 +66,6 @@ void bootinfo_init() {
     /* live? */
     bootinfo->live = 1;
     bios.diskfs.getuuid(bootinfo->uuid);
+
 
 }

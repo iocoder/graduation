@@ -25,5 +25,9 @@ void print_hex(unsigned int num, char attr);
 void print_str(char *str, char attr);
 void print_hf(int line, char *str, char attr);
 void print_fmt(char *fmt, ...);
+int  get_cursor(char *x, char *y);
+int  set_attr_at_off(char x, char y, char attr);
+int  set_char_at_off(char x, char y, char c);
+int  set_cursor(char x, char y);
 
 #endif

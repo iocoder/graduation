@@ -85,19 +85,19 @@ void legacy_init() {
 }
 
 int32_t legacy_get_cursor(char *x, char *y) {
-    return ESUCCESS;
+    return bios_ptr->vga.get_cursor(x, y);
 }
 
 int32_t legacy_set_attr_at_off(char x, char y, char attr) {
-    return ESUCCESS;
+    return bios_ptr->vga.set_attr_at_off(x, y, attr);
 }
 
 int32_t legacy_set_char_at_off(char x, char y, char c) {
-    return ESUCCESS;
+    return bios_ptr->vga.set_char_at_off(x, y, c);
 }
 
 int32_t legacy_set_cursor(char x, char y) {
-    return ESUCCESS;
+    return bios_ptr->vga.set_cursor(x, y);
 }
 
 void legacy_redraw() {

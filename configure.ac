@@ -47,6 +47,7 @@ AC_CONFIG_FILES([Makefile
                  quafios/coreutils/Makefile
                  quafios/edit/Makefile
                  quafios/calc/Makefile
+                 quafios/media/Makefile
                  quafios/nes/Makefile
                  quafios/tools/Makefile
                  hardware/Makefile

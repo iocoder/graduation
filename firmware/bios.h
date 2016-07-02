@@ -15,28 +15,32 @@ typedef struct {
     /*0A*/ void (*print_str)(char *str, char attr);
     /*0B*/ void (*print_hf)(int line, char *str, char attr);
     /*0C*/ void (*print_fmt)(char *fmt, ...);
+    /*0D*/ int  (*get_cursor)(char *x, char *y);
+    /*0E*/ int  (*set_attr_at_off)(char x, char y, char attr);
+    /*0F*/ int  (*set_char_at_off)(char x, char y, char c);
+    /*10*/ int  (*set_cursor)(char x, char y);
 } bios_vga_t;
 
 typedef struct {
-    /*0D*/ char (*getc)();
-    /*0E*/ void (*scan_char)(char *c);
-    /*0F*/ void (*scan_str)(char *str);
-    /*10*/ int  (*scan_int)(int *num);
+    /*11*/ char (*getc)();
+    /*12*/ void (*scan_char)(char *c);
+    /*13*/ void (*scan_str)(char *str);
+    /*14*/ int  (*scan_int)(int *num);
 } bios_kbd_t;
 
 typedef struct {
-    /*11*/ int (*readsect)(int id, int lba, void *buf);
-    /*12*/ int (*readsects)(int id, int lba, int count, void *buf);
+    /*15*/ int (*readsect)(int id, int lba, void *buf);
+    /*16*/ int (*readsects)(int id, int lba, int count, void *buf);
 } bios_disk_t;
 
 typedef struct {
-    /*13*/ int (*loadfile)(int id,int firstsect,char *path,unsigned int base);
-    /*14*/ void (*getuuid)(char *uuid);
+    /*17*/ int (*loadfile)(int id,int firstsect,char *path,unsigned int base);
+    /*18*/ void (*getuuid)(char *uuid);
 } bios_diskfs_t;
 
 typedef struct {
-    /*15*/ void (**ptrs)(int *regs);
-    /*16*/ void (*set_isr_loc)(void *loc);
+    /*19*/ void (**ptrs)(int *regs);
+    /*1A*/ void (*set_isr_loc)(void *loc);
 } bios_isr_t;
 
 typedef struct {
