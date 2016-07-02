@@ -265,7 +265,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = boot kernel qlibc init rash coreutils edit calc media nes tools
+SUBDIRS = boot kernel qlibc init rash coreutils edit calc demo media nes tools
 REMOVE_EMPTY_DIR = @SUBDIRS=;\
 	IFS=$$'\n'; \
 	v=$$(find $(1)/ -type d | tac);\

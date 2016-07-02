@@ -4996,7 +4996,7 @@ done
 
 
 # Config files.
-ac_config_files="$ac_config_files Makefile logo/Makefile firmware/Makefile quafios/Makefile quafios/boot/Makefile quafios/kernel/Makefile quafios/qlibc/Makefile quafios/init/Makefile quafios/rash/Makefile quafios/coreutils/Makefile quafios/edit/Makefile quafios/calc/Makefile quafios/media/Makefile quafios/nes/Makefile quafios/tools/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile upload/Makefile"
+ac_config_files="$ac_config_files Makefile logo/Makefile firmware/Makefile quafios/Makefile quafios/boot/Makefile quafios/kernel/Makefile quafios/qlibc/Makefile quafios/init/Makefile quafios/rash/Makefile quafios/coreutils/Makefile quafios/edit/Makefile quafios/calc/Makefile quafios/demo/Makefile quafios/media/Makefile quafios/nes/Makefile quafios/tools/Makefile hardware/Makefile mipsemu/Makefile vhdsim/Makefile upload/Makefile"
 
 
 # Generate output files.
@@ -5754,6 +5754,7 @@ do
     "quafios/coreutils/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/coreutils/Makefile" ;;
     "quafios/edit/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/edit/Makefile" ;;
     "quafios/calc/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/calc/Makefile" ;;
+    "quafios/demo/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/demo/Makefile" ;;
     "quafios/media/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/media/Makefile" ;;
     "quafios/nes/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/nes/Makefile" ;;
     "quafios/tools/Makefile") CONFIG_FILES="$CONFIG_FILES quafios/tools/Makefile" ;;

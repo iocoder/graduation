@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <api/mman.h>
+#include <api/fs.h>
 
 char *filename;
 char *fileMem;
@@ -36,16 +37,18 @@ int offset = 0;
 int fileModified = 0;
 
 int file_load(char *fname) {
+    stat_t st = {0};
     FILE *fp = fopen(fname, "r");
     filename = fname;
     fileMem = sbrk(0);
     if (fp) {
+        /* get file size */
+        stat(fname, &st);
+        fileSize = st.size;
         /* read file */
-        int c;
-        while((c = getc(fp)) != EOF) {
-            sbrk(1);
-            fileMem[fileSize++] = (char) c;
-        }
+        sbrk(fileSize);
+        fread(fileMem, fileSize, 1, fp);
+        /* close file */
         fclose(fp);
     } else {
         /* invalid name */

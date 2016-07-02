@@ -97,13 +97,17 @@ uint32_t ramdisk_probe(device_t *dev, void *config) {
 uint32_t ramdisk_read(device_t *dev, uint64_t off, uint32_t size, char *buff) {
 
     info_t *info = (info_t *) dev->drvreg;
+    uint32_t base = info->base;
+    uint32_t limit = info->size;
+    
     if (info == NULL)
         return ENOMEM;
 
     while (size--) {
-        if (off > info->size)
+        if (off > limit)
             return ESUCCESS;
-        *buff = pmem_readb((uint32_t)(info->base + off++));
+
+        *buff = pmem_readb((uint32_t)(base + off++));
         buff++;
     }
 
