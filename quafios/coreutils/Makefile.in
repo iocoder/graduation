@@ -455,6 +455,7 @@ readsect: readsect.o
 
 install-exec-local:
 	$(INSTALL) -D ls           $(OBJECT_PREFIX)/ls
+	$(INSTALL) -D cat          $(OBJECT_PREFIX)/cat
 
 uninstall-local:
 	rm -f $(OBJECT_PREFIX)/umount

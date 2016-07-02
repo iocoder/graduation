@@ -104,6 +104,7 @@ uint32_t restore_strv(char *strv[], uint32_t stack_top) {
     }
 
     /* copy the vector itself: */
+    stack_top &= ~3;
     for (i = count; i >= 0; i--) {
         stack_top -= sizeof(char *);
         *((char **) stack_top) = strv[i];
@@ -238,6 +239,7 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
     /* push envp (down arg vector area) */
     sp = (uint32_t) argv;
     sp -= sizeof(char **);
+    sp &= ~3;
     *((char ***) sp) = envp;
 
     /* push argv: */
@@ -249,8 +251,8 @@ int32_t execve(char *filename, char *argv[], char *envp[]) {
     *((int32_t *) sp) = strv_len(argv);
 
     /* push a pseudo program counter: */
-    sp -= sizeof(void *);
-    *((void **) sp) = (void *) 0;
+    /*sp -= sizeof(void *);
+    *((void **) sp) = (void *) 0;*/
 
     /* Copy the program itself:  */
     /* ========================= */

@@ -112,7 +112,9 @@ char **tokenize(char *str, char *del) {
             continue;
         }
         /* copy token */
-        strcpy(tokens[tok_i++]=malloc(strlen(tmp2)+1), tmp2);
+        tmpptr = malloc(strlen(tmp2)+1);
+        tokens[tok_i] = tmpptr;
+        strcpy(tokens[tok_i++], tmp2);
     }
 
     /* done */

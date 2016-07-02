@@ -79,7 +79,7 @@ setup:
 diskimg:
 	make install prefix=`pwd`/disk
 	mkdir -p `pwd`/iso
-	dd if=/dev/zero of=disk.img bs=1024K count=1 &> /dev/null
+	dd if=/dev/zero of=disk.img bs=1536K count=1 &> /dev/null
 	echo -e "o\nn\np\n1\n63\n\na\nw\n" | fdisk disk.img > /dev/null
 	tools/mkdiskfs disk disk.img $(shell uuidgen) 32256
 

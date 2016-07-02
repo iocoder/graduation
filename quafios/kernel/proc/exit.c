@@ -42,10 +42,14 @@ void exit(int32_t status) {
 
     /* init process? */
     if (curproc->pid == 1) {
-        printk("%a", 0x0C);
+        char *initpath = "/bin/rash";
+        char *argv[2] = {NULL};
+        argv[0] = initpath;
+        execve(initpath, argv, 0);
+        /*printk("%a", 0x0C);
         printk("init process just terminated!\n");
         printk("rebooting...\n");
-        legacy_reboot();
+        legacy_reboot();*/
     }
 
     /* clear memory: */

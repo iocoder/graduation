@@ -140,7 +140,7 @@ void irq_entry() {
     int n = 0;
 
     /* for debugging */
-    *((unsigned short *) 0xBE000000) = chr++;
+    /* *((unsigned short *) 0xBE000000) = chr++; */
 
     /* ask for interrupt number */
     dev_ioctl(irq[0].pic_device, 1, &n);

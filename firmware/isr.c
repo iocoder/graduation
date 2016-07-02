@@ -69,7 +69,7 @@ void handle_interrupt(int *regs) {
     }
     if (isr[pic_read()&7])
         isr[pic_read()&7](regs);
-    *((unsigned short *) 0xBE000000) = x++;
+    /**((unsigned short *) 0xBE000000) = x++;*/
     /*print_epc();
     print_cause();
     print_status();*/

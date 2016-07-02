@@ -132,7 +132,7 @@ uint32_t mmap(uint32_t base, uint32_t size, uint32_t type,
     uint32_t addr;
     umem_t *umem = &(curproc->umem); /* current process umem image. */
 
-    printk("mmap called: %x, size: %x\n", base, size);
+    /*printk("mmap called: %x, size: %x\n", base, size);*/
 
     /* make sure fd is valid if a file is to be used */
     if (type & MMAP_TYPE_FILE) {

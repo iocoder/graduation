@@ -38,8 +38,9 @@ void proc_init() {
 
     /* Process Manager Initialization */
     int32_t i, err = 0;
-    char *initpath = "/bin/edit";
+    char *initpath = "/bin/rash";
     int32_t bootdisk;
+    char *argv[2] = {NULL};
 
     /* (I) Initialize linked lists:  */
     /* ----------------------------- */
@@ -138,6 +139,11 @@ void proc_init() {
     /* mount as diskfs filesystem */
     mount("/bootdisk", "/", "diskfs", 0, NULL);
 
+    /* mount misc filesystems */
+    mount("", "/tmp", "tmpfs", 0, NULL);
+    /*mount("", "/dev", "devfs", 0, NULL);*/
+    /*mount("", "/sys", "sysfs", 0, NULL);*/
+
     /* chdir to the new root */
     chdir("/");
 
@@ -146,7 +152,8 @@ void proc_init() {
     /*synctest();*/
     printk("Executing \"%s\" ...\n\n", initpath);
     printk("%a", 0x0E);
-    execve(initpath, 0, 0);
+    argv[0] = initpath;
+    execve(initpath, argv, 0);
     printk("FATAL: Error happened during execution.\n");
     idle();
 

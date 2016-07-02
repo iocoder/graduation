@@ -83,7 +83,7 @@ reset:
     lui    $t4, %hi(fetch)
     addiu  $t4, $t4, %lo(fetch)
     # register ISR
-    lw     $t0, 0x14*4($gp)
+    lw     $t0, 0x19*4($gp)
     lui    $t1, %hi(isr)
     ori    $t1, $t1, %lo(isr)
     sw     $t1, 3*4($t0)

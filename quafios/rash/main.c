@@ -8,8 +8,6 @@ int main(int argc, char *argv[]) {
     int ret = 0; /* return value */
     char **pathv = tokenize(getenv("PATH"), ":"); /* parse $PATH */
 
-    printf("hello!\n");
-
     /* initialize logger */
     if (log_init())
         return -3;

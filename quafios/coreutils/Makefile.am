@@ -72,7 +72,7 @@ install-exec-local:
 	## $(INSTALL) -D mknod        $(OBJECT_PREFIX)/mknod
 	## $(INSTALL) -D dir          $(OBJECT_PREFIX)/dir
 	$(INSTALL) -D ls           $(OBJECT_PREFIX)/ls
-	## $(INSTALL) -D cat          $(OBJECT_PREFIX)/cat
+	$(INSTALL) -D cat          $(OBJECT_PREFIX)/cat
 	## $(INSTALL) -D cp           $(OBJECT_PREFIX)/cp
 	## $(INSTALL) -D reboot       $(OBJECT_PREFIX)/reboot
 	## $(INSTALL) -D readsect     $(OBJECT_PREFIX)/readsect

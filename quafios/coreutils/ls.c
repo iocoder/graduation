@@ -44,6 +44,8 @@ typedef struct lsentry {
 lsentry_t *lshead = NULL;
 lsentry_t *lstail = NULL;
 
+char prevdir[1024];
+
 void setAttr(unsigned char data) {
     ioctl(1 /*stdout*/, TTY_ATTR, (void *) &data);
 }
@@ -67,6 +69,8 @@ int main(int argc, char *argv[], char *envp[]) {
     lsentry_t *p, *entry, *next;
     int size_digits;
     int ino_digits;
+
+    getcwd(prevdir, sizeof(prevdir));
 
     if (argc > 1) {
         err = chdir(argv[1]);
@@ -167,5 +171,6 @@ int main(int argc, char *argv[], char *envp[]) {
     }
 
     close(fd);
+    chdir(prevdir);
     return 0;
 }

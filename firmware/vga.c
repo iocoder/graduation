@@ -258,7 +258,7 @@ int set_char_at_off(char x, char y, char c) {
 }
 
 int set_cursor(char x, char y) {
-    move_cursor(y, x);
+    move_cursor(x, y);
 }
 
 __asm__(".section .rodata         ");

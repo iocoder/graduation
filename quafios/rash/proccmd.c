@@ -45,11 +45,14 @@ void proccmd(char *cmd, char **pathv) {
         func(argv);
     } else {
         /* not internal */
+#if 0
         if (pid = do_fork()) {
+            printf("return to parent!\n");
             /* parent, wait for child if no & in the command */
             if (wait)
                 do_waitpid(pid, &status);
         } else {
+#endif
             /* child, check if command contains a '/' */
             for (i = 0; argv[0][i] && argv[0][i] != '/'; i++);
             if (argv[0][i] == '/') {
@@ -71,7 +74,9 @@ void proccmd(char *cmd, char **pathv) {
             /* cannot execute comamnd */
             fprintf(stderr, "%s: command not found.\n", argv[0]);
             exit(127);
+#if 0
         }
+#endif
     }
 
     /* deallocate argv */

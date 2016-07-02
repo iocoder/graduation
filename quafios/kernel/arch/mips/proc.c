@@ -34,24 +34,21 @@
 #include <sys/error.h>
 
 #include <mips/asm.h>
+#include <mips/stack.h>
 
 void svc_entry();
-
-void hey_you() {
-    printk("From user to kernel!\n");
-    while(1);
-}
+extern uint32_t cur_stack_top;
 
 void umode_jmp(int32_t vaddr, int32_t sp) {
 
-    printk("umode jmp!\n");
+    /* clear TLB */
+    arch_vmswitch(&(curproc->umem));
 
+    /* far jump */
     __asm__("move $s1, %0"::"r"(sp));
-
     __asm__("move $a0, %0"::"r"(((int *) sp)[0]));
     __asm__("move $a1, %0"::"r"(((int *) sp)[1]));
     __asm__("move $a2, %0"::"r"(((int *) sp)[2]));
-
     __asm__("move $gp, %0"::"r"(svc_entry));
     __asm__("move $sp, $s1; jr %0"::"r"(vaddr));
 
@@ -68,8 +65,10 @@ void arch_proc_switch(proc_t *oldproc, proc_t *newproc) {
     /* update Task Segment: */
     /* ... */
 
-    /* update CR3: */
+    /* update CR3 and TLB */
     arch_vmswitch(&(newproc->umem));
+
+    /*cur_stack_top=((uint32_t)&newproc->kstack[KERNEL_STACK_SIZE])|0x80000000;*/
 
     /* store stack parameters: */
     /*__asm__("mov %%ebp, %%eax":"=a"(oldproc->reg1));

@@ -2,7 +2,7 @@
 
 ppu_read:
     # read byte from PPU
-    lui   $t0, 0x1EC0
+    lui   $t0, 0xBEC0
     addu  $t0, $t0, $a0
     lbu   $v0, 0($t0)
     jr    $ra
@@ -17,7 +17,7 @@ ppu_write:
     # write byte to PPU
     ori   $t0, $0,  0x4014
     beq   $t0, $a0, do_dma
-    lui   $t0, 0x1EC0
+    lui   $t0, 0xBEC0
     addu  $t0, $t0, $a0
     sb    $a1, 0($t0)
     jr    $ra
@@ -28,7 +28,7 @@ do_dma:
     sw    $s2, -12($sp)
     sw    $ra, -16($sp)
     ori   $s0, $0,  256
-    lui   $s1, 0x1EC0
+    lui   $s1, 0xBEC0
     addiu $s1, $s1, 0x2004
     sll   $s2, $a1, 8
 1:  move  $a0, $s2

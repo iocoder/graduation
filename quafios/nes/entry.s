@@ -29,7 +29,7 @@ main:
     ls     $a0, "%e"
     bios   printf
     # switch to NES PPU mode
-    lui    $t0, 0x1E00
+    lui    $t0, 0xBE00
     ori    $t0, $t0, 0x1FF8
     ori    $t1, $0 , 1
     sh     $t1, 0($t0)
